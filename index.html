@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#6366f1" />
+  <meta name="description" content="A beautiful daily to-do app with water tracking, reminders, and calendar" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="To-Do" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%236366f1' width='192' height='192'/><text x='50%' y='50%' font-size='120' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>✓</text></svg>" />
+  <title>To-Do</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Color tokens (light mode) ── */
+    body {
+      --bg-from: #e0e7ff; --bg-to: #f0fdf4;
+      --card:    #ffffff;
+      --text:    #1f2937;
+      --heading: #1e1b4b;
+      --subtle:  #6b7280;
+      --muted:   #9ca3af;
+      --border:  #e5e7eb;
+      --task-bg: #f9fafb;
+      --input-bg:#ffffff;
+      --del-hover-bg: #fff1f2;
+      --shadow:  rgba(0,0,0,0.10);
+      /* water */
+      --water:          #0ea5e9;
+      --water-dark:     #0284c7;
+      --water-fill-top: #38bdf8;
+      --water-fill-bot: #0369a1;
+    }
+
+    /* ── Dark mode overrides ── */
+    body.dark {
+      --bg-from: #0f0f1a; --bg-to: #0f0f1a;
+      --card:    #1e1e2e;
+      --text:    #e5e7eb;
+      --heading: #c7d2fe;
+      --subtle:  #9ca3af;
+      --muted:   #6b7280;
+      --border:  #3f3f5a;
+      --task-bg: #2a2a3e;
+      --input-bg:#2a2a3e;
+      --del-hover-bg: #3b1f1f;
+      --shadow:  rgba(0,0,0,0.40);
+      --water-fill-top: #0ea5e9;
+      --water-fill-bot: #0c4a6e;
+    }
+
+    .hidden { display: none !important; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg-from) 0%, var(--bg-to) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 16px 80px;
+      transition: background 0.3s;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px var(--shadow);
+      width: 100%;
+      max-width: 480px;
+      padding: 32px 28px 28px;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--heading);
+      margin-bottom: 4px;
+      transition: color 0.3s;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: var(--subtle);
+      transition: color 0.3s;
+    }
+
+    /* ── Dark mode toggle ── */
+    .btn-theme {
+      background: var(--task-bg);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      padding: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--subtle);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      min-width: 44px;
+      min-height: 44px;
+      flex-shrink: 0;
+      margin-left: 12px;
+      touch-action: manipulation;
+    }
+    .btn-theme:hover  { border-color: #6366f1; color: #6366f1; }
+    .btn-theme:active { opacity: 0.7; }
+    .icon-sun  { display: none; }
+    .icon-moon { display: block; }
+    body.dark .icon-sun  { display: block; }
+    body.dark .icon-moon { display: none; }
+
+    /* ── TAB BAR ── */
+    .tab-bar {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+      transition: border-color 0.3s;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px 6px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      touch-action: manipulation;
+      letter-spacing: 0.01em;
+    }
+    .tab-btn:hover { color: var(--text); }
+    #tab-tasks.active { color: #6366f1; border-bottom-color: #6366f1; }
+    #tab-water.active { color: var(--water); border-bottom-color: var(--water); }
+    #tab-cal.active   { color: #10b981;  border-bottom-color: #10b981; }
+
+    /* ── Add Task button (replaces inline form) ── */
+    .btn-open-modal {
+      width: 100%;
+      padding: 13px;
+      background: var(--task-bg);
+      color: #6366f1;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s, border-color 0.2s, border-style 0.2s;
+      touch-action: manipulation;
+    }
+    .btn-open-modal:hover {
+      background: #eef2ff;
+      border-color: #6366f1;
+      border-style: solid;
+    }
+    body.dark .btn-open-modal:hover { background: #1e1b4b; }
+
+    /* ── REMINDERS ── */
+    .reminders-block {
+      margin-bottom: 24px;
+      padding: 16px 16px 14px;
+      background: var(--task-bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .reminders-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .reminders-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #0d9488;
+    }
+    .reminders-done-count {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .reminder-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 4px;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .reminder-item + .reminder-item {
+      border-top: 1px solid var(--border);
+    }
+    .reminder-item.done-today { background: #f0fdf4; border-radius: 8px; }
+    body.dark .reminder-item.done-today { background: #052e16; }
+    .reminder-check {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+      touch-action: manipulation;
+      background: var(--card);
+      flex-shrink: 0;
+    }
+    .reminder-check:hover { border-color: #0d9488; }
+    .reminder-item.done-today .reminder-check { background: #0d9488; border-color: #0d9488; }
+    .reminder-text {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.4;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: color 0.15s;
+      word-break: break-word;
+    }
+    .reminder-item.done-today .reminder-text { text-decoration: line-through; color: var(--muted); }
+    .btn-del-reminder {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s, background 0.15s;
+      touch-action: manipulation;
+      flex-shrink: 0;
+    }
+    .btn-del-reminder:hover { color: #ef4444; background: var(--del-hover-bg); }
+    .reminders-empty {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 6px 0 8px;
+    }
+    .reminder-add-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1.5px solid var(--border);
+      transition: border-color 0.3s;
+    }
+    .reminder-input {
+      flex: 1;
+      padding: 8px 11px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--input-bg);
+      outline: none;
+      transition: border-color 0.2s, background 0.3s, color 0.3s;
+    }
+    .reminder-input:focus { border-color: #0d9488; }
+    .reminder-input::placeholder { color: var(--muted); }
+    .btn-reminder-add {
+      padding: 8px 14px;
+      background: #0d9488;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      touch-action: manipulation;
+      white-space: nowrap;
+    }
+    .btn-reminder-add:hover { background: #0f766e; }
+
+    /* ── Sections ── */
+    .section-block { margin-bottom: 20px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      min-height: 44px;
+    }
+
+    .section-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: 20px;
+      color: #fff;
+    }
+    .pill-school { background: #6366f1; }
+    .pill-work   { background: #10b981; }
+    .pill-misc   { background: #f59e0b; }
+
+    .section-count {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 500;
+      flex: 1;
+      transition: color 0.3s;
+    }
+
+    .section-chevron {
+      color: var(--muted);
+      transition: transform 0.2s, color 0.3s;
+      display: flex;
+    }
+    .section-block.collapsed .section-chevron { transform: rotate(-90deg); }
+
+    .section-list { list-style: none; }
+    .section-block.collapsed .section-list { display: none; }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center;
+      padding: 20px 0 12px;
+    }
+    .empty p { font-size: 0.875rem; color: var(--muted); }
+
+    /* ── Task item ── */
+    .task {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 10px;
+      border-radius: 12px;
+      background: var(--task-bg);
+      margin-bottom: 7px;
+      animation: slideIn 0.2s ease;
+      transition: background 0.3s, opacity 0.2s;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .task.removing {
+      opacity: 0;
+      transform: translateX(18px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    /* Custom checkbox */
+    .task input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s, border-color 0.15s;
+      touch-action: manipulation;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .section-block[data-section="school"] .task input[type="checkbox"]:checked { background: #6366f1; border-color: #6366f1; }
+    .section-block[data-section="work"]   .task input[type="checkbox"]:checked { background: #10b981; border-color: #10b981; }
+    .section-block[data-section="misc"]   .task input[type="checkbox"]:checked { background: #f59e0b; border-color: #f59e0b; }
+
+    .task input[type="checkbox"]:checked::after {
+      content: "";
+      display: block;
+      width: 5px;
+      height: 9px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translateY(-1px);
+    }
+
+    /* Task body (text + meta) */
+    .task-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .task-text {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--text);
+      cursor: pointer;
+      word-break: break-word;
+      line-height: 1.4;
+      transition: color 0.15s;
+      touch-action: manipulation;
+    }
+    .task.done .task-text { text-decoration: line-through; color: var(--muted); }
+
+    /* Sublabel + due date meta row */
+    .task-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 6px;
+    }
+
+    .task-label-pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1.5;
+    }
+
+    .task-due-chip {
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: var(--task-bg);
+      color: var(--muted);
+      border: 1.5px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      line-height: 1.5;
+    }
+    .task-due-chip.overdue { background: #fff1f2; color: #ef4444; border-color: #fca5a5; }
+    .task-due-chip.today   { background: #fff7ed; color: #f59e0b; border-color: #fcd34d; }
+    body.dark .task-due-chip.overdue { background: #3b1f1f; color: #f87171; border-color: #7f1d1d; }
+    body.dark .task-due-chip.today   { background: #3b2406; color: #fbbf24; border-color: #92400e; }
+
+    /* Edit + Delete buttons */
+    .btn-edit-task, .btn-delete {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 7px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, background 0.15s;
+      min-width: 32px;
+      min-height: 32px;
+      margin-top: 1px;
+      touch-action: manipulation;
+      flex-shrink: 0;
+    }
+    .btn-edit-task:hover  { color: #6366f1; background: #eef2ff; }
+    .btn-delete:hover     { color: #ef4444; background: var(--del-hover-bg); }
+    body.dark .btn-edit-task:hover { background: #1e1b4b; }
+
+    /* ── Footer + sync tools ── */
+    .footer {
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: right;
+      transition: color 0.3s;
+    }
+
+    .sync-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      transition: border-color 0.3s;
+    }
+
+    .btn-sync {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.78rem;
+      color: var(--muted);
+      padding: 6px 4px;
+      border-radius: 6px;
+      transition: color 0.15s;
+      touch-action: manipulation;
+    }
+    .btn-sync:hover { color: #6366f1; }
+
+    /* ══════════════════════════════════════════════════════
+       TASK MODAL (add & edit)
+    ══════════════════════════════════════════════════════ */
+    .task-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 200;
+    }
+    .task-modal-overlay.hidden { display: none; }
+
+    .task-modal-box {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.28);
+    }
+
+    .modal-heading-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modal-heading-row h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--heading);
+    }
+    .btn-modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s, background 0.15s;
+      touch-action: manipulation;
+    }
+    .btn-modal-close:hover { color: var(--text); background: var(--task-bg); }
+
+    .modal-form-group { margin-bottom: 15px; }
+    .modal-lbl {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+    .modal-lbl span { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--muted); }
+
+    .modal-input {
+      width: 100%;
+      padding: 11px 13px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--input-bg);
+      outline: none;
+      transition: border-color 0.2s, background 0.3s, color 0.3s;
+    }
+    .modal-input:focus { border-color: #6366f1; }
+    .modal-input::placeholder { color: var(--muted); }
+
+    .modal-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Label + color row */
+    .modal-label-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .modal-label-row .modal-input { flex: 1; }
+    .modal-color-btn {
+      width: 44px;
+      height: 44px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      cursor: pointer;
+      background: var(--input-bg);
+      flex-shrink: 0;
+      transition: border-color 0.2s;
+    }
+    .modal-color-btn:focus { border-color: #6366f1; outline: none; }
+
+    /* Color preset swatches */
+    .color-presets {
+      display: flex;
+      gap: 8px;
+      margin-top: 9px;
+      flex-wrap: wrap;
+    }
+    .color-dot {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s;
+      flex-shrink: 0;
+      outline: 3px solid transparent;
+      outline-offset: 2px;
+    }
+    .color-dot:hover { transform: scale(1.15); }
+    .color-dot.selected { outline-color: var(--text); }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 22px;
+    }
+    .btn-modal-cancel {
+      padding: 10px 18px;
+      background: var(--task-bg);
+      color: var(--text);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: border-color 0.15s;
+    }
+    .btn-modal-cancel:hover { border-color: var(--muted); }
+    .btn-modal-save {
+      padding: 10px 20px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: background 0.15s;
+    }
+    .btn-modal-save:hover { background: #4f46e5; }
+
+    /* ══════════════════════════════════════════════════════
+       IMPORT OVERLAY
+    ══════════════════════════════════════════════════════ */
+    .import-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+    .import-overlay.hidden { display: none; }
+
+    .import-box {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+    }
+    .import-box h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--heading);
+      margin-bottom: 6px;
+    }
+    .import-box p {
+      font-size: 0.82rem;
+      color: var(--subtle);
+      margin-bottom: 12px;
+    }
+    .import-box textarea {
+      width: 100%;
+      height: 120px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 13px;
+      font-family: monospace;
+      color: var(--text);
+      background: var(--input-bg);
+      resize: vertical;
+      outline: none;
+      margin-bottom: 12px;
+    }
+    .import-box textarea:focus { border-color: #6366f1; }
+    .import-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .btn-import-cancel {
+      padding: 9px 16px;
+      background: var(--task-bg);
+      color: var(--text);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .btn-import-confirm {
+      padding: 9px 16px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .btn-import-confirm:hover { background: #4f46e5; }
+
+    /* ══════════════════════════════════════════════════════
+       CALENDAR TAB
+    ══════════════════════════════════════════════════════ */
+    .cal-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .cal-month-label {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--heading);
+      transition: color 0.3s;
+    }
+    .btn-cal-nav {
+      background: var(--task-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--subtle);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      touch-action: manipulation;
+    }
+    .btn-cal-nav:hover { border-color: #10b981; color: #10b981; }
+
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .cal-weekday {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 4px 0;
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      margin-bottom: 18px;
+    }
+
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.83rem;
+      font-weight: 500;
+      color: var(--text);
+      padding: 2px 0;
+      transition: background 0.15s, color 0.15s;
+      gap: 2px;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .cal-day:hover:not(.cal-day-other) { background: var(--task-bg); }
+    .cal-day-other { color: var(--muted); cursor: default; opacity: 0.45; }
+    .cal-day-other:hover { background: none; }
+    .cal-day-today {
+      background: #eef2ff;
+      color: #6366f1;
+      font-weight: 700;
+      box-shadow: inset 0 0 0 2px #6366f1;
+    }
+    body.dark .cal-day-today { background: #1e1b4b; }
+    .cal-day-selected {
+      background: #6366f1 !important;
+      color: #fff !important;
+      box-shadow: none !important;
+    }
+
+    .cal-dot-row {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+      justify-content: center;
+      min-height: 7px;
+    }
+    .cal-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .cal-dot-school { background: #6366f1; }
+    .cal-dot-work   { background: #10b981; }
+    .cal-dot-misc   { background: #f59e0b; }
+    .cal-day-selected .cal-dot { background: rgba(255,255,255,0.75) !important; }
+
+    /* Tasks list below calendar */
+    .cal-tasks {
+      border-top: 1.5px solid var(--border);
+      padding-top: 16px;
+      transition: border-color 0.3s;
+    }
+    .cal-tasks-header {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--heading);
+      margin-bottom: 12px;
+      transition: color 0.3s;
+    }
+    .cal-tasks-empty {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       WATER TRACKER
+    ══════════════════════════════════════════════════════ */
+    .water-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .water-drop { font-size: 2.2rem; line-height: 1; flex-shrink: 0; }
+    .water-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--heading);
+      margin-bottom: 3px;
+      transition: color 0.3s;
+    }
+    .water-sub { font-size: 0.78rem; color: var(--muted); }
+
+    .bottle-counter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 10px;
+    }
+    .btn-water-ctrl {
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      background: var(--water);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.1s, opacity 0.2s;
+      touch-action: manipulation;
+      box-shadow: 0 3px 10px rgba(14,165,233,0.40);
+      flex-shrink: 0;
+    }
+    .btn-water-ctrl:hover  { background: var(--water-dark); }
+    .btn-water-ctrl:active { transform: scale(0.92); }
+    .btn-water-ctrl:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .bottle-display { text-align: center; min-width: 90px; }
+    .bottle-num {
+      display: block;
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--water);
+      line-height: 1;
+      transition: color 0.3s;
+      font-variant-numeric: tabular-nums;
+    }
+    .bottle-label { font-size: 0.78rem; color: var(--muted); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+
+    .water-oz-text { text-align: center; font-size: 0.9rem; color: var(--subtle); margin-bottom: 22px; transition: color 0.3s; }
+
+    .water-bar-track {
+      width: 100%; height: 54px;
+      border-radius: 14px;
+      background: var(--task-bg);
+      border: 2px solid var(--border);
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 10px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .water-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(180deg, var(--water-fill-top) 0%, var(--water-fill-bot) 100%);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      transition: width 0.65s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+    .water-fill::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 40%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 100%);
+      border-radius: 12px 12px 0 0;
+      pointer-events: none;
+    }
+    .wave {
+      position: absolute;
+      top: -10px; left: -100%;
+      width: 300%; height: 22px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 50%;
+      animation: slosh 2.6s ease-in-out infinite;
+    }
+    @keyframes slosh {
+      0%   { transform: translateX(0)   scaleY(1);    }
+      20%  { transform: translateX(7%)  scaleY(0.82); }
+      50%  { transform: translateX(0)   scaleY(1.08); }
+      75%  { transform: translateX(-6%) scaleY(0.88); }
+      100% { transform: translateX(0)   scaleY(1);    }
+    }
+    .water-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+      transition: color 0.3s;
+    }
+    .water-pct-label { font-weight: 700; color: var(--water); font-size: 0.9rem; }
+    .water-complete {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #ecfdf5;
+      border: 2px solid #6ee7b7;
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #065f46;
+      animation: fadeInUp 0.35s ease;
+    }
+    body.dark .water-complete { background: #064e3b; border-color: #059669; color: #6ee7b7; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>My Day</h1>
+      <p class="subtitle">Stay on top of your day</p>
+    </div>
+    <button class="btn-theme" id="theme-btn" aria-label="Toggle dark mode">
+      <svg class="icon-moon" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
+      </svg>
+      <svg class="icon-sun" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/>
+        <path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button class="tab-btn" id="tab-tasks" onclick="switchTab('tasks')">My Tasks</button>
+    <button class="tab-btn" id="tab-cal"   onclick="switchTab('cal')">Calendar</button>
+    <button class="tab-btn" id="tab-water" onclick="switchTab('water')">Water Drank</button>
+  </div>
+
+  <!-- ══ TASKS PANEL ══ -->
+  <div id="panel-tasks">
+    <!-- Add Task button -->
+    <button class="btn-open-modal" onclick="openTaskModal(-1)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add Task
+    </button>
+
+    <!-- Reminders -->
+    <div class="reminders-block">
+      <div class="reminders-header">
+        <div class="reminders-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 1 1-.18-3.5"/>
+          </svg>
+          Daily Reminders
+        </div>
+        <span class="reminders-done-count" id="reminders-done-count"></span>
+      </div>
+      <div id="reminders-list"></div>
+      <div class="reminder-add-row">
+        <input class="reminder-input" id="reminder-input" type="text"
+               placeholder="Add a recurring reminder…" maxlength="100" autocomplete="off" />
+        <button class="btn-reminder-add" onclick="addReminder()">Add</button>
+      </div>
+    </div>
+
+    <!-- School section -->
+    <div class="section-block" id="block-school" data-section="school">
+      <div class="section-header" id="hdr-school">
+        <span class="section-pill pill-school">School</span>
+        <span class="section-count" id="count-school"></span>
+        <span class="section-chevron">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </span>
+      </div>
+      <ul class="section-list" id="list-school"></ul>
+    </div>
+
+    <!-- Work section -->
+    <div class="section-block" id="block-work" data-section="work">
+      <div class="section-header" id="hdr-work">
+        <span class="section-pill pill-work">Work</span>
+        <span class="section-count" id="count-work"></span>
+        <span class="section-chevron">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </span>
+      </div>
+      <ul class="section-list" id="list-work"></ul>
+    </div>
+
+    <!-- Misc section -->
+    <div class="section-block" id="block-misc" data-section="misc">
+      <div class="section-header" id="hdr-misc">
+        <span class="section-pill pill-misc">Misc</span>
+        <span class="section-count" id="count-misc"></span>
+        <span class="section-chevron">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </span>
+      </div>
+      <ul class="section-list" id="list-misc"></ul>
+    </div>
+
+    <p class="footer" id="footer"></p>
+
+    <div class="sync-row">
+      <button class="btn-sync" id="export-btn">↑ Export tasks</button>
+      <button class="btn-sync" id="import-btn">↓ Import tasks</button>
+    </div>
+  </div><!-- /panel-tasks -->
+
+  <!-- ══ WATER PANEL ══ -->
+  <div id="panel-water" class="hidden">
+    <div class="water-header">
+      <span class="water-drop">💧</span>
+      <div>
+        <p class="water-title">Today's Water Intake</p>
+        <p class="water-sub">26 oz per bottle · Goal: 128 oz (1 gallon)</p>
+      </div>
+    </div>
+    <div class="bottle-counter">
+      <button class="btn-water-ctrl" id="btn-minus" onclick="adjustBottles(-1)" aria-label="Remove one bottle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+      <div class="bottle-display">
+        <span class="bottle-num" id="bottle-num">0</span>
+        <span class="bottle-label">bottles</span>
+      </div>
+      <button class="btn-water-ctrl" id="btn-plus" onclick="adjustBottles(1)" aria-label="Add one bottle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    </div>
+    <p class="water-oz-text" id="water-oz-text">0 oz consumed</p>
+    <div class="water-bar-track">
+      <div class="water-fill" id="water-fill">
+        <div class="wave" id="water-wave"></div>
+      </div>
+    </div>
+    <div class="water-stats">
+      <span><span class="water-pct-label" id="water-pct">0%</span> of daily goal</span>
+      <span id="water-remaining">128 oz to go</span>
+    </div>
+    <div class="water-complete hidden" id="water-complete">
+      🎉 Daily goal reached — well done!
+    </div>
+  </div><!-- /panel-water -->
+
+  <!-- ══ CALENDAR PANEL ══ -->
+  <div id="panel-cal" class="hidden">
+    <div class="cal-nav">
+      <button class="btn-cal-nav" onclick="prevMonth()" aria-label="Previous month">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <span class="cal-month-label" id="cal-month-label"></span>
+      <button class="btn-cal-nav" onclick="nextMonth()" aria-label="Next month">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+    </div>
+    <div class="cal-weekdays">
+      <div class="cal-weekday">Su</div>
+      <div class="cal-weekday">Mo</div>
+      <div class="cal-weekday">Tu</div>
+      <div class="cal-weekday">We</div>
+      <div class="cal-weekday">Th</div>
+      <div class="cal-weekday">Fr</div>
+      <div class="cal-weekday">Sa</div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-tasks" id="cal-tasks"></div>
+  </div><!-- /panel-cal -->
+
+</div><!-- /card -->
+
+<!-- Import overlay -->
+<div class="import-overlay hidden" id="import-overlay">
+  <div class="import-box">
+    <h2>Import tasks</h2>
+    <p>Paste the exported text from your other device below.</p>
+    <textarea id="import-textarea" placeholder='[{"text":"Buy milk","done":false,"section":"misc"},…]'></textarea>
+    <div class="import-actions">
+      <button class="btn-import-cancel" id="import-cancel">Cancel</button>
+      <button class="btn-import-confirm" id="import-confirm">Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- Task modal (add & edit) -->
+<div class="task-modal-overlay hidden" id="task-modal-overlay" onclick="if(event.target===this)closeTaskModal()">
+  <div class="task-modal-box">
+    <div class="modal-heading-row">
+      <h2 id="modal-heading">Add Task</h2>
+      <button class="btn-modal-close" onclick="closeTaskModal()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-form-group">
+      <label class="modal-lbl" for="modal-text">Task</label>
+      <input class="modal-input" type="text" id="modal-text" placeholder="What needs to be done?" maxlength="200" autocomplete="off" />
+    </div>
+
+    <div class="modal-form-row modal-form-group">
+      <div>
+        <label class="modal-lbl" for="modal-section">Section</label>
+        <select class="modal-input" id="modal-section">
+          <option value="school">School</option>
+          <option value="work">Work</option>
+          <option value="misc">Misc</option>
+        </select>
+      </div>
+      <div>
+        <label class="modal-lbl" for="modal-due">Due Date <span>(optional)</span></label>
+        <input class="modal-input" type="date" id="modal-due" />
+      </div>
+    </div>
+
+    <div class="modal-form-group">
+      <label class="modal-lbl">Label <span>(optional — e.g. CS101, Project A)</span></label>
+      <div class="modal-label-row">
+        <input class="modal-input" type="text" id="modal-label" placeholder="Label name" maxlength="30" />
+        <input type="color" class="modal-color-btn" id="modal-label-color" value="#6366f1"
+               oninput="updateColorSwatches(this.value)" title="Pick label color" />
+      </div>
+      <div class="color-presets">
+        <button class="color-dot" data-color="#6366f1" style="background:#6366f1" onclick="setLabelColor('#6366f1')" aria-label="Indigo"></button>
+        <button class="color-dot" data-color="#3b82f6" style="background:#3b82f6" onclick="setLabelColor('#3b82f6')" aria-label="Blue"></button>
+        <button class="color-dot" data-color="#10b981" style="background:#10b981" onclick="setLabelColor('#10b981')" aria-label="Emerald"></button>
+        <button class="color-dot" data-color="#f59e0b" style="background:#f59e0b" onclick="setLabelColor('#f59e0b')" aria-label="Amber"></button>
+        <button class="color-dot" data-color="#ef4444" style="background:#ef4444" onclick="setLabelColor('#ef4444')" aria-label="Red"></button>
+        <button class="color-dot" data-color="#8b5cf6" style="background:#8b5cf6" onclick="setLabelColor('#8b5cf6')" aria-label="Violet"></button>
+        <button class="color-dot" data-color="#ec4899" style="background:#ec4899" onclick="setLabelColor('#ec4899')" aria-label="Pink"></button>
+        <button class="color-dot" data-color="#64748b" style="background:#64748b" onclick="setLabelColor('#64748b')" aria-label="Slate"></button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeTaskModal()">Cancel</button>
+      <button class="btn-modal-save" id="modal-save" onclick="saveTaskModal()">Add Task</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SECTIONS = ['school', 'work', 'misc'];
+
+  // ── Safe localStorage ─────────────────────────────────
+  function lsGet(key, fallback) {
+    try { const v = localStorage.getItem(key); return v !== null ? v : fallback; }
+    catch(e) { return fallback; }
+  }
+  function lsSet(key, value) {
+    try { localStorage.setItem(key, value); } catch(e) {}
+  }
+
+  // ── Tasks state ───────────────────────────────────────
+  let tasks     = JSON.parse(lsGet('tasks',     '[]'));
+  let collapsed = JSON.parse(lsGet('collapsed', '{}'));
+  let dark      = lsGet('dark', 'false') === 'true';
+
+  // Migrate existing tasks to new data model
+  tasks.forEach(t => {
+    if (!t.section)    t.section    = 'misc';
+    if (t.label      === undefined) t.label      = '';
+    if (t.labelColor  === undefined) t.labelColor  = '#6366f1';
+    if (t.dueDate    === undefined) t.dueDate    = '';
+  });
+
+  // ── Dark mode ─────────────────────────────────────────
+  if (dark) document.body.classList.add('dark');
+  document.getElementById('theme-btn').addEventListener('click', () => {
+    dark = !dark;
+    document.body.classList.toggle('dark', dark);
+    lsSet('dark', dark);
+  });
+
+  // ── Persist ───────────────────────────────────────────
+  function save() { lsSet('tasks', JSON.stringify(tasks)); }
+  function saveCollapsed() { lsSet('collapsed', JSON.stringify(collapsed)); }
+
+  // ── Date helpers ──────────────────────────────────────
+  function today() { return new Date().toISOString().slice(0, 10); }
+
+  function formatDueDate(dateStr) {
+    if (!dateStr) return '';
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
+  function dueDateStatus(dateStr) {
+    if (!dateStr) return '';
+    const t = today();
+    if (dateStr < t) return 'overdue';
+    if (dateStr === t) return 'today';
+    return '';
+  }
+
+  // ── Task meta HTML (label pill + due chip) ────────────
+  function buildTaskMeta(task) {
+    let html = '';
+    if (task.label) {
+      const c = task.labelColor || '#6366f1';
+      html += `<span class="task-label-pill" style="background:${c}22;color:${c};border:1.5px solid ${c}55">${escapeHtml(task.label)}</span>`;
+    }
+    if (task.dueDate) {
+      const status = dueDateStatus(task.dueDate);
+      const icon   = status === 'overdue' ? '⚠' : '📅';
+      html += `<span class="task-due-chip${status ? ' ' + status : ''}">${icon} ${formatDueDate(task.dueDate)}</span>`;
+    }
+    return html;
+  }
+
+  // ── Render tasks ──────────────────────────────────────
+  function render() {
+    let totalDone = 0, totalAll = 0;
+
+    SECTIONS.forEach(sec => {
+      const list     = document.getElementById('list-' + sec);
+      const count    = document.getElementById('count-' + sec);
+      const block    = document.getElementById('block-' + sec);
+      const secTasks = tasks.filter(t => t.section === sec);
+
+      block.classList.toggle('collapsed', !!collapsed[sec]);
+
+      const done = secTasks.filter(t => t.done).length;
+      count.textContent = secTasks.length ? `${done}/${secTasks.length} done` : 'no tasks';
+      totalDone += done;
+      totalAll  += secTasks.length;
+
+      list.innerHTML = '';
+
+      if (secTasks.length === 0) {
+        list.innerHTML = `<li class="empty"><p>No tasks — click "Add Task" above!</p></li>`;
+        return;
+      }
+
+      secTasks.forEach(task => {
+        const globalIndex = tasks.indexOf(task);
+        const li = document.createElement('li');
+        li.className = 'task' + (task.done ? ' done' : '');
+
+        const meta = buildTaskMeta(task);
+        li.innerHTML = `
+          <input type="checkbox" ${task.done ? 'checked' : ''} aria-label="Complete task" />
+          <div class="task-body">
+            <span class="task-text">${escapeHtml(task.text)}</span>
+            ${meta ? `<div class="task-meta">${meta}</div>` : ''}
+          </div>
+          <button class="btn-edit-task" aria-label="Edit task" title="Edit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          <button class="btn-delete" aria-label="Delete task" title="Delete">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7
+                   m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 014 0v2"/>
+            </svg>
+          </button>`;
+
+        li.querySelector('input[type="checkbox"]').addEventListener('change', () => toggle(globalIndex));
+        li.querySelector('.task-text').addEventListener('click', () => toggle(globalIndex));
+        li.querySelector('.btn-edit-task').addEventListener('click', () => openTaskModal(globalIndex));
+        li.querySelector('.btn-delete').addEventListener('click', () => remove(li, globalIndex));
+
+        list.appendChild(li);
+      });
+    });
+
+    const footer = document.getElementById('footer');
+    if (totalAll === 0) {
+      footer.textContent = '';
+    } else if (totalDone === totalAll) {
+      footer.textContent = `All ${totalAll} task${totalAll !== 1 ? 's' : ''} complete!`;
+    } else {
+      footer.textContent = `${totalDone} of ${totalAll} complete`;
+    }
+  }
+
+  // ── Collapse toggle ───────────────────────────────────
+  SECTIONS.forEach(sec => {
+    document.getElementById('hdr-' + sec).addEventListener('click', () => {
+      collapsed[sec] = !collapsed[sec];
+      saveCollapsed();
+      render();
+    });
+  });
+
+  // ── Toggle / Remove ───────────────────────────────────
+  function toggle(i) {
+    tasks[i].done = !tasks[i].done;
+    render();
+    save();
+  }
+
+  function remove(li, i) {
+    li.classList.add('removing');
+    li.addEventListener('transitionend', () => {
+      tasks.splice(i, 1);
+      render();
+      save();
+      if (selectedCalDate) renderCalendar();
+    }, { once: true });
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ══════════════════════════════════════════════════════
+  // TASK MODAL (add + edit)
+  // ══════════════════════════════════════════════════════
+  let editingIndex = -1;
+
+  function openTaskModal(i) {
+    editingIndex = i;
+    const isEdit = i >= 0;
+    document.getElementById('modal-heading').textContent = isEdit ? 'Edit Task' : 'Add Task';
+    document.getElementById('modal-save').textContent    = isEdit ? 'Save Changes' : 'Add Task';
+
+    if (isEdit) {
+      const t = tasks[i];
+      document.getElementById('modal-text').value         = t.text;
+      document.getElementById('modal-section').value      = t.section;
+      document.getElementById('modal-due').value          = t.dueDate    || '';
+      document.getElementById('modal-label').value        = t.label      || '';
+      document.getElementById('modal-label-color').value  = t.labelColor || '#6366f1';
+      updateColorSwatches(t.labelColor || '#6366f1');
+    } else {
+      document.getElementById('modal-text').value         = '';
+      document.getElementById('modal-section').value      = 'school';
+      document.getElementById('modal-due').value          = '';
+      document.getElementById('modal-label').value        = '';
+      document.getElementById('modal-label-color').value  = '#6366f1';
+      updateColorSwatches('#6366f1');
+    }
+
+    document.getElementById('task-modal-overlay').classList.remove('hidden');
+    document.getElementById('modal-text').focus();
+  }
+
+  function closeTaskModal() {
+    document.getElementById('task-modal-overlay').classList.add('hidden');
+    editingIndex = -1;
+  }
+
+  function saveTaskModal() {
+    const text = document.getElementById('modal-text').value.trim();
+    if (!text) { document.getElementById('modal-text').focus(); return; }
+
+    const newTask = {
+      text,
+      done:       editingIndex >= 0 ? tasks[editingIndex].done : false,
+      section:    document.getElementById('modal-section').value,
+      label:      document.getElementById('modal-label').value.trim(),
+      labelColor: document.getElementById('modal-label-color').value,
+      dueDate:    document.getElementById('modal-due').value,
+    };
+
+    if (editingIndex === -1) {
+      tasks.push(newTask);
+    } else {
+      tasks[editingIndex] = newTask;
+    }
+
+    render();
+    save();
+    if (selectedCalDate) renderCalendar();
+    closeTaskModal();
+  }
+
+  function setLabelColor(color) {
+    document.getElementById('modal-label-color').value = color;
+    updateColorSwatches(color);
+  }
+
+  function updateColorSwatches(selected) {
+    const norm = selected.toLowerCase();
+    document.querySelectorAll('.color-dot').forEach(dot => {
+      dot.classList.toggle('selected', dot.dataset.color.toLowerCase() === norm);
+    });
+  }
+
+  // ESC closes any open modal
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeTaskModal();
+      document.getElementById('import-overlay').classList.add('hidden');
+    }
+  });
+
+  // ── Export ────────────────────────────────────────────
+  document.getElementById('export-btn').addEventListener('click', () => {
+    const json = JSON.stringify(tasks);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(json).then(() => {
+        const btn = document.getElementById('export-btn');
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => { btn.textContent = '↑ Export tasks'; }, 2000);
+      }).catch(() => fallbackCopy(json));
+    } else {
+      fallbackCopy(json);
+    }
+  });
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('export-btn');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = '↑ Export tasks'; }, 2000);
+  }
+
+  // ── Import ────────────────────────────────────────────
+  const importOverlay = document.getElementById('import-overlay');
+
+  document.getElementById('import-btn').addEventListener('click', () => {
+    document.getElementById('import-textarea').value = '';
+    importOverlay.classList.remove('hidden');
+    document.getElementById('import-textarea').focus();
+  });
+  document.getElementById('import-cancel').addEventListener('click', () => {
+    importOverlay.classList.add('hidden');
+  });
+  document.getElementById('import-confirm').addEventListener('click', () => {
+    const raw = document.getElementById('import-textarea').value.trim();
+    try {
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) throw new Error();
+      tasks = parsed
+        .filter(t => t && typeof t.text === 'string')
+        .map(t => ({
+          text:       String(t.text).slice(0, 200),
+          done:       !!t.done,
+          section:    ['school','work','misc'].includes(t.section) ? t.section : 'misc',
+          label:      typeof t.label === 'string' ? t.label : '',
+          labelColor: typeof t.labelColor === 'string' ? t.labelColor : '#6366f1',
+          dueDate:    typeof t.dueDate === 'string' ? t.dueDate : '',
+        }));
+      render();
+      save();
+      importOverlay.classList.add('hidden');
+    } catch(e) {
+      alert('Could not read that data. Make sure you copied the full exported text.');
+    }
+  });
+  importOverlay.addEventListener('click', e => {
+    if (e.target === importOverlay) importOverlay.classList.add('hidden');
+  });
+
+  // ══════════════════════════════════════════════════════
+  // CALENDAR
+  // ══════════════════════════════════════════════════════
+  const now0 = new Date();
+  let calYear  = now0.getFullYear();
+  let calMonth = now0.getMonth();   // 0-indexed
+  let selectedCalDate = null;
+
+  function prevMonth() {
+    if (calMonth === 0) { calMonth = 11; calYear--; }
+    else calMonth--;
+    renderCalendar();
+  }
+  function nextMonth() {
+    if (calMonth === 11) { calMonth = 0; calYear++; }
+    else calMonth++;
+    renderCalendar();
+  }
+
+  function selectCalDay(dateStr) {
+    selectedCalDate = selectedCalDate === dateStr ? null : dateStr;
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    const todayStr   = today();
+    const firstDay   = new Date(calYear, calMonth, 1).getDay();  // 0=Sun
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+    // Build dueMap: dateStr → [task, ...]
+    const dueMap = {};
+    tasks.forEach(t => {
+      if (t.dueDate) {
+        if (!dueMap[t.dueDate]) dueMap[t.dueDate] = [];
+        dueMap[t.dueDate].push(t);
+      }
+    });
+
+    // Month label
+    const label = new Date(calYear, calMonth, 1)
+      .toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    document.getElementById('cal-month-label').textContent = label;
+
+    // Build grid HTML
+    let cells = '';
+
+    // Leading blank cells
+    for (let i = 0; i < firstDay; i++) {
+      cells += `<div class="cal-day cal-day-other"></div>`;
+    }
+
+    // Day cells
+    for (let d = 1; d <= daysInMonth; d++) {
+      const mm  = String(calMonth + 1).padStart(2, '0');
+      const dd  = String(d).padStart(2, '0');
+      const ds  = `${calYear}-${mm}-${dd}`;
+      const isToday    = ds === todayStr;
+      const isSelected = ds === selectedCalDate;
+      const dayTasks   = dueMap[ds] || [];
+
+      let cls = 'cal-day';
+      if (isToday)    cls += ' cal-day-today';
+      if (isSelected) cls += ' cal-day-selected';
+
+      // Dots (deduplicated by section)
+      let dots = '';
+      if (dayTasks.length > 0) {
+        const sections = [...new Set(dayTasks.map(t => t.section))];
+        dots = `<div class="cal-dot-row">${sections.map(s => `<span class="cal-dot cal-dot-${s}"></span>`).join('')}</div>`;
+      }
+
+      cells += `<div class="${cls}" onclick="selectCalDay('${ds}')">${d}${dots}</div>`;
+    }
+
+    // Trailing blank cells
+    const total = firstDay + daysInMonth;
+    const trail = total % 7 === 0 ? 0 : 7 - (total % 7);
+    for (let i = 0; i < trail; i++) {
+      cells += `<div class="cal-day cal-day-other"></div>`;
+    }
+
+    document.getElementById('cal-grid').innerHTML = cells;
+
+    // Render selected day task list
+    const calTasksEl = document.getElementById('cal-tasks');
+    if (!selectedCalDate) {
+      calTasksEl.innerHTML = '';
+      return;
+    }
+
+    const dayTasksSelected = tasks.filter(t => t.dueDate === selectedCalDate);
+    const [sy, sm, sd] = selectedCalDate.split('-').map(Number);
+    const dayLabel = new Date(sy, sm - 1, sd)
+      .toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+
+    if (dayTasksSelected.length === 0) {
+      calTasksEl.innerHTML = `
+        <div class="cal-tasks-header">${dayLabel}</div>
+        <div class="cal-tasks-empty">No tasks due on this day.</div>`;
+      return;
+    }
+
+    const SECTION_COLORS = { school: '#6366f1', work: '#10b981', misc: '#f59e0b' };
+
+    calTasksEl.innerHTML = `
+      <div class="cal-tasks-header">${dayLabel}</div>
+      ${dayTasksSelected.map(task => {
+        const gi = tasks.indexOf(task);
+        const sc = SECTION_COLORS[task.section] || '#6b7280';
+        const meta = buildTaskMeta(task);
+        return `
+          <div class="task ${task.done ? 'done' : ''}">
+            <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleFromCal(${gi})" aria-label="Complete task"
+              style="margin-top:2px;flex-shrink:0;" />
+            <div class="task-body">
+              <span class="task-text" style="cursor:default">${escapeHtml(task.text)}</span>
+              <div class="task-meta">
+                <span class="task-label-pill" style="background:${sc}22;color:${sc};border:1.5px solid ${sc}55">${task.section}</span>
+                ${task.label ? `<span class="task-label-pill" style="background:${task.labelColor}22;color:${task.labelColor};border:1.5px solid ${task.labelColor}55">${escapeHtml(task.label)}</span>` : ''}
+              </div>
+            </div>
+          </div>`;
+      }).join('')}`;
+
+    // Re-apply checkbox styling (section-block data-section isn't present in calendar)
+    calTasksEl.querySelectorAll('input[type="checkbox"]').forEach((cb, idx) => {
+      const task = dayTasksSelected[idx];
+      const sc   = SECTION_COLORS[task.section] || '#6b7280';
+      cb.style.accentColor = sc;
+    });
+  }
+
+  function toggleFromCal(i) {
+    tasks[i].done = !tasks[i].done;
+    save();
+    render();
+    renderCalendar();
+  }
+
+  // ══════════════════════════════════════════════════════
+  // WATER TRACKER
+  // ══════════════════════════════════════════════════════
+  const BOTTLE_OZ = 26;
+  const GOAL_OZ   = 128;
+
+  function loadWater() {
+    const t = today();
+    try {
+      const raw = localStorage.getItem('water');
+      if (raw) {
+        const w = JSON.parse(raw);
+        if (w && w.date === t) return w;
+      }
+    } catch(e) {}
+    return { date: t, bottles: 0 };
+  }
+  function saveWater() { lsSet('water', JSON.stringify(water)); }
+
+  let water = loadWater();
+
+  function adjustBottles(delta) {
+    water.bottles = Math.max(0, Math.min(10, water.bottles + delta));
+    renderWater();
+    saveWater();
+  }
+
+  function renderWater() {
+    const oz   = water.bottles * BOTTLE_OZ;
+    const pct  = Math.min(100, Math.round((oz / GOAL_OZ) * 100));
+    const rem  = Math.max(0, GOAL_OZ - oz);
+    const done = oz >= GOAL_OZ;
+    document.getElementById('bottle-num').textContent    = water.bottles;
+    document.getElementById('water-oz-text').textContent = `${oz} oz consumed`;
+    document.getElementById('water-fill').style.width   = pct + '%';
+    document.getElementById('water-pct').textContent    = pct + '%';
+    document.getElementById('water-remaining').textContent = done ? '🎉 Goal reached!' : `${rem} oz to go`;
+    document.getElementById('water-complete').classList.toggle('hidden', !done);
+    document.getElementById('water-wave').style.display = water.bottles > 0 ? 'block' : 'none';
+    document.getElementById('btn-minus').disabled = water.bottles === 0;
+  }
+
+  // ══════════════════════════════════════════════════════
+  // TAB SWITCHING
+  // ══════════════════════════════════════════════════════
+  function switchTab(tab) {
+    ['tasks', 'water', 'cal'].forEach(t => {
+      document.getElementById('panel-' + t).classList.toggle('hidden', tab !== t);
+      document.getElementById('tab-'   + t).classList.toggle('active', tab === t);
+    });
+    lsSet('active-tab', tab);
+    if (tab === 'cal') renderCalendar();
+  }
+
+  // ══════════════════════════════════════════════════════
+  // REMINDERS
+  // ══════════════════════════════════════════════════════
+  let reminders = JSON.parse(lsGet('reminders', '[]'));
+  function saveReminders() { lsSet('reminders', JSON.stringify(reminders)); }
+
+  function addReminder() {
+    const input = document.getElementById('reminder-input');
+    const text  = input.value.trim();
+    if (!text) { input.focus(); return; }
+    reminders.push({ id: Date.now(), text, lastDone: '' });
+    saveReminders();
+    renderReminders();
+    input.value = '';
+    input.focus();
+  }
+
+  function toggleReminder(id) {
+    const r = reminders.find(r => r.id === id);
+    if (!r) return;
+    const t = today();
+    r.lastDone = (r.lastDone === t) ? '' : t;
+    saveReminders();
+    renderReminders();
+  }
+
+  function deleteReminder(id) {
+    reminders = reminders.filter(r => r.id !== id);
+    saveReminders();
+    renderReminders();
+  }
+
+  function renderReminders() {
+    const t       = today();
+    const listEl  = document.getElementById('reminders-list');
+    const countEl = document.getElementById('reminders-done-count');
+
+    const doneCount = reminders.filter(r => r.lastDone === t).length;
+    countEl.textContent = reminders.length ? `${doneCount} / ${reminders.length} done` : '';
+
+    if (reminders.length === 0) {
+      listEl.innerHTML = `<div class="reminders-empty">No reminders yet — add one below!</div>`;
+      return;
+    }
+
+    listEl.innerHTML = reminders.map(r => {
+      const done = r.lastDone === t;
+      const check = done
+        ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+        : '';
+      return `
+        <div class="reminder-item${done ? ' done-today' : ''}">
+          <button class="reminder-check" onclick="toggleReminder(${r.id})" aria-label="${done ? 'Uncheck' : 'Check'} reminder">
+            ${check}
+          </button>
+          <span class="reminder-text" onclick="toggleReminder(${r.id})">${escapeHtml(r.text)}</span>
+          <button class="btn-del-reminder" onclick="deleteReminder(${r.id})" aria-label="Delete reminder">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>`;
+    }).join('');
+  }
+
+  document.getElementById('reminder-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addReminder();
+  });
+
+  // ── PWA Service Worker Registration ─────────────────────────────
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(registration => {
+        console.log('Service Worker registered:', registration);
+      }).catch(error => {
+        console.log('Service Worker registration failed:', error);
+      });
+    });
+  }
+
+  // ── Init ─────────────────────────────────────────────
+  render();
+  renderReminders();
+  renderWater();
+  switchTab(lsGet('active-tab', 'tasks'));
+</script>
+</body>
+</html>
