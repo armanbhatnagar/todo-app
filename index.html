@@ -487,6 +487,97 @@
     .btn-delete:hover     { color: #ef4444; background: var(--del-hover-bg); }
     body.dark .btn-edit-task:hover { background: #1e1b4b; }
 
+    /* ── Star (priority) button ── */
+    .btn-star {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 7px;
+      font-size: 1.05rem;
+      line-height: 1;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, background 0.15s;
+      min-width: 32px;
+      min-height: 32px;
+      margin-top: 1px;
+      touch-action: manipulation;
+      flex-shrink: 0;
+    }
+    .btn-star:hover  { color: #f59e0b; background: #fef3c7; }
+    .btn-star.active { color: #f59e0b; }
+    body.dark .btn-star:hover { background: #3b2406; }
+
+    /* ── Priority highlight in section lists ── */
+    .task.priority {
+      border-left: 3px solid #f59e0b;
+      background: rgba(245, 158, 11, 0.05);
+    }
+    body.dark .task.priority { background: rgba(245, 158, 11, 0.07); }
+
+    /* ── Top 3 Today section ── */
+    .top3-section {
+      border: 1.5px solid #fcd34d;
+      border-radius: 14px;
+      background: rgba(254, 252, 232, 0.65);
+      padding: 14px 14px 8px;
+      margin-bottom: 18px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    body.dark .top3-section {
+      background: rgba(59, 36, 6, 0.45);
+      border-color: #92400e;
+    }
+    .top3-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .top3-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--heading);
+      letter-spacing: 0.01em;
+    }
+    .top3-count {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: #b45309;
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      border-radius: 10px;
+      padding: 1px 9px;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark .top3-count {
+      background: #3b2406;
+      color: #fbbf24;
+      border-color: #92400e;
+    }
+    .top3-list { list-style: none; }
+    .top3-list .task input[type="checkbox"]:checked { background: #f59e0b; border-color: #f59e0b; }
+
+    /* ── Priority limit message ── */
+    .priority-limit-msg {
+      font-size: 0.78rem;
+      color: #b45309;
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      border-radius: 8px;
+      padding: 6px 10px;
+      margin-bottom: 8px;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark .priority-limit-msg {
+      background: #3b2406;
+      color: #fbbf24;
+      border-color: #92400e;
+    }
+
     /* ── Footer + sync tools ── */
     .footer {
       margin-top: 16px;
@@ -1060,6 +1151,18 @@
       </div>
     </div>
 
+    <!-- Top 3 Today -->
+    <div id="top3-section" class="top3-section hidden">
+      <div class="top3-header">
+        <span class="top3-title">⭐ Top 3 Today</span>
+        <span class="top3-count" id="top3-count">0 / 3</span>
+      </div>
+      <p id="priority-limit-msg" class="priority-limit-msg hidden">
+        Only 3 priorities allowed today — deselect one first.
+      </p>
+      <ul id="list-top3" class="top3-list"></ul>
+    </div>
+
     <!-- School section -->
     <div class="section-block" id="block-school" data-section="school">
       <div class="section-header" id="hdr-school">
@@ -1274,7 +1377,16 @@
     if (t.label      === undefined) t.label      = '';
     if (t.labelColor  === undefined) t.labelColor  = '#6366f1';
     if (t.dueDate    === undefined) t.dueDate    = '';
+    if (t.isPriority  === undefined) t.isPriority  = false;
   });
+
+  // Reset priority status at the start of a new day
+  const _storedPriorityDate = lsGet('priorityDate', '');
+  if (_storedPriorityDate !== today()) {
+    tasks.forEach(t => { t.isPriority = false; });
+    lsSet('priorityDate', today());
+    save();
+  }
 
   // ── Dark mode ─────────────────────────────────────────
   if (dark) document.body.classList.add('dark');
@@ -1289,7 +1401,7 @@
   function saveCollapsed() { lsSet('collapsed', JSON.stringify(collapsed)); }
 
   // ── Date helpers ──────────────────────────────────────
-  function today() { return new Date().toISOString().slice(0, 10); }
+  function today() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
   function formatDueDate(dateStr) {
     if (!dateStr) return '';
@@ -1324,6 +1436,32 @@
   function render() {
     let totalDone = 0, totalAll = 0;
 
+    // ── Top 3 Today section ──
+    const priorityTasks = tasks.filter(t => t.isPriority);
+    const top3El    = document.getElementById('top3-section');
+    const top3List  = document.getElementById('list-top3');
+    const top3Count = document.getElementById('top3-count');
+    top3El.classList.toggle('hidden', priorityTasks.length === 0);
+    top3Count.textContent = `${priorityTasks.length} / 3`;
+    top3List.innerHTML = '';
+    priorityTasks.forEach(task => {
+      const gi = tasks.indexOf(task);
+      const li = document.createElement('li');
+      li.className = 'task' + (task.done ? ' done' : '');
+      const meta = buildTaskMeta(task);
+      li.innerHTML = `
+        <button class="btn-star active" title="Remove from priorities">★</button>
+        <input type="checkbox" ${task.done ? 'checked' : ''} aria-label="Complete task" />
+        <div class="task-body">
+          <span class="task-text">${escapeHtml(task.text)}</span>
+          ${meta ? `<div class="task-meta">${meta}</div>` : ''}
+        </div>`;
+      li.querySelector('.btn-star').addEventListener('click', () => togglePriority(gi));
+      li.querySelector('input[type="checkbox"]').addEventListener('change', () => toggle(gi));
+      li.querySelector('.task-text').addEventListener('click', () => toggle(gi));
+      top3List.appendChild(li);
+    });
+
     SECTIONS.forEach(sec => {
       const list     = document.getElementById('list-' + sec);
       const count    = document.getElementById('count-' + sec);
@@ -1347,7 +1485,7 @@
       secTasks.forEach(task => {
         const globalIndex = tasks.indexOf(task);
         const li = document.createElement('li');
-        li.className = 'task' + (task.done ? ' done' : '');
+        li.className = 'task' + (task.done ? ' done' : '') + (task.isPriority ? ' priority' : '');
 
         const meta = buildTaskMeta(task);
         li.innerHTML = `
@@ -1356,6 +1494,7 @@
             <span class="task-text">${escapeHtml(task.text)}</span>
             ${meta ? `<div class="task-meta">${meta}</div>` : ''}
           </div>
+          <button class="btn-star${task.isPriority ? ' active' : ''}" title="${task.isPriority ? 'Remove priority' : 'Set as priority'}">★</button>
           <button class="btn-edit-task" aria-label="Edit task" title="Edit">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -1372,6 +1511,7 @@
 
         li.querySelector('input[type="checkbox"]').addEventListener('change', () => toggle(globalIndex));
         li.querySelector('.task-text').addEventListener('click', () => toggle(globalIndex));
+        li.querySelector('.btn-star').addEventListener('click', () => togglePriority(globalIndex));
         li.querySelector('.btn-edit-task').addEventListener('click', () => openTaskModal(globalIndex));
         li.querySelector('.btn-delete').addEventListener('click', () => remove(li, globalIndex));
 
@@ -1419,6 +1559,38 @@
     return String(str)
       .replace(/&/g,'&amp;').replace(/</g,'&lt;')
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Priority toggle ────────────────────────────────────
+  let _priorityMsgTimer;
+
+  function showPriorityMsg() {
+    const el = document.getElementById('priority-limit-msg');
+    el.classList.remove('hidden');
+    clearTimeout(_priorityMsgTimer);
+    _priorityMsgTimer = setTimeout(() => el.classList.add('hidden'), 3000);
+  }
+
+  function hidePriorityMsg() {
+    clearTimeout(_priorityMsgTimer);
+    document.getElementById('priority-limit-msg').classList.add('hidden');
+  }
+
+  function togglePriority(i) {
+    const t = tasks[i];
+    if (t.isPriority) {
+      t.isPriority = false;
+      hidePriorityMsg();
+    } else {
+      if (tasks.filter(x => x.isPriority).length >= 3) {
+        showPriorityMsg();
+        return;
+      }
+      t.isPriority = true;
+      lsSet('priorityDate', today());
+    }
+    save();
+    render();
   }
 
   // ══════════════════════════════════════════════════════
@@ -1469,7 +1641,13 @@
       label:      document.getElementById('modal-label').value.trim(),
       labelColor: document.getElementById('modal-label-color').value,
       dueDate:    document.getElementById('modal-due').value,
+      isPriority: editingIndex >= 0 ? tasks[editingIndex].isPriority : false,
     };
+
+    // Clear priority if due date is set to a future date
+    if (newTask.dueDate && newTask.dueDate !== today()) {
+      newTask.isPriority = false;
+    }
 
     if (editingIndex === -1) {
       tasks.push(newTask);
