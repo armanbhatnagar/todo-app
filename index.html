@@ -11,6 +11,9 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%236366f1' width='192' height='192'/><text x='50%' y='50%' font-size='120' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>✓</text></svg>" />
   <title>My Daily To-Do</title>
+  <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore-compat.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -120,6 +123,56 @@
     .icon-moon { display: block; }
     body.dark .icon-sun  { display: block; }
     body.dark .icon-moon { display: none; }
+
+    /* ── Auth / sync button ── */
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .btn-auth {
+      background: var(--task-bg);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      padding: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--subtle);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      min-width: 44px;
+      min-height: 44px;
+      flex-shrink: 0;
+      touch-action: manipulation;
+      position: relative;
+    }
+    .btn-auth:hover { border-color: #6366f1; color: #6366f1; }
+    .btn-auth.signed-in { border-color: #6366f1; }
+    .auth-icon-cloud { display: block; flex-shrink: 0; }
+    .auth-avatar {
+      display: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #6366f1;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .btn-auth.signed-in .auth-icon-cloud { display: none; }
+    .btn-auth.signed-in .auth-avatar { display: flex; }
+    .btn-auth.syncing::after {
+      content: '';
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: syncpulse 1.5s infinite;
+    }
+    @keyframes syncpulse {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
+    }
 
     /* ── TAB BAR ── */
     .tab-bar {
@@ -578,6 +631,22 @@
       border-color: #92400e;
     }
 
+    /* ── Water streak bar (in Calendar tab) ── */
+    .water-streak-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--subtle);
+      margin-bottom: 14px;
+      font-weight: 500;
+      flex-wrap: wrap;
+      transition: color 0.3s;
+      min-height: 20px;
+    }
+    .water-streak-bar strong { color: #0ea5e9; }
+    .wst-sep { color: var(--muted); }
+
     /* ── Footer + sync tools ── */
     .footer {
       margin-top: 16px;
@@ -940,6 +1009,7 @@
     .cal-dot-school { background: #6366f1; }
     .cal-dot-work   { background: #10b981; }
     .cal-dot-misc   { background: #f59e0b; }
+    .cal-dot-water  { background: #0ea5e9; }
     .cal-day-selected .cal-dot { background: rgba(255,255,255,0.75) !important; }
 
     /* Tasks list below calendar */
@@ -1103,15 +1173,23 @@
       <h1>My Day</h1>
       <p class="subtitle">Stay on top of your day</p>
     </div>
-    <button class="btn-theme" id="theme-btn" aria-label="Toggle dark mode">
-      <svg class="icon-moon" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
-      </svg>
-      <svg class="icon-sun" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="5"/>
-        <path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-      </svg>
-    </button>
+    <div class="header-actions">
+      <button class="btn-auth" id="auth-btn" onclick="handleAuthClick()" aria-label="Sign in to sync" title="Sign in to sync across devices">
+        <svg class="auth-icon-cloud" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+        </svg>
+        <span class="auth-avatar" id="auth-avatar"></span>
+      </button>
+      <button class="btn-theme" id="theme-btn" aria-label="Toggle dark mode">
+        <svg class="icon-moon" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
+        </svg>
+        <svg class="icon-sun" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <!-- Tab bar -->
@@ -1255,6 +1333,7 @@
 
   <!-- ══ CALENDAR PANEL ══ -->
   <div id="panel-cal" class="hidden">
+    <div id="water-streak-bar" class="water-streak-bar"></div>
     <div class="cal-nav">
       <button class="btn-cal-nav" onclick="prevMonth()" aria-label="Previous month">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -1280,6 +1359,7 @@
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-tasks" id="cal-tasks"></div>
   </div><!-- /panel-cal -->
+
 
 </div><!-- /card -->
 
@@ -1355,6 +1435,22 @@
 </div>
 
 <script>
+  // ── Firebase ──────────────────────────────────────────
+  firebase.initializeApp({
+    apiKey:            "AIzaSyD5b4O-EvlgDNbD3TzhdInltm_VrHULX78",
+    authDomain:        "todoapp-e049d.firebaseapp.com",
+    projectId:         "todoapp-e049d",
+    storageBucket:     "todoapp-e049d.firebasestorage.app",
+    messagingSenderId: "127672043794",
+    appId:             "1:127672043794:web:0cd2f204d054b22fa34bcb"
+  });
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
+  db.enablePersistence().catch(() => {}); // offline support
+
+  let currentUser  = null;
+  let _unsubscribe = null;
+
   const SECTIONS = ['school', 'work', 'misc'];
 
   // ── Safe localStorage ─────────────────────────────────
@@ -1394,14 +1490,16 @@
     dark = !dark;
     document.body.classList.toggle('dark', dark);
     lsSet('dark', dark);
+    saveToFirestore();
   });
 
   // ── Persist ───────────────────────────────────────────
-  function save() { lsSet('tasks', JSON.stringify(tasks)); }
-  function saveCollapsed() { lsSet('collapsed', JSON.stringify(collapsed)); }
+  function save() { lsSet('tasks', JSON.stringify(tasks)); saveToFirestore(); }
+  function saveCollapsed() { lsSet('collapsed', JSON.stringify(collapsed)); saveToFirestore(); }
 
   // ── Date helpers ──────────────────────────────────────
   function today() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+  function getYesterday() { const d = new Date(); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
   function formatDueDate(dateStr) {
     if (!dateStr) return '';
@@ -1770,6 +1868,14 @@
   }
 
   function renderCalendar() {
+    // Water streak bar
+    const wsBar = document.getElementById('water-streak-bar');
+    wsBar.innerHTML = (waterStreak.currentStreak > 0 || waterStreak.longestStreak > 0)
+      ? `<span>💧 <strong>${waterStreak.currentStreak}</strong>-day streak</span>
+         <span class="wst-sep">·</span>
+         <span>🏆 Best: <strong>${waterStreak.longestStreak}</strong> day${waterStreak.longestStreak !== 1 ? 's' : ''}</span>`
+      : `<span style="color:var(--muted);font-size:0.78rem">Hit your water goal to start a streak</span>`;
+
     const todayStr   = today();
     const firstDay   = new Date(calYear, calMonth, 1).getDay();  // 0=Sun
     const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
@@ -1809,11 +1915,14 @@
       if (isToday)    cls += ' cal-day-today';
       if (isSelected) cls += ' cal-day-selected';
 
-      // Dots (deduplicated by section)
+      // Dots (deduplicated by section + water hit)
+      const hasWaterHit = waterStreak.history && waterStreak.history[ds];
       let dots = '';
-      if (dayTasks.length > 0) {
+      if (dayTasks.length > 0 || hasWaterHit) {
         const sections = [...new Set(dayTasks.map(t => t.section))];
-        dots = `<div class="cal-dot-row">${sections.map(s => `<span class="cal-dot cal-dot-${s}"></span>`).join('')}</div>`;
+        let dotHtml = sections.map(s => `<span class="cal-dot cal-dot-${s}"></span>`).join('');
+        if (hasWaterHit) dotHtml += `<span class="cal-dot cal-dot-water"></span>`;
+        dots = `<div class="cal-dot-row">${dotHtml}</div>`;
       }
 
       cells += `<div class="${cls}" onclick="selectCalDay('${ds}')">${d}${dots}</div>`;
@@ -1901,14 +2010,42 @@
     } catch(e) {}
     return { date: t, bottles: 0 };
   }
-  function saveWater() { lsSet('water', JSON.stringify(water)); }
+  function saveWater() { lsSet('water', JSON.stringify(water)); saveToFirestore(); }
 
   let water = loadWater();
+
+  let waterStreak = JSON.parse(lsGet('waterStreak', 'null')) ||
+    { currentStreak: 0, longestStreak: 0, lastHit: '', history: {} };
+  function saveWaterStreak() { lsSet('waterStreak', JSON.stringify(waterStreak)); saveToFirestore(); }
+
+  // Reset streak if a day was missed — deterministic, runs on every load
+  (function() {
+    const yest = getYesterday();
+    if (waterStreak.lastHit && waterStreak.lastHit !== today() && waterStreak.lastHit !== yest) {
+      waterStreak.currentStreak = 0;
+      saveWaterStreak();
+    }
+  })();
+
+  function checkWaterGoalHit() {
+    if (water.bottles * BOTTLE_OZ < GOAL_OZ) return;
+    const t = today(), yest = getYesterday();
+    if (waterStreak.lastHit === t) return; // already recorded today
+    waterStreak.currentStreak = (waterStreak.lastHit === yest) ? waterStreak.currentStreak + 1 : 1;
+    if (waterStreak.currentStreak > waterStreak.longestStreak)
+      waterStreak.longestStreak = waterStreak.currentStreak;
+    waterStreak.lastHit = t;
+    if (!waterStreak.history) waterStreak.history = {};
+    waterStreak.history[t] = true;
+    saveWaterStreak();
+    if (!document.getElementById('panel-cal').classList.contains('hidden')) renderCalendar();
+  }
 
   function adjustBottles(delta) {
     water.bottles = Math.max(0, Math.min(10, water.bottles + delta));
     renderWater();
     saveWater();
+    checkWaterGoalHit();
   }
 
   function renderWater() {
@@ -1942,7 +2079,7 @@
   // REMINDERS
   // ══════════════════════════════════════════════════════
   let reminders = JSON.parse(lsGet('reminders', '[]'));
-  function saveReminders() { lsSet('reminders', JSON.stringify(reminders)); }
+  function saveReminders() { lsSet('reminders', JSON.stringify(reminders)); saveToFirestore(); }
 
   function addReminder() {
     const input = document.getElementById('reminder-input');
@@ -2018,11 +2155,99 @@
     });
   }
 
+  // ══════════════════════════════════════════════════════
+  // FIREBASE AUTH + SYNC
+  // ══════════════════════════════════════════════════════
+  function handleAuthClick() {
+    if (currentUser) {
+      if (confirm('Sign out? The app will keep working with your local data.')) signOutUser();
+    } else {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(err => console.warn('Sign-in cancelled', err));
+    }
+  }
+
+  function signOutUser() {
+    if (_unsubscribe) { _unsubscribe(); _unsubscribe = null; }
+    auth.signOut();
+  }
+
+  function updateAuthUI(user) {
+    const btn    = document.getElementById('auth-btn');
+    const avatar = document.getElementById('auth-avatar');
+    if (user) {
+      btn.classList.add('signed-in');
+      btn.title = `Signed in as ${user.email}\nClick to sign out`;
+      avatar.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
+    } else {
+      btn.classList.remove('signed-in', 'syncing');
+      btn.title = 'Sign in to sync across devices';
+      avatar.textContent = '';
+    }
+  }
+
+  function applyFirestoreData(data) {
+    if (!data) return;
+    if (Array.isArray(data.tasks))     { tasks     = data.tasks;     lsSet('tasks',     JSON.stringify(tasks)); }
+    if (Array.isArray(data.reminders)) { reminders = data.reminders; lsSet('reminders', JSON.stringify(reminders)); }
+    if (data.collapsed)   { collapsed   = data.collapsed;   lsSet('collapsed',   JSON.stringify(collapsed)); }
+    if (data.waterStreak) { waterStreak = data.waterStreak; lsSet('waterStreak', JSON.stringify(waterStreak)); }
+    if (data.water)       { water       = data.water;       lsSet('water',       JSON.stringify(water)); }
+    if (data.priorityDate){ lsSet('priorityDate', data.priorityDate); }
+    if (data.dark !== undefined) {
+      dark = data.dark === 'true';
+      lsSet('dark', data.dark);
+      document.body.classList.toggle('dark', dark);
+    }
+    render(); renderReminders(); renderWater();
+  }
+
+  let _fsTimer;
+  function saveToFirestore() {
+    if (!currentUser) return;
+    document.getElementById('auth-btn').classList.add('syncing');
+    clearTimeout(_fsTimer);
+    _fsTimer = setTimeout(() => {
+      db.collection('users').doc(currentUser.uid).set({
+        tasks, reminders, collapsed,
+        dark: String(dark),
+        waterStreak, water,
+        priorityDate: lsGet('priorityDate', ''),
+      }).then(() => {
+        document.getElementById('auth-btn').classList.remove('syncing');
+      }).catch(console.error);
+    }, 1000);
+  }
+
+  function setupRealtimeSync(uid) {
+    if (_unsubscribe) _unsubscribe();
+    _unsubscribe = db.collection('users').doc(uid).onSnapshot(snap => {
+      if (snap.exists) {
+        applyFirestoreData(snap.data());
+      } else {
+        saveToFirestore(); // first sign-in — push local data up
+      }
+    }, console.error);
+  }
+
+  function initAuth() {
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      updateAuthUI(user);
+      if (user) {
+        setupRealtimeSync(user.uid);
+      } else {
+        if (_unsubscribe) { _unsubscribe(); _unsubscribe = null; }
+      }
+    });
+  }
+
   // ── Init ─────────────────────────────────────────────
   render();
   renderReminders();
   renderWater();
   switchTab(lsGet('active-tab', 'tasks'));
+  initAuth();
 </script>
 </body>
 </html>
