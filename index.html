@@ -980,7 +980,6 @@
     }
     .set-input:focus { outline: none; border-color: #22c55e; }
     .set-x { color: var(--muted); font-size: 0.78rem; }
-    .ex-volume { font-size: 0.75rem; color: var(--muted); margin-top: 6px; font-weight: 500; }
     .btn-add-set, .btn-add-exercise {
       margin-top: 6px; padding: 4px 10px;
       border: 1.5px dashed var(--border); border-radius: 6px;
@@ -990,12 +989,6 @@
     }
     .btn-add-set:hover, .btn-add-exercise:hover { color: #22c55e; border-color: #22c55e; }
     .btn-add-exercise { display: block; width: 100%; margin-top: 4px; }
-    .workout-total-volume {
-      background: var(--card); border: 1.5px solid var(--border);
-      border-radius: 8px; padding: 8px 12px;
-      font-size: 0.82rem; color: var(--text); margin: 10px 0;
-    }
-    .workout-total-volume strong { color: #22c55e; }
     .intensity-row { display: flex; gap: 6px; margin-bottom: 4px; }
     .intensity-btn {
       width: 32px; height: 32px; border-radius: 8px;
@@ -1012,6 +1005,35 @@
     }
     .workout-notes:focus { outline: none; border-color: #22c55e; }
     .workout-notes::placeholder { color: var(--muted); }
+
+    /* SPINNERS */
+    .spinner-group {
+      display: flex; align-items: center;
+      border: 1.5px solid var(--border); border-radius: 6px; overflow: hidden;
+    }
+    .spinner-btn {
+      width: 32px; height: 34px; background: var(--card); border: none;
+      color: var(--text); font-size: 1.1rem; font-weight: 700;
+      cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+      transition: background 0.1s, transform 0.1s, opacity 0.1s;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .spinner-btn:hover { background: #6366f1; color: #fff; }
+    .spinner-btn.pressing { transform: scale(0.88); opacity: 0.65; background: #6366f1; color: #fff; }
+    .spinner-value {
+      min-width: 40px; text-align: center;
+      font-size: 0.88rem; font-weight: 600; color: var(--text); padding: 0 2px;
+    }
+    .spinner-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .spinner-label { font-size: 0.62rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .set-actions { display: flex; gap: 8px; margin: 3px 0 6px 42px; }
+    .set-action-btn {
+      font-size: 0.72rem; color: var(--muted); background: none;
+      border: 1px solid var(--border); border-radius: 5px;
+      padding: 3px 8px; cursor: pointer; touch-action: manipulation;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .set-action-btn:hover { color: #6366f1; border-color: #6366f1; }
 
     /* ══ QUICK STIM PANEL ══ */
     .stim-activity-row {
@@ -2462,6 +2484,7 @@
   }
 
   // ── Tasks state ───────────────────────────────────────
+  let _spinTimer = null, _spinLongPressed = false;
   let tasks     = JSON.parse(lsGet('tasks',     '[]'));
   let collapsed = JSON.parse(lsGet('collapsed', '{}'));
   let dark      = lsGet('dark', 'false') === 'true';
@@ -3369,6 +3392,52 @@
     }
   }
 
+  function spinPressDown(btn) {
+    _spinLongPressed = false;
+    btn.classList.add('pressing');
+    _spinTimer = setTimeout(() => { _spinLongPressed = true; }, 500);
+  }
+  function spinPressUp(btn, dateStr, exIdx, setIdx, field, dir) {
+    clearTimeout(_spinTimer);
+    btn.classList.remove('pressing');
+    const delta = _spinLongPressed
+      ? (field === 'weight' ? dir * 5 : dir * 4)
+      : dir;
+    _spinLongPressed = false;
+    spinnerAdjust(dateStr, exIdx, setIdx, field, delta);
+  }
+  function spinnerAdjust(dateStr, exIdx, setIdx, field, delta) {
+    const day = ensureGymDay(dateStr);
+    const set = day.exercises[exIdx]?.sets[setIdx];
+    if (!set) return;
+    if (field === 'weight') {
+      set.weight = Math.max(0, Math.min(500, (parseFloat(set.weight) || 0) + delta));
+    } else {
+      set.reps = Math.max(1, Math.min(100, (parseInt(set.reps) || 0) + delta));
+    }
+    saveGymData();
+    const valEl = document.getElementById(`sv-${exIdx}-${setIdx}-${field}`);
+    if (valEl) valEl.textContent = set[field];
+  }
+  function duplicateGymSet(dateStr, exIdx, setIdx) {
+    const day = ensureGymDay(dateStr);
+    const set = day.exercises[exIdx]?.sets[setIdx];
+    if (!set) return;
+    day.exercises[exIdx].sets.splice(setIdx + 1, 0, { weight: set.weight, reps: set.reps });
+    saveGymData(); renderWorkoutPanel(dateStr); renderCalendarIfVisible();
+  }
+  function createDropset(dateStr, exIdx, setIdx) {
+    const day = ensureGymDay(dateStr);
+    const set = day.exercises[exIdx]?.sets[setIdx];
+    if (!set) return;
+    const w = parseFloat(set.weight) || 0;
+    const r = parseInt(set.reps) || 0;
+    const newW = Math.max(5, Math.round((w * 0.85) / 5) * 5);
+    const newR = r + 2;
+    day.exercises[exIdx].sets.splice(setIdx + 1, 0, { weight: newW, reps: newR });
+    saveGymData(); renderWorkoutPanel(dateStr); renderCalendarIfVisible();
+  }
+
   function setGymIntensity(dateStr, intensity) {
     const day = ensureGymDay(dateStr);
     day.intensity = intensity;
@@ -3573,22 +3642,39 @@
         const prevPR = getExercisePRExcluding(ex.name, dateStr);
         const isPR = ex.name && dayMax > 0 && dayMax > prevPR;
         const prBadge = isPR ? `<span class="pr-badge">🏆 New PR</span>` : '';
-        const exVol = calcExerciseVolume(ex);
         const datalistId = `ex-sug-${group}-${exIdx}`;
         const datalistHtml = suggestions.length > 0
           ? `<datalist id="${datalistId}">${suggestions.map(n => `<option value="${escapeHtml(n)}"></option>`).join('')}</datalist>`
           : '';
 
-        const setsHtml = (ex.sets||[]).map((s,si) => `
+        const mkSpinner = (di, si, field, val) => `
+          <div class="spinner-wrap">
+            <span class="spinner-label">${field === 'weight' ? 'lbs' : 'reps'}</span>
+            <div class="spinner-group">
+              <button class="spinner-btn"
+                onmousedown="spinPressDown(this)" onmouseup="spinPressUp(this,'${dateStr}',${di},${si},'${field}',-1)"
+                ontouchstart="spinPressDown(this);event.preventDefault()" ontouchend="spinPressUp(this,'${dateStr}',${di},${si},'${field}',-1);event.preventDefault()">−</button>
+              <span class="spinner-value" id="sv-${di}-${si}-${field}">${val||0}</span>
+              <button class="spinner-btn"
+                onmousedown="spinPressDown(this)" onmouseup="spinPressUp(this,'${dateStr}',${di},${si},'${field}',1)"
+                ontouchstart="spinPressDown(this);event.preventDefault()" ontouchend="spinPressUp(this,'${dateStr}',${di},${si},'${field}',1);event.preventDefault()">+</button>
+            </div>
+          </div>`;
+        const setsHtml = (ex.sets||[]).map((s,si) => {
+          const actionsHtml = `
+            <div class="set-actions">
+              <button class="set-action-btn" onclick="duplicateGymSet('${dateStr}',${exIdx},${si})">⊕ Duplicate</button>
+              <button class="set-action-btn" onclick="createDropset('${dateStr}',${exIdx},${si})">💧 Dropset</button>
+            </div>`;
+          return `
           <div class="set-row">
             <span class="set-num">Set ${si+1}</span>
-            <input type="number" class="set-input" value="${s.weight||''}" placeholder="lbs" min="0"
-                   onchange="updateGymSet('${dateStr}',${exIdx},${si},'weight',this.value)">
+            ${mkSpinner(exIdx, si, 'weight', s.weight)}
             <span class="set-x">×</span>
-            <input type="number" class="set-input" value="${s.reps||''}" placeholder="reps" min="0"
-                   onchange="updateGymSet('${dateStr}',${exIdx},${si},'reps',this.value)">
+            ${mkSpinner(exIdx, si, 'reps', s.reps)}
             <button class="set-remove" onclick="removeGymSet('${dateStr}',${exIdx},${si})">✕</button>
-          </div>`).join('');
+          </div>${actionsHtml}`;
+        }).join('');
 
         return `
           <div class="exercise-entry">
@@ -3601,7 +3687,6 @@
             </div>
             ${setsHtml}
             <button class="btn-add-set" onclick="addGymSet('${dateStr}',${exIdx})">+ Add Set</button>
-            <div class="ex-volume" id="ex-vol-${exIdx}">Volume: ${exVol > 0 ? exVol.toLocaleString()+' lbs' : '—'}</div>
           </div>`;
       }).join('');
 
@@ -3613,7 +3698,6 @@
         </div>`;
     });
 
-    const totalVol = calcDayVolume(dateStr);
     const intensityHtml = [1,2,3,4,5].map(n =>
       `<button class="intensity-btn ${(day.intensity||0) >= n ? 'active':''}" onclick="setGymIntensity('${dateStr}',${n})">${n}</button>`
     ).join('');
@@ -3623,9 +3707,6 @@
         <div class="workout-section-label">Body Groups</div>
         <div class="body-group-chips">${chipsHtml}</div>
         ${exercisesHtml}
-        <div class="workout-total-volume" ${totalVol === 0 ? 'style="display:none"' : ''}>
-          Total Volume: <strong id="workout-total-vol">${totalVol > 0 ? totalVol.toLocaleString()+' lbs' : ''}</strong>
-        </div>
         <div class="workout-section-label">Intensity</div>
         <div class="intensity-row">${intensityHtml}</div>
         <div class="workout-section-label">Notes</div>
