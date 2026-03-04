@@ -1764,6 +1764,90 @@
     #sw-bg[data-view="workout"] .sw-ship     { opacity: 0.18; }
     #sw-bg[data-view="stim"]    .sw-planet-2 { opacity: 0.20; }
     #sw-bg[data-view="stim"]    .sw-planet-3 { opacity: 0.16; }
+
+    /* ══ GOOGLE CALENDAR + LEGEND ════════════════════════ */
+    body { --gcal-arm-color: #9d174e; }
+
+    .cal-dot-gcal { background: var(--gcal-arm-color); }
+
+    /* ── Calendar legend ─────────────────────────────── */
+    .cal-legend {
+      display: flex; flex-wrap: wrap; gap: 6px 14px;
+      padding: 10px 12px; margin-top: 14px;
+      background: var(--task-bg); border: 1.5px solid var(--border);
+      border-radius: 10px; transition: background 0.3s, border-color 0.3s;
+    }
+    .cal-legend-item {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.76rem; color: var(--subtle);
+    }
+    .cal-legend-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .cal-legend-dot-gcal {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--gcal-arm-color); cursor: pointer; flex-shrink: 0;
+      transition: transform 0.15s;
+    }
+    .cal-legend-dot-gcal:hover { transform: scale(1.3); }
+
+    /* ── GCal sync indicator ─────────────────────────── */
+    .gcal-sync-dot {
+      display: inline-block; width: 6px; height: 6px;
+      border-radius: 50%; background: #10b981; margin-left: 6px;
+      vertical-align: middle; animation: syncpulse 1.2s ease-in-out infinite;
+    }
+    #gcal-sync-dot { display: none; }
+
+    /* ── GCal reconnect button ───────────────────────── */
+    .gcal-reconnect {
+      text-align: center; padding: 6px 0 10px;
+    }
+    .gcal-reconnect button {
+      font-size: 0.8rem; color: var(--muted); background: none;
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 5px 12px; cursor: pointer; font-family: inherit;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .gcal-reconnect button:hover { border-color: #6366f1; color: #6366f1; }
+
+    /* ── GCal events in selected-day panel ───────────── */
+    .cal-gcal-section {
+      margin-top: 14px; padding-top: 14px;
+      border-top: 1.5px solid var(--border);
+    }
+    .cal-gcal-section-title {
+      font-size: 0.74rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 10px;
+    }
+    .cal-gcal-event-item {
+      display: flex; align-items: flex-start; gap: 9px;
+      padding: 7px 0; border-bottom: 1px solid rgba(128,128,128,0.07);
+    }
+    .cal-gcal-event-item:last-child { border-bottom: none; }
+    .cal-gcal-event-name { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+    .cal-gcal-event-time { font-size: 0.77rem; color: var(--muted); margin-top: 2px; }
+    .cal-gcal-event-desc {
+      font-size: 0.77rem; color: var(--subtle); margin-top: 3px;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    /* ── Settings: Calendar color presets ────────────── */
+    .gcal-color-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px;
+    }
+    .gcal-color-label {
+      font-size: 0.9rem; font-weight: 500; color: var(--text);
+    }
+    .gcal-color-presets { display: flex; gap: 7px; }
+    .gcal-color-btn {
+      width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent;
+      cursor: pointer; transition: transform 0.15s, border-color 0.15s;
+    }
+    .gcal-color-btn:hover { transform: scale(1.2); }
+    .gcal-color-btn.active { border-color: var(--text); }
   </style>
 </head>
 <body>
@@ -1890,6 +1974,21 @@
               <span>Dark Mode</span>
               <div class="settings-toggle-pill" id="settings-dark-pill"></div>
             </button>
+          </div>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-section">
+          <div class="settings-section-title">Calendar</div>
+          <div class="gcal-color-row">
+            <span class="gcal-color-label">Event Color</span>
+            <div class="gcal-color-presets">
+              <button class="gcal-color-btn" data-color="#9d174e" style="background:#9d174e" onclick="setGcalArmColor('#9d174e')" title="Radicchio"></button>
+              <button class="gcal-color-btn" data-color="#1d4ed8" style="background:#1d4ed8" onclick="setGcalArmColor('#1d4ed8')" title="Blue"></button>
+              <button class="gcal-color-btn" data-color="#15803d" style="background:#15803d" onclick="setGcalArmColor('#15803d')" title="Green"></button>
+              <button class="gcal-color-btn" data-color="#7c3aed" style="background:#7c3aed" onclick="setGcalArmColor('#7c3aed')" title="Purple"></button>
+              <button class="gcal-color-btn" data-color="#c2410c" style="background:#c2410c" onclick="setGcalArmColor('#c2410c')" title="Orange"></button>
+              <button class="gcal-color-btn" data-color="#be185d" style="background:#be185d" onclick="setGcalArmColor('#be185d')" title="Pink"></button>
+            </div>
           </div>
         </div>
       </div>
@@ -2066,7 +2165,7 @@
           <path d="M15 18l-6-6 6-6"/>
         </svg>
       </button>
-      <span class="cal-month-label" id="cal-month-label"></span>
+      <span class="cal-month-label" id="cal-month-label"></span><span class="gcal-sync-dot" id="gcal-sync-dot"></span>
       <button class="btn-cal-nav" onclick="nextMonth()" aria-label="Next month">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
           <path d="M9 18l6-6-6-6"/>
@@ -2082,8 +2181,29 @@
       <div class="cal-weekday">Fr</div>
       <div class="cal-weekday">Sa</div>
     </div>
+    <div id="gcal-reconnect" class="gcal-reconnect hidden">
+      <button onclick="gcalReconnect()">🔗 Reconnect Google Calendar</button>
+    </div>
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-tasks" id="cal-tasks"></div>
+    <!-- Calendar legend -->
+    <div class="cal-legend" id="cal-legend">
+      <div class="cal-legend-item">
+        <span class="cal-legend-dot" style="background:#6366f1"></span><span>Tasks</span>
+      </div>
+      <div class="cal-legend-item">
+        <span class="cal-legend-dot" style="background:#22c55e"></span><span>Workout</span>
+      </div>
+      <div class="cal-legend-item">
+        <span class="cal-legend-dot" style="background:#0ea5e9"></span><span>Water Goal</span>
+      </div>
+      <div class="cal-legend-item">
+        <span class="cal-legend-dot-gcal" onclick="openGcalColorPicker()" title="Click to change color"></span><span>My Calendar</span>
+      </div>
+      <div class="cal-legend-item">
+        <span style="font-size:0.9rem;line-height:1">🎂</span><span>Birthdays</span>
+      </div>
+    </div>
   </div><!-- /panel-cal -->
 
   <!-- ══ WORKOUT PANEL ══ -->
@@ -2260,6 +2380,12 @@
     lsSet('priorityDate', today());
     save();
   }
+
+  // ── Google Calendar state ─────────────────────────
+  let gcalArmColor  = lsGet('gcalArmColor', '#9d174e');
+  let gcalEvents    = {};
+  let gcalCacheTime = parseInt(lsGet('gcalCacheTime', '0'), 10);
+  let gcalSyncTimer = null;
 
   // ── Theme & Mode ─────────────────────────────────────
   let appMode = lsGet('appMode', 'normal');
@@ -2799,6 +2925,18 @@
       }
     });
 
+    // Google Calendar event maps
+    const gcalPrimMap = {};
+    const gcalBdayMap = {};
+    if (gcalEvents.primary)   gcalEvents.primary.forEach(function(e)   { if (!gcalPrimMap[e.dateStr]) gcalPrimMap[e.dateStr]=[]; gcalPrimMap[e.dateStr].push(e); });
+    if (gcalEvents.birthdays) gcalEvents.birthdays.forEach(function(e) { if (!gcalBdayMap[e.dateStr]) gcalBdayMap[e.dateStr]=[]; gcalBdayMap[e.dateStr].push(e); });
+    // Invalidate cache if viewing a far-away month
+    if (gcalEvents.year !== undefined && (gcalEvents.year !== calYear || Math.abs(gcalEvents.month - calMonth) > 1)) {
+      gcalCacheTime = 0;
+      lsSet('gcalCacheTime', '0');
+      if (gcalTokenValid()) gcalFetchAll();
+    }
+
     // Month label
     const label = new Date(calYear, calMonth, 1)
       .toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
@@ -2828,12 +2966,16 @@
       // Dots: section colors + water + gym
       const hasWaterHit = waterStreak.history && waterStreak.history[ds];
       const hasGymHit   = gymData.history[ds] && gymData.history[ds].completed;
+      const dayGcalPrim = gcalPrimMap[ds] || [];
+      const dayGcalBday = gcalBdayMap[ds] || [];
       let dots = '';
-      if (dayTasks.length > 0 || hasWaterHit || hasGymHit) {
+      if (dayTasks.length > 0 || hasWaterHit || hasGymHit || dayGcalPrim.length || dayGcalBday.length) {
         const sections = [...new Set(dayTasks.map(t => t.section))];
         let dotHtml = sections.map(s => `<span class="cal-dot cal-dot-${s}"></span>`).join('');
-        if (hasWaterHit) dotHtml += `<span class="cal-dot cal-dot-water"></span>`;
-        if (hasGymHit)   dotHtml += `<span class="cal-dot cal-dot-gym"></span>`;
+        if (hasWaterHit)         dotHtml += `<span class="cal-dot cal-dot-water"></span>`;
+        if (hasGymHit)           dotHtml += `<span class="cal-dot cal-dot-gym"></span>`;
+        if (dayGcalPrim.length)  dotHtml += `<span class="cal-dot cal-dot-gcal"></span>`;
+        if (dayGcalBday.length)  dotHtml += `<span style="font-size:0.68rem;line-height:1">🎂</span>`;
         dots = `<div class="cal-dot-row">${dotHtml}</div>`;
       }
 
@@ -2913,6 +3055,12 @@
 
     // Render workout summary after DOM is set
     renderCalWorkoutSummary(selectedCalDate);
+
+    // Append gcal events to selected day panel
+    if (selectedCalDate) {
+      const gcalHtml = buildGcalDayHtml(selectedCalDate);
+      if (gcalHtml) document.getElementById('cal-tasks').insertAdjacentHTML('beforeend', gcalHtml);
+    }
   }
 
   function toggleFromCal(i) {
@@ -4076,7 +4224,12 @@
     const label = document.getElementById('view-trigger-label');
     if (label) label.textContent = VIEW_LABELS[tab] || tab;
     lsSet('active-tab', tab);
-    if (tab === 'cal')     renderCalendar();
+    if (tab === 'cal') {
+      renderCalendar();
+      if (currentUser && gcalTokenValid()) gcalSyncStart();
+    } else {
+      gcalSyncStop();
+    }
     if (tab === 'workout') renderWorkoutTab();
     if (tab === 'stim')    renderStimTab();
   }
@@ -4169,7 +4322,14 @@
       if (confirm('Sign out? The app will keep working with your local data.')) signOutUser();
     } else {
       const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(err => console.warn('Sign-in cancelled', err));
+      provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+      auth.signInWithPopup(provider).then(function(result) {
+        if (result.credential && result.credential.accessToken) {
+          lsSet('gcalToken', result.credential.accessToken);
+          lsSet('gcalTokenExpiry', String(Date.now() + 55 * 60 * 1000));
+          gcalSyncStart();
+        }
+      }).catch(err => console.warn('Sign-in cancelled', err));
     }
   }
 
@@ -4244,13 +4404,232 @@
       updateAuthUI(user);
       if (user) {
         setupRealtimeSync(user.uid);
+        if (gcalTokenValid()) {
+          gcalSyncStart();
+        } else {
+          gcalRefreshToken();
+        }
       } else {
         if (_unsubscribe) { _unsubscribe(); _unsubscribe = null; }
+        gcalSyncStop();
       }
     });
   }
 
+  // ══════════════════════════════════════════════════════
+  // GOOGLE CALENDAR SYNC
+  // ══════════════════════════════════════════════════════
+
+  function gcalTokenValid() {
+    const token  = lsGet('gcalToken', '');
+    const expiry = parseInt(lsGet('gcalTokenExpiry', '0'), 10);
+    return !!(token && Date.now() < expiry);
+  }
+
+  function gcalRefreshToken() {
+    if (!currentUser) return;
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+    provider.setCustomParameters({ prompt: 'none' });
+    auth.signInWithPopup(provider).then(function(result) {
+      if (result.credential && result.credential.accessToken) {
+        lsSet('gcalToken', result.credential.accessToken);
+        lsSet('gcalTokenExpiry', String(Date.now() + 55 * 60 * 1000));
+        gcalSyncStart();
+        const rc = document.getElementById('gcal-reconnect');
+        if (rc) rc.classList.add('hidden');
+      }
+    }).catch(function() {
+      gcalShowReconnect();
+    });
+  }
+
+  function gcalShowReconnect() {
+    const rc = document.getElementById('gcal-reconnect');
+    if (rc) rc.classList.remove('hidden');
+  }
+
+  function gcalReconnect() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+    auth.signInWithPopup(provider).then(function(result) {
+      if (result.credential && result.credential.accessToken) {
+        lsSet('gcalToken', result.credential.accessToken);
+        lsSet('gcalTokenExpiry', String(Date.now() + 55 * 60 * 1000));
+        const rc = document.getElementById('gcal-reconnect');
+        if (rc) rc.classList.add('hidden');
+        gcalSyncStart();
+      }
+    }).catch(err => console.warn('Reconnect cancelled', err));
+  }
+
+  function gcalSyncStart() {
+    gcalSyncStop();
+    gcalSync();
+    gcalSyncTimer = setInterval(gcalSync, 10000);
+  }
+
+  function gcalSyncStop() {
+    if (gcalSyncTimer) { clearInterval(gcalSyncTimer); gcalSyncTimer = null; }
+  }
+
+  function gcalSync() {
+    if (!gcalTokenValid()) { gcalRefreshToken(); return; }
+    const TEN_MIN = 10 * 60 * 1000;
+    if (Date.now() - gcalCacheTime < TEN_MIN && gcalEvents.primary) {
+      const calPanel = document.getElementById('panel-cal');
+      if (calPanel && !calPanel.classList.contains('hidden')) renderCalendar();
+      return;
+    }
+    gcalFetchAll();
+  }
+
+  async function gcalFetchAll() {
+    const token = lsGet('gcalToken', '');
+    if (!token) return;
+    const dot = document.getElementById('gcal-sync-dot');
+    if (dot) dot.style.display = 'inline-block';
+    try {
+      const headers = { Authorization: 'Bearer ' + token };
+
+      // 1. Get calendar list to find Birthdays calendar ID
+      const listResp = await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', { headers });
+      if (listResp.status === 401) { gcalHandleExpired(); return; }
+      const listData = await listResp.json();
+      const bdayCal  = (listData.items || []).find(c =>
+        c.summary === 'Birthdays' || (c.id || '').includes('contacts@group.v.calendar')
+      );
+
+      // 2. Date range: current month + 1 month ahead
+      const tMin = new Date(calYear, calMonth, 1).toISOString();
+      const tMax = new Date(calYear, calMonth + 2, 1).toISOString();
+      const base = 'singleEvents=true&orderBy=startTime&maxResults=100&timeMin='
+                 + encodeURIComponent(tMin) + '&timeMax=' + encodeURIComponent(tMax);
+
+      // 3. Fetch primary calendar events
+      const primResp = await fetch(
+        'https://www.googleapis.com/calendar/v3/calendars/primary/events?' + base, { headers }
+      );
+      let primaryEvents = [];
+      if (primResp.ok) {
+        const pd = await primResp.json();
+        primaryEvents = (pd.items || []).map(function(e) {
+          const allDay = !e.start.dateTime;
+          return {
+            id: e.id,
+            summary: e.summary || '(No title)',
+            start: e.start,
+            end: e.end || e.start,
+            description: (e.description || '').replace(/<[^>]*>/g, '').trim(),
+            allDay: allDay,
+            dateStr: (e.start.dateTime || e.start.date || '').substring(0, 10)
+          };
+        });
+      }
+
+      // 4. Fetch Birthdays calendar events
+      let birthdayEvents = [];
+      if (bdayCal) {
+        const bdResp = await fetch(
+          'https://www.googleapis.com/calendar/v3/calendars/' +
+          encodeURIComponent(bdayCal.id) + '/events?' + base, { headers }
+        );
+        if (bdResp.ok) {
+          const bd = await bdResp.json();
+          birthdayEvents = (bd.items || []).map(function(e) {
+            return {
+              id: e.id,
+              summary: e.summary || 'Birthday',
+              allDay: true,
+              dateStr: (e.start.date || '').substring(0, 10)
+            };
+          });
+        }
+      }
+
+      gcalEvents    = { primary: primaryEvents, birthdays: birthdayEvents,
+                        month: calMonth, year: calYear };
+      gcalCacheTime = Date.now();
+      lsSet('gcalCache',     JSON.stringify(gcalEvents));
+      lsSet('gcalCacheTime', String(gcalCacheTime));
+
+      const calPanel = document.getElementById('panel-cal');
+      if (calPanel && !calPanel.classList.contains('hidden')) renderCalendar();
+
+    } catch(err) {
+      console.warn('GCal sync error:', err);
+    } finally {
+      if (dot) dot.style.display = 'none';
+    }
+  }
+
+  function gcalHandleExpired() {
+    lsSet('gcalToken', '');
+    lsSet('gcalTokenExpiry', '0');
+    gcalSyncStop();
+    gcalShowReconnect();
+  }
+
+  function formatGcalTime(event) {
+    if (event.allDay || !event.start || !event.start.dateTime) return 'All day';
+    const s = new Date(event.start.dateTime);
+    const e = new Date((event.end || event.start).dateTime);
+    const fmt = function(d) { return d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); };
+    return fmt(s) + ' – ' + fmt(e);
+  }
+
+  function buildGcalDayHtml(dateStr) {
+    const primary = (gcalEvents.primary  || []).filter(function(e) { return e.dateStr === dateStr; });
+    const bdays   = (gcalEvents.birthdays || []).filter(function(e) { return e.dateStr === dateStr; });
+    if (!primary.length && !bdays.length) return '';
+    const bdayHtml = bdays.map(function(e) {
+      return '<div class="cal-gcal-event-item">' +
+        '<span style="font-size:1.1rem;line-height:1.2;flex-shrink:0">🎂</span>' +
+        '<div><div class="cal-gcal-event-name">' + e.summary + '</div>' +
+        '<div class="cal-gcal-event-time">All day</div></div></div>';
+    }).join('');
+    const primHtml = primary.map(function(e) {
+      const desc = e.description
+        ? '<div class="cal-gcal-event-desc">' + e.description.substring(0, 120) + '</div>'
+        : '';
+      return '<div class="cal-gcal-event-item">' +
+        '<div style="width:8px;height:8px;border-radius:50%;background:var(--gcal-arm-color);' +
+        'flex-shrink:0;margin-top:4px"></div>' +
+        '<div><div class="cal-gcal-event-name">' + e.summary + '</div>' +
+        '<div class="cal-gcal-event-time">' + formatGcalTime(e) + '</div>' + desc + '</div></div>';
+    }).join('');
+    return '<div class="cal-gcal-section">' +
+      '<div class="cal-gcal-section-title">📅 Calendar Events</div>' +
+      bdayHtml + primHtml + '</div>';
+  }
+
+  function setGcalArmColor(color) {
+    gcalArmColor = color;
+    lsSet('gcalArmColor', color);
+    document.documentElement.style.setProperty('--gcal-arm-color', color);
+    document.querySelectorAll('.gcal-color-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.color === color);
+    });
+  }
+
+  function openGcalColorPicker() {
+    const menu = document.getElementById('settings-menu');
+    if (menu) {
+      menu.classList.remove('hidden');
+      const pill = document.getElementById('settings-dark-pill');
+      if (pill) pill.classList.toggle('on', dark);
+    }
+  }
+
   // ── Init ─────────────────────────────────────────────
+  // Init gcal color + load cached events
+  document.documentElement.style.setProperty('--gcal-arm-color', gcalArmColor);
+  document.querySelectorAll('.gcal-color-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.color === gcalArmColor);
+  });
+  const _cachedGcal = lsGet('gcalCache', '');
+  if (_cachedGcal) { try { gcalEvents = JSON.parse(_cachedGcal); } catch(e) { gcalEvents = {}; } }
+
   render();
   renderReminders();
   applyMode();
