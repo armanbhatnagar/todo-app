@@ -631,21 +631,169 @@
       border-color: #92400e;
     }
 
-    /* ── Water streak bar (in Calendar tab) ── */
-    .water-streak-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.82rem;
-      color: var(--subtle);
-      margin-bottom: 14px;
-      font-weight: 500;
-      flex-wrap: wrap;
-      transition: color 0.3s;
-      min-height: 20px;
+    /* ── Streak bars (in Calendar tab) ── */
+    .streak-bars-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .streak-bar-row {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--task-bg); padding: 10px 16px;
+      border-radius: 12px; font-size: 0.85rem; font-weight: 500;
+      color: var(--subtle); transition: color 0.3s; min-height: 20px;
     }
-    .water-streak-bar strong { color: #0ea5e9; }
     .wst-sep { color: var(--muted); }
+
+    /* Weekly summary bar */
+    .weekly-summary-bar {
+      background: var(--task-bg); border-radius: 10px;
+      padding: 8px 14px; margin-bottom: 14px;
+      font-size: 0.8rem; color: var(--text);
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .wk-label { color: var(--muted); font-weight: 600; }
+    .wk-chip {
+      background: var(--card); border: 1.5px solid var(--border);
+      border-radius: 6px; padding: 2px 8px; font-size: 0.75rem;
+    }
+    .wk-chip strong { color: #22c55e; }
+
+    /* Gym dot on calendar cells */
+    .cal-dot-gym { background: #22c55e; }
+
+    /* Workout panel */
+    .workout-panel-inner {
+      border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 14px; margin: 8px 0 4px; background: var(--task-bg);
+    }
+    .workout-section-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--heading);
+      margin-bottom: 8px; margin-top: 14px;
+    }
+    .workout-section-label:first-child { margin-top: 0; }
+    .body-group-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+    .bg-chip {
+      padding: 5px 12px; border-radius: 20px;
+      border: 2px solid var(--border); background: var(--card);
+      color: var(--text); font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s; touch-action: manipulation;
+    }
+    .bg-chip.active { background: #22c55e; border-color: #22c55e; color: #fff; }
+    .recovery-note { font-size: 0.68rem; color: #f59e0b; font-weight: 600; display: block; margin: 0 0 4px 0; }
+    .exercise-group { margin: 10px 0; border-left: 3px solid #22c55e; padding-left: 10px; }
+    .exercise-group-label {
+      font-size: 0.72rem; font-weight: 700; color: #22c55e;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;
+    }
+    .exercise-entry {
+      background: var(--card); border-radius: 8px;
+      padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border);
+    }
+    .exercise-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+    .exercise-name-input {
+      flex: 1; border: none; background: transparent; color: var(--text);
+      font-size: 0.88rem; font-weight: 600; font-family: inherit;
+      padding: 2px 0; border-bottom: 1.5px solid var(--border); min-width: 0;
+    }
+    .exercise-name-input:focus { outline: none; border-bottom-color: #22c55e; }
+    .exercise-name-input::placeholder { color: var(--muted); }
+    .pr-badge {
+      font-size: 0.65rem; font-weight: 700;
+      background: #fef3c7; color: #d97706;
+      border: 1.5px solid #fbbf24; border-radius: 4px;
+      padding: 1px 6px; white-space: nowrap; flex-shrink: 0;
+    }
+    body.dark .pr-badge { background: #3a2a00; color: #fbbf24; border-color: #fbbf24; }
+    .ex-remove, .set-remove {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 0.75rem; padding: 2px 4px;
+      border-radius: 4px; transition: color 0.15s, background 0.15s;
+    }
+    .ex-remove:hover, .set-remove:hover { color: #ef4444; background: #fee2e2; }
+    .set-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+    .set-num { font-size: 0.72rem; color: var(--muted); min-width: 38px; }
+    .set-input {
+      width: 58px; padding: 4px 6px;
+      border: 1.5px solid var(--border); border-radius: 6px;
+      background: var(--input-bg); color: var(--text);
+      font-size: 0.82rem; font-family: inherit; text-align: center;
+    }
+    .set-input:focus { outline: none; border-color: #22c55e; }
+    .set-x { color: var(--muted); font-size: 0.78rem; }
+    .ex-volume { font-size: 0.75rem; color: var(--muted); margin-top: 6px; font-weight: 500; }
+    .btn-add-set, .btn-add-exercise {
+      margin-top: 6px; padding: 4px 10px;
+      border: 1.5px dashed var(--border); border-radius: 6px;
+      background: transparent; color: var(--muted);
+      font-size: 0.78rem; cursor: pointer;
+      transition: color 0.15s, border-color 0.15s; touch-action: manipulation;
+    }
+    .btn-add-set:hover, .btn-add-exercise:hover { color: #22c55e; border-color: #22c55e; }
+    .btn-add-exercise { display: block; width: 100%; margin-top: 4px; }
+    .workout-total-volume {
+      background: var(--card); border: 1.5px solid var(--border);
+      border-radius: 8px; padding: 8px 12px;
+      font-size: 0.82rem; color: var(--text); margin: 10px 0;
+    }
+    .workout-total-volume strong { color: #22c55e; }
+    .intensity-row { display: flex; gap: 6px; margin-bottom: 4px; }
+    .intensity-btn {
+      width: 32px; height: 32px; border-radius: 8px;
+      border: 2px solid var(--border); background: var(--card);
+      color: var(--muted); font-size: 0.85rem; font-weight: 700;
+      cursor: pointer; transition: all 0.15s; touch-action: manipulation;
+    }
+    .intensity-btn.active { background: #22c55e; border-color: #22c55e; color: #fff; }
+    .workout-notes {
+      width: 100%; min-height: 70px; padding: 8px 10px;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      background: var(--input-bg); color: var(--text);
+      font-size: 0.82rem; font-family: inherit; resize: vertical; box-sizing: border-box;
+    }
+    .workout-notes:focus { outline: none; border-color: #22c55e; }
+    .workout-notes::placeholder { color: var(--muted); }
+
+    /* Workout tab active color */
+    #tab-workout.active { color: #22c55e; border-bottom-color: #22c55e; }
+
+    /* Workout tab date navigation */
+    .workout-date-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px; background: var(--task-bg); border-radius: 12px; padding: 10px 14px;
+    }
+    .workout-date-label {
+      font-size: 0.88rem; font-weight: 700; color: var(--heading); text-align: center; flex: 1;
+    }
+    .workout-toggle-row {
+      background: var(--task-bg); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px;
+    }
+    .workout-toggle-label {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.9rem; font-weight: 600; color: var(--text); cursor: pointer; user-select: none;
+    }
+    .workout-toggle-label input[type="checkbox"] {
+      width: 18px; height: 18px; accent-color: #22c55e; cursor: pointer; flex-shrink: 0;
+    }
+
+    /* Calendar read-only workout summary */
+    .cal-workout-read {
+      border: 1.5px solid #22c55e44; border-radius: 10px;
+      padding: 10px 14px; margin: 4px 0 8px; background: var(--task-bg);
+    }
+    .cal-workout-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;
+    }
+    .cal-workout-badge { font-size: 0.8rem; font-weight: 700; color: #22c55e; }
+    .cal-workout-intensity { font-size: 0.75rem; color: var(--muted); }
+    .cal-summary-groups { font-size: 0.8rem; color: var(--text); margin-bottom: 4px; }
+    .cal-summary-vol { font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+    .cal-summary-vol strong { color: #22c55e; }
+    .cal-summary-notes { font-size: 0.75rem; color: var(--muted); font-style: italic; margin-bottom: 6px; }
+    .btn-edit-workout {
+      font-size: 0.75rem; font-weight: 600; color: #22c55e;
+      background: none; border: 1.5px solid #22c55e44;
+      border-radius: 6px; padding: 4px 10px;
+      cursor: pointer; transition: background 0.15s; touch-action: manipulation;
+    }
+    .btn-edit-workout:hover { background: #22c55e22; }
 
     /* ── Footer + sync tools ── */
     .footer {
@@ -1031,6 +1179,27 @@
       text-align: center;
       padding: 20px 0;
     }
+    .cal-habit-row {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+    .cal-habit-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.87rem;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+    .cal-habit-label input[type="checkbox"] {
+      accent-color: #38bdf8;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
 
     /* ══════════════════════════════════════════════════════
        WATER TRACKER
@@ -1194,9 +1363,10 @@
 
   <!-- Tab bar -->
   <div class="tab-bar">
-    <button class="tab-btn" id="tab-tasks" onclick="switchTab('tasks')">My Tasks</button>
-    <button class="tab-btn" id="tab-cal"   onclick="switchTab('cal')">Calendar</button>
-    <button class="tab-btn" id="tab-water" onclick="switchTab('water')">Water Drank</button>
+    <button class="tab-btn" id="tab-tasks"   onclick="switchTab('tasks')">My Tasks</button>
+    <button class="tab-btn" id="tab-cal"     onclick="switchTab('cal')">Calendar</button>
+    <button class="tab-btn" id="tab-water"   onclick="switchTab('water')">Water Drank</button>
+    <button class="tab-btn" id="tab-workout" onclick="switchTab('workout')">Workout</button>
   </div>
 
   <!-- ══ TASKS PANEL ══ -->
@@ -1333,7 +1503,11 @@
 
   <!-- ══ CALENDAR PANEL ══ -->
   <div id="panel-cal" class="hidden">
-    <div id="water-streak-bar" class="water-streak-bar"></div>
+    <div class="streak-bars-container">
+      <div id="water-streak-bar" class="streak-bar-row"></div>
+      <div id="gym-streak-bar"   class="streak-bar-row"></div>
+    </div>
+    <div id="weekly-summary" class="weekly-summary-bar"></div>
     <div class="cal-nav">
       <button class="btn-cal-nav" onclick="prevMonth()" aria-label="Previous month">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -1359,6 +1533,31 @@
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-tasks" id="cal-tasks"></div>
   </div><!-- /panel-cal -->
+
+  <!-- ══ WORKOUT PANEL ══ -->
+  <div id="panel-workout" class="hidden">
+    <div class="workout-date-nav">
+      <button class="btn-cal-nav" onclick="workoutPrevDay()" aria-label="Previous day">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <span class="workout-date-label" id="workout-date-label"></span>
+      <button class="btn-cal-nav" onclick="workoutNextDay()" aria-label="Next day">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+    </div>
+    <div class="workout-toggle-row">
+      <label class="workout-toggle-label">
+        <input type="checkbox" id="workout-completed-toggle"
+               onchange="toggleWorkoutCompletion(workoutDate)">
+        💪 Workout Completed
+      </label>
+    </div>
+    <div id="workout-panel"></div>
+  </div><!-- /panel-workout -->
 
 
 </div><!-- /card -->
@@ -1870,11 +2069,20 @@
   function renderCalendar() {
     // Water streak bar
     const wsBar = document.getElementById('water-streak-bar');
-    wsBar.innerHTML = (waterStreak.currentStreak > 0 || waterStreak.longestStreak > 0)
-      ? `<span>💧 <strong>${waterStreak.currentStreak}</strong>-day streak</span>
-         <span class="wst-sep">·</span>
-         <span>🏆 Best: <strong>${waterStreak.longestStreak}</strong> day${waterStreak.longestStreak !== 1 ? 's' : ''}</span>`
-      : `<span style="color:var(--muted);font-size:0.78rem">Hit your water goal to start a streak</span>`;
+    const { currentStreak: wCur, longestStreak: wBest } = computeWaterStreaks();
+    wsBar.innerHTML = (wCur > 0 || wBest > 0)
+      ? `<span>💧 <strong style="color:#0ea5e9">${wCur}</strong>-day streak <span class="wst-sep">·</span> 🏆 Best: <strong style="color:#0ea5e9">${wBest}</strong> day${wBest!==1?'s':''}</span>`
+      : `<span>💧</span><span style="color:var(--muted)">Hit your water goal to start a streak</span>`;
+
+    // Gym streak bar
+    const gsBar = document.getElementById('gym-streak-bar');
+    const { currentStreak: gCur, longestStreak: gBest } = computeGymStreaks();
+    gsBar.innerHTML = (gCur > 0 || gBest > 0)
+      ? `<span>💪 <strong style="color:#22c55e">${gCur}</strong>-day streak <span class="wst-sep">·</span> 🏆 Best: <strong style="color:#22c55e">${gBest}</strong> day${gBest!==1?'s':''}</span>`
+      : `<span>💪</span><span style="color:var(--muted)">Log a workout to start a gym streak</span>`;
+
+    // Weekly summary
+    renderWeeklySummary();
 
     const todayStr   = today();
     const firstDay   = new Date(calYear, calMonth, 1).getDay();  // 0=Sun
@@ -1915,13 +2123,15 @@
       if (isToday)    cls += ' cal-day-today';
       if (isSelected) cls += ' cal-day-selected';
 
-      // Dots (deduplicated by section + water hit)
+      // Dots: section colors + water + gym
       const hasWaterHit = waterStreak.history && waterStreak.history[ds];
+      const hasGymHit   = gymData.history[ds] && gymData.history[ds].completed;
       let dots = '';
-      if (dayTasks.length > 0 || hasWaterHit) {
+      if (dayTasks.length > 0 || hasWaterHit || hasGymHit) {
         const sections = [...new Set(dayTasks.map(t => t.section))];
         let dotHtml = sections.map(s => `<span class="cal-dot cal-dot-${s}"></span>`).join('');
         if (hasWaterHit) dotHtml += `<span class="cal-dot cal-dot-water"></span>`;
+        if (hasGymHit)   dotHtml += `<span class="cal-dot cal-dot-gym"></span>`;
         dots = `<div class="cal-dot-row">${dotHtml}</div>`;
       }
 
@@ -1937,7 +2147,7 @@
 
     document.getElementById('cal-grid').innerHTML = cells;
 
-    // Render selected day task list
+    // Render selected day panel
     const calTasksEl = document.getElementById('cal-tasks');
     if (!selectedCalDate) {
       calTasksEl.innerHTML = '';
@@ -1949,41 +2159,58 @@
     const dayLabel = new Date(sy, sm - 1, sd)
       .toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 
-    if (dayTasksSelected.length === 0) {
-      calTasksEl.innerHTML = `
-        <div class="cal-tasks-header">${dayLabel}</div>
-        <div class="cal-tasks-empty">No tasks due on this day.</div>`;
-      return;
-    }
+    const isWaterHit = !!waterStreak.history[selectedCalDate];
+    const habitRow = `
+      <div class="cal-habit-row">
+        <label class="cal-habit-label">
+          <input type="checkbox" ${isWaterHit ? 'checked' : ''}
+                 onchange="toggleWaterCompletion('${selectedCalDate}')">
+          💧 Hit water goal
+        </label>
+      </div>`;
 
     const SECTION_COLORS = { school: '#6366f1', work: '#10b981', misc: '#f59e0b' };
 
-    calTasksEl.innerHTML = `
-      <div class="cal-tasks-header">${dayLabel}</div>
-      ${dayTasksSelected.map(task => {
-        const gi = tasks.indexOf(task);
-        const sc = SECTION_COLORS[task.section] || '#6b7280';
-        const meta = buildTaskMeta(task);
-        return `
-          <div class="task ${task.done ? 'done' : ''}">
-            <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleFromCal(${gi})" aria-label="Complete task"
-              style="margin-top:2px;flex-shrink:0;" />
-            <div class="task-body">
-              <span class="task-text" style="cursor:default">${escapeHtml(task.text)}</span>
-              <div class="task-meta">
-                <span class="task-label-pill" style="background:${sc}22;color:${sc};border:1.5px solid ${sc}55">${task.section}</span>
-                ${task.label ? `<span class="task-label-pill" style="background:${task.labelColor}22;color:${task.labelColor};border:1.5px solid ${task.labelColor}55">${escapeHtml(task.label)}</span>` : ''}
+    if (dayTasksSelected.length === 0) {
+      calTasksEl.innerHTML = `
+        <div class="cal-tasks-header">${dayLabel}</div>
+        ${habitRow}
+        <div id="cal-workout-summary"></div>
+        <div class="cal-tasks-empty">No tasks due on this day.</div>`;
+    } else {
+      calTasksEl.innerHTML = `
+        <div class="cal-tasks-header">${dayLabel}</div>
+        ${habitRow}
+        <div id="cal-workout-summary"></div>
+        ${dayTasksSelected.map(task => {
+          const gi = tasks.indexOf(task);
+          const sc = SECTION_COLORS[task.section] || '#6b7280';
+          const meta = buildTaskMeta(task);
+          return `
+            <div class="task ${task.done ? 'done' : ''}">
+              <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleFromCal(${gi})" aria-label="Complete task"
+                style="margin-top:2px;flex-shrink:0;" />
+              <div class="task-body">
+                <span class="task-text" style="cursor:default">${escapeHtml(task.text)}</span>
+                <div class="task-meta">
+                  <span class="task-label-pill" style="background:${sc}22;color:${sc};border:1.5px solid ${sc}55">${task.section}</span>
+                  ${task.label ? `<span class="task-label-pill" style="background:${task.labelColor}22;color:${task.labelColor};border:1.5px solid ${task.labelColor}55">${escapeHtml(task.label)}</span>` : ''}
+                </div>
               </div>
-            </div>
-          </div>`;
-      }).join('')}`;
+            </div>`;
+        }).join('')}`;
 
-    // Re-apply checkbox styling (section-block data-section isn't present in calendar)
-    calTasksEl.querySelectorAll('input[type="checkbox"]').forEach((cb, idx) => {
-      const task = dayTasksSelected[idx];
-      const sc   = SECTION_COLORS[task.section] || '#6b7280';
-      cb.style.accentColor = sc;
-    });
+      // Re-apply checkbox styling
+      calTasksEl.querySelectorAll('input[type="checkbox"]').forEach((cb, idx) => {
+        const task = dayTasksSelected[idx];
+        if (!task) return;
+        const sc = SECTION_COLORS[task.section] || '#6b7280';
+        cb.style.accentColor = sc;
+      });
+    }
+
+    // Render workout summary after DOM is set
+    renderCalWorkoutSummary(selectedCalDate);
   }
 
   function toggleFromCal(i) {
@@ -2014,31 +2241,440 @@
 
   let water = loadWater();
 
-  let waterStreak = JSON.parse(lsGet('waterStreak', 'null')) ||
-    { currentStreak: 0, longestStreak: 0, lastHit: '', history: {} };
+  let waterStreak = JSON.parse(lsGet('waterStreak', 'null')) || { history: {} };
+  if (!waterStreak.history) waterStreak.history = {};
   function saveWaterStreak() { lsSet('waterStreak', JSON.stringify(waterStreak)); saveToFirestore(); }
 
-  // Reset streak if a day was missed — deterministic, runs on every load
-  (function() {
-    const yest = getYesterday();
-    if (waterStreak.lastHit && waterStreak.lastHit !== today() && waterStreak.lastHit !== yest) {
-      waterStreak.currentStreak = 0;
-      saveWaterStreak();
+  function computeWaterStreaks() {
+    const history = waterStreak.history || {};
+    // Current streak: consecutive days back from today
+    let cur = 0;
+    const d = new Date();
+    while (true) {
+      const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      if (history[ds]) { cur++; d.setDate(d.getDate() - 1); }
+      else break;
     }
-  })();
+    // Longest streak: scan all completed dates in order
+    const dates = Object.keys(history).filter(k => history[k]).sort();
+    let longest = 0, run = 0;
+    for (let i = 0; i < dates.length; i++) {
+      if (i === 0) { run = 1; }
+      else {
+        const diff = (new Date(dates[i]) - new Date(dates[i-1])) / 86400000;
+        run = diff === 1 ? run + 1 : 1;
+      }
+      if (run > longest) longest = run;
+    }
+    return { currentStreak: cur, longestStreak: longest };
+  }
 
   function checkWaterGoalHit() {
     if (water.bottles * BOTTLE_OZ < GOAL_OZ) return;
-    const t = today(), yest = getYesterday();
-    if (waterStreak.lastHit === t) return; // already recorded today
-    waterStreak.currentStreak = (waterStreak.lastHit === yest) ? waterStreak.currentStreak + 1 : 1;
-    if (waterStreak.currentStreak > waterStreak.longestStreak)
-      waterStreak.longestStreak = waterStreak.currentStreak;
-    waterStreak.lastHit = t;
-    if (!waterStreak.history) waterStreak.history = {};
+    const t = today();
+    if (waterStreak.history[t]) return; // already recorded today
     waterStreak.history[t] = true;
     saveWaterStreak();
     if (!document.getElementById('panel-cal').classList.contains('hidden')) renderCalendar();
+  }
+
+  function toggleWaterCompletion(dateStr) {
+    if (waterStreak.history[dateStr]) {
+      delete waterStreak.history[dateStr];
+    } else {
+      waterStreak.history[dateStr] = true;
+    }
+    saveWaterStreak();
+    renderCalendar();
+  }
+
+  // ══════════════════════════════════════════════════════
+  // GYM / WORKOUT TRACKER
+  // ══════════════════════════════════════════════════════
+  let gymData = JSON.parse(lsGet('gymData', 'null')) || { history: {} };
+  if (!gymData.history) gymData.history = {};
+  function saveGymData() { lsSet('gymData', JSON.stringify(gymData)); saveToFirestore(); }
+
+  function ensureGymDay(dateStr) {
+    if (!gymData.history[dateStr])
+      gymData.history[dateStr] = { completed: false, bodyGroups: [], exercises: [], intensity: 0, notes: '' };
+    return gymData.history[dateStr];
+  }
+
+  function computeGymStreaks() {
+    const history = gymData.history || {};
+    let cur = 0;
+    const d = new Date();
+    while (true) {
+      const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      if (history[ds] && history[ds].completed) { cur++; d.setDate(d.getDate() - 1); }
+      else break;
+    }
+    const dates = Object.keys(history).filter(k => history[k] && history[k].completed).sort();
+    let longest = 0, run = 0;
+    for (let i = 0; i < dates.length; i++) {
+      if (i === 0) { run = 1; }
+      else {
+        const diff = (new Date(dates[i]) - new Date(dates[i-1])) / 86400000;
+        run = diff === 1 ? run + 1 : 1;
+      }
+      if (run > longest) longest = run;
+    }
+    return { currentStreak: cur, longestStreak: longest };
+  }
+
+  function toggleWorkoutCompletion(dateStr) {
+    const day = ensureGymDay(dateStr);
+    day.completed = !day.completed;
+    saveGymData();
+    const toggle = document.getElementById('workout-completed-toggle');
+    if (toggle) toggle.checked = day.completed;
+    renderWorkoutPanel(dateStr);
+    renderCalendarIfVisible();
+  }
+
+  function toggleBodyGroup(dateStr, group) {
+    const day = ensureGymDay(dateStr);
+    const idx = day.bodyGroups.indexOf(group);
+    if (idx === -1) day.bodyGroups.push(group);
+    else day.bodyGroups.splice(idx, 1);
+    saveGymData();
+    renderWorkoutPanel(dateStr);
+    renderCalendarIfVisible();
+  }
+
+  function addGymExercise(dateStr, bodyGroup) {
+    const day = ensureGymDay(dateStr);
+    day.exercises.push({ name: '', bodyGroup, sets: [{ weight: '', reps: '' }] });
+    saveGymData();
+    renderWorkoutPanel(dateStr);
+    renderCalendarIfVisible();
+  }
+
+  function removeGymExercise(dateStr, exIdx) {
+    const day = ensureGymDay(dateStr);
+    day.exercises.splice(exIdx, 1);
+    saveGymData();
+    renderWorkoutPanel(dateStr);
+    renderCalendarIfVisible();
+  }
+
+  function updateGymExerciseName(dateStr, exIdx, name) {
+    const day = ensureGymDay(dateStr);
+    if (!day.exercises[exIdx]) return;
+    day.exercises[exIdx].name = name;
+    // Prefill sets from last session if all current sets are empty
+    if (name) {
+      const hasData = day.exercises[exIdx].sets.some(s => s.weight || s.reps);
+      if (!hasData) {
+        const lastSets = getLastUsedSets(name, dateStr);
+        if (lastSets && lastSets.length > 0) {
+          day.exercises[exIdx].sets = lastSets.map(s => ({ weight: s.weight, reps: s.reps }));
+        }
+      }
+    }
+    saveGymData();
+    renderWorkoutPanel(dateStr);
+    renderCalendarIfVisible();
+  }
+
+  function addGymSet(dateStr, exIdx) {
+    const day = ensureGymDay(dateStr);
+    if (!day.exercises[exIdx]) return;
+    day.exercises[exIdx].sets.push({ weight: '', reps: '' });
+    saveGymData();
+    renderWorkoutPanel(dateStr);
+    renderCalendarIfVisible();
+  }
+
+  function removeGymSet(dateStr, exIdx, setIdx) {
+    const day = ensureGymDay(dateStr);
+    if (!day.exercises[exIdx]) return;
+    day.exercises[exIdx].sets.splice(setIdx, 1);
+    saveGymData();
+    renderWorkoutPanel(dateStr);
+    renderCalendarIfVisible();
+  }
+
+  function updateGymSet(dateStr, exIdx, setIdx, field, value) {
+    const day = ensureGymDay(dateStr);
+    if (!day.exercises[exIdx] || !day.exercises[exIdx].sets[setIdx]) return;
+    day.exercises[exIdx].sets[setIdx][field] = field === 'weight' ? parseFloat(value)||0 : parseInt(value)||0;
+    saveGymData();
+    const exVol = calcExerciseVolume(day.exercises[exIdx]);
+    const volEl = document.getElementById('ex-vol-' + exIdx);
+    if (volEl) volEl.textContent = 'Volume: ' + (exVol > 0 ? exVol.toLocaleString() + ' lbs' : '—');
+    const totalVol = calcDayVolume(dateStr);
+    const totalEl = document.getElementById('workout-total-vol');
+    if (totalEl) {
+      totalEl.textContent = totalVol > 0 ? totalVol.toLocaleString() + ' lbs' : '—';
+      totalEl.closest('.workout-total-volume').style.display = totalVol > 0 ? '' : 'none';
+    }
+  }
+
+  function setGymIntensity(dateStr, intensity) {
+    const day = ensureGymDay(dateStr);
+    day.intensity = intensity;
+    saveGymData();
+    renderWorkoutPanel(dateStr);
+    renderCalendarIfVisible();
+  }
+
+  function updateGymNotes(dateStr, notes) {
+    const day = ensureGymDay(dateStr);
+    day.notes = notes;
+    saveGymData();
+    renderCalendarIfVisible();
+  }
+
+  function calcExerciseVolume(ex) {
+    return (ex.sets || []).reduce((sum, s) => sum + (parseFloat(s.weight)||0) * (parseInt(s.reps)||0), 0);
+  }
+
+  function calcDayVolume(dateStr) {
+    const day = gymData.history[dateStr];
+    if (!day) return 0;
+    return (day.exercises || []).reduce((sum, ex) => sum + calcExerciseVolume(ex), 0);
+  }
+
+  function getExercisePRExcluding(exerciseName, excludeDate) {
+    if (!exerciseName) return 0;
+    let maxWeight = 0;
+    Object.entries(gymData.history || {}).forEach(([ds, day]) => {
+      if (ds === excludeDate) return;
+      (day.exercises || []).forEach(ex => {
+        if (ex.name && ex.name.toLowerCase() === exerciseName.toLowerCase()) {
+          (ex.sets || []).forEach(s => {
+            const w = parseFloat(s.weight) || 0;
+            if (w > maxWeight) maxWeight = w;
+          });
+        }
+      });
+    });
+    return maxWeight;
+  }
+
+  function getDateMinus1(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    d.setDate(d.getDate() - 1);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  // ── Exercise memory ───────────────────────────────────
+  function getExerciseSuggestions(group) {
+    const seen = new Set();
+    const result = [];
+    Object.keys(gymData.history).sort().reverse().forEach(ds => {
+      const day = gymData.history[ds];
+      if (!day || !day.exercises) return;
+      day.exercises.forEach(ex => {
+        if (ex.name && ex.bodyGroup === group && !seen.has(ex.name.toLowerCase())) {
+          seen.add(ex.name.toLowerCase());
+          result.push(ex.name);
+        }
+      });
+    });
+    return result;
+  }
+
+  function getLastUsedSets(exerciseName, excludeDate) {
+    const dates = Object.keys(gymData.history).sort().reverse();
+    for (const ds of dates) {
+      if (ds === excludeDate) continue;
+      const day = gymData.history[ds];
+      if (!day || !day.exercises) continue;
+      const ex = day.exercises.find(e => e.name && e.name.toLowerCase() === exerciseName.toLowerCase());
+      if (ex && ex.sets && ex.sets.length > 0 && ex.sets.some(s => s.weight || s.reps)) {
+        return ex.sets;
+      }
+    }
+    return null;
+  }
+
+  // ── Workout tab state & navigation ───────────────────
+  let workoutDate = today();
+
+  function workoutPrevDay() {
+    workoutDate = getDateMinus1(workoutDate);
+    renderWorkoutTab();
+  }
+
+  function workoutNextDay() {
+    const d = new Date(workoutDate + 'T00:00:00');
+    d.setDate(d.getDate() + 1);
+    workoutDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    renderWorkoutTab();
+  }
+
+  function renderWorkoutTab() {
+    const [sy, sm, sd] = workoutDate.split('-').map(Number);
+    const dateObj = new Date(sy, sm - 1, sd);
+    const t = today();
+    let labelText;
+    if (workoutDate === t) {
+      labelText = 'Today — ' + dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    } else if (workoutDate === getYesterday()) {
+      labelText = 'Yesterday — ' + dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    } else {
+      labelText = dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    const labelEl = document.getElementById('workout-date-label');
+    if (labelEl) labelEl.textContent = labelText;
+    const toggle = document.getElementById('workout-completed-toggle');
+    if (toggle) {
+      const day = gymData.history[workoutDate];
+      toggle.checked = !!(day && day.completed);
+    }
+    renderWorkoutPanel(workoutDate);
+  }
+
+  function openWorkoutForDate(dateStr) {
+    workoutDate = dateStr;
+    switchTab('workout');
+  }
+
+  function renderCalendarIfVisible() {
+    if (!document.getElementById('panel-cal').classList.contains('hidden')) renderCalendar();
+  }
+
+  // ── Calendar read-only workout summary ────────────────
+  function renderCalWorkoutSummary(dateStr) {
+    const el = document.getElementById('cal-workout-summary');
+    if (!el) return;
+    const day = gymData.history[dateStr];
+    if (!day || !day.completed) { el.innerHTML = ''; return; }
+    const totalVol = calcDayVolume(dateStr);
+    const groups = (day.bodyGroups || []).map(g => g[0].toUpperCase() + g.slice(1)).join(', ');
+    const intensityStr = day.intensity > 0 ? `Intensity: ${day.intensity}/5` : '';
+    const notesHtml = day.notes
+      ? `<div class="cal-summary-notes">"${escapeHtml(day.notes)}"</div>` : '';
+    el.innerHTML = `
+      <div class="cal-workout-read">
+        <div class="cal-workout-header">
+          <span class="cal-workout-badge">💪 Workout</span>
+          ${intensityStr ? `<span class="cal-workout-intensity">${intensityStr}</span>` : ''}
+        </div>
+        ${groups ? `<div class="cal-summary-groups">${groups}</div>` : ''}
+        ${totalVol > 0 ? `<div class="cal-summary-vol">Total Volume: <strong>${totalVol.toLocaleString()} lbs</strong></div>` : ''}
+        ${notesHtml}
+        <button class="btn-edit-workout" onclick="openWorkoutForDate('${dateStr}')">Edit Workout →</button>
+      </div>`;
+  }
+
+  function renderWeeklySummary() {
+    const el = document.getElementById('weekly-summary');
+    if (!el) return;
+    const now = new Date();
+    const dow = now.getDay();
+    const mon = new Date(now);
+    mon.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+    const weekDates = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(mon); d.setDate(mon.getDate() + i);
+      weekDates.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
+    }
+    const counts = {};
+    weekDates.forEach(ds => {
+      const day = gymData.history[ds];
+      if (day && day.completed) (day.bodyGroups || []).forEach(g => { counts[g] = (counts[g]||0) + 1; });
+    });
+    if (Object.keys(counts).length === 0) { el.innerHTML = ''; return; }
+    const chips = Object.entries(counts).map(([g, n]) =>
+      `<span class="wk-chip">${g[0].toUpperCase()+g.slice(1)}: <strong>${n}×</strong></span>`
+    ).join('');
+    el.innerHTML = `<span class="wk-label">This week:</span> ${chips}`;
+  }
+
+  function renderWorkoutPanel(dateStr) {
+    const el = document.getElementById('workout-panel');
+    if (!el) return;
+    const day = gymData.history[dateStr];
+    if (!day || !day.completed) { el.innerHTML = ''; return; }
+
+    const BODY_GROUPS = ['Arms','Back','Chest','Shoulders','Triceps','Legs','Abs'];
+    const prevDay = getDateMinus1(dateStr);
+    const prevDayData = gymData.history[prevDay];
+
+    const chipsHtml = BODY_GROUPS.map(g => {
+      const key = g.toLowerCase();
+      const active = day.bodyGroups.includes(key);
+      const wasYest = active && prevDayData && prevDayData.completed && (prevDayData.bodyGroups||[]).includes(key);
+      const recovery = wasYest ? `<span class="recovery-note">↩ Trained yesterday</span>` : '';
+      return `<button class="bg-chip ${active?'active':''}" onclick="toggleBodyGroup('${dateStr}','${key}')">${g}</button>${recovery}`;
+    }).join('');
+
+    let exercisesHtml = '';
+    (day.bodyGroups || []).forEach(group => {
+      const groupLabel = group[0].toUpperCase() + group.slice(1);
+      const groupExercises = (day.exercises || []).filter(ex => ex.bodyGroup === group);
+
+      const suggestions = getExerciseSuggestions(group);
+      const exHtml = groupExercises.map(ex => {
+        const exIdx = day.exercises.indexOf(ex);
+        const weights = (ex.sets||[]).map(s => parseFloat(s.weight)||0).filter(w => w > 0);
+        const dayMax = weights.length > 0 ? Math.max(...weights) : 0;
+        const prevPR = getExercisePRExcluding(ex.name, dateStr);
+        const isPR = ex.name && dayMax > 0 && dayMax > prevPR;
+        const prBadge = isPR ? `<span class="pr-badge">🏆 New PR</span>` : '';
+        const exVol = calcExerciseVolume(ex);
+        const datalistId = `ex-sug-${group}-${exIdx}`;
+        const datalistHtml = suggestions.length > 0
+          ? `<datalist id="${datalistId}">${suggestions.map(n => `<option value="${escapeHtml(n)}"></option>`).join('')}</datalist>`
+          : '';
+
+        const setsHtml = (ex.sets||[]).map((s,si) => `
+          <div class="set-row">
+            <span class="set-num">Set ${si+1}</span>
+            <input type="number" class="set-input" value="${s.weight||''}" placeholder="lbs" min="0"
+                   onchange="updateGymSet('${dateStr}',${exIdx},${si},'weight',this.value)">
+            <span class="set-x">×</span>
+            <input type="number" class="set-input" value="${s.reps||''}" placeholder="reps" min="0"
+                   onchange="updateGymSet('${dateStr}',${exIdx},${si},'reps',this.value)">
+            <button class="set-remove" onclick="removeGymSet('${dateStr}',${exIdx},${si})">✕</button>
+          </div>`).join('');
+
+        return `
+          <div class="exercise-entry">
+            <div class="exercise-header">
+              <input type="text" class="exercise-name-input" value="${escapeHtml(ex.name||'')}" placeholder="Exercise name"
+                     list="${datalistId}"
+                     onchange="updateGymExerciseName('${dateStr}',${exIdx},this.value)">${datalistHtml}
+              ${prBadge}
+              <button class="ex-remove" onclick="removeGymExercise('${dateStr}',${exIdx})">✕</button>
+            </div>
+            ${setsHtml}
+            <button class="btn-add-set" onclick="addGymSet('${dateStr}',${exIdx})">+ Add Set</button>
+            <div class="ex-volume" id="ex-vol-${exIdx}">Volume: ${exVol > 0 ? exVol.toLocaleString()+' lbs' : '—'}</div>
+          </div>`;
+      }).join('');
+
+      exercisesHtml += `
+        <div class="exercise-group">
+          <div class="exercise-group-label">${groupLabel}</div>
+          ${exHtml}
+          <button class="btn-add-exercise" onclick="addGymExercise('${dateStr}','${group}')">+ Add Exercise</button>
+        </div>`;
+    });
+
+    const totalVol = calcDayVolume(dateStr);
+    const intensityHtml = [1,2,3,4,5].map(n =>
+      `<button class="intensity-btn ${(day.intensity||0) >= n ? 'active':''}" onclick="setGymIntensity('${dateStr}',${n})">${n}</button>`
+    ).join('');
+
+    el.innerHTML = `
+      <div class="workout-panel-inner">
+        <div class="workout-section-label">Body Groups</div>
+        <div class="body-group-chips">${chipsHtml}</div>
+        ${exercisesHtml}
+        <div class="workout-total-volume" ${totalVol === 0 ? 'style="display:none"' : ''}>
+          Total Volume: <strong id="workout-total-vol">${totalVol > 0 ? totalVol.toLocaleString()+' lbs' : ''}</strong>
+        </div>
+        <div class="workout-section-label">Intensity</div>
+        <div class="intensity-row">${intensityHtml}</div>
+        <div class="workout-section-label">Notes</div>
+        <textarea class="workout-notes" placeholder="Sleep, energy, injuries, anything..."
+                  onchange="updateGymNotes('${dateStr}',this.value)">${escapeHtml(day.notes||'')}</textarea>
+      </div>`;
   }
 
   function adjustBottles(delta) {
@@ -2067,12 +2703,13 @@
   // TAB SWITCHING
   // ══════════════════════════════════════════════════════
   function switchTab(tab) {
-    ['tasks', 'water', 'cal'].forEach(t => {
+    ['tasks', 'water', 'cal', 'workout'].forEach(t => {
       document.getElementById('panel-' + t).classList.toggle('hidden', tab !== t);
       document.getElementById('tab-'   + t).classList.toggle('active', tab === t);
     });
     lsSet('active-tab', tab);
-    if (tab === 'cal') renderCalendar();
+    if (tab === 'cal')     renderCalendar();
+    if (tab === 'workout') renderWorkoutTab();
   }
 
   // ══════════════════════════════════════════════════════
@@ -2191,8 +2828,9 @@
     if (Array.isArray(data.tasks))     { tasks     = data.tasks;     lsSet('tasks',     JSON.stringify(tasks)); }
     if (Array.isArray(data.reminders)) { reminders = data.reminders; lsSet('reminders', JSON.stringify(reminders)); }
     if (data.collapsed)   { collapsed   = data.collapsed;   lsSet('collapsed',   JSON.stringify(collapsed)); }
-    if (data.waterStreak) { waterStreak = data.waterStreak; lsSet('waterStreak', JSON.stringify(waterStreak)); }
+    if (data.waterStreak) { waterStreak = data.waterStreak; if (!waterStreak.history) waterStreak.history = {}; lsSet('waterStreak', JSON.stringify(waterStreak)); }
     if (data.water)       { water       = data.water;       lsSet('water',       JSON.stringify(water)); }
+    if (data.gymData)     { gymData     = data.gymData;     if (!gymData.history) gymData.history = {};     lsSet('gymData',     JSON.stringify(gymData)); }
     if (data.priorityDate){ lsSet('priorityDate', data.priorityDate); }
     if (data.dark !== undefined) {
       dark = data.dark === 'true';
@@ -2200,6 +2838,7 @@
       document.body.classList.toggle('dark', dark);
     }
     render(); renderReminders(); renderWater();
+    if (!document.getElementById('panel-cal').classList.contains('hidden')) renderCalendar();
   }
 
   let _fsTimer;
@@ -2211,7 +2850,7 @@
       db.collection('users').doc(currentUser.uid).set({
         tasks, reminders, collapsed,
         dark: String(dark),
-        waterStreak, water,
+        waterStreak, water, gymData,
         priorityDate: lsGet('priorityDate', ''),
       }).then(() => {
         document.getElementById('auth-btn').classList.remove('syncing');
@@ -2246,6 +2885,7 @@
   render();
   renderReminders();
   renderWater();
+  renderWorkoutTab();
   switchTab(lsGet('active-tab', 'tasks'));
   initAuth();
 </script>
