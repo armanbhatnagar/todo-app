@@ -234,6 +234,8 @@
       max-width: 480px;
       padding: 32px 28px 28px;
       transition: background 0.3s, box-shadow 0.3s;
+      position: relative;
+      z-index: 1;
     }
 
     /* ── Header ── */
@@ -1672,9 +1674,149 @@
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+
+    /* ══ SW BACKGROUND SYSTEM ══════════════════════════════ */
+    #sw-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    body.sw-mode #sw-bg { display: block; }
+
+    /* ── Star layers ──────────────────────────────────────── */
+    .star-layer {
+      position: absolute;
+      border-radius: 50%;
+      will-change: transform;
+      pointer-events: none;
+    }
+    .star-layer-1 { width: 1px; height: 1px; top: 0; left: 0; }
+    .star-layer-2 { width: 2px; height: 2px; top: 0; left: 0; }
+    .star-layer-3 { width: 2px; height: 2px; top: 0; left: 0; }
+    /* box-shadow lists injected by starfieldInit() */
+
+    /* ── Planet colors ────────────────────────────────────── */
+    body.sw-mode:not(.dark) .p1-base { fill: #4a7cff; }
+    body.sw-mode.dark       .p1-base { fill: #e8622c; }
+    body.sw-mode:not(.dark) .p2-base { fill: #d4a017; }
+    body.sw-mode.dark       .p2-base { fill: #8b2fc9; }
+    body.sw-mode:not(.dark) .p2-ring-back  { stroke: rgba(180,140,20,0.45); }
+    body.sw-mode:not(.dark) .p2-ring-front { stroke: rgba(180,140,20,0.55); }
+    body.sw-mode.dark       .p2-ring-back  { stroke: rgba(139,47,201,0.45); }
+    body.sw-mode.dark       .p2-ring-front { stroke: rgba(139,47,201,0.55); }
+    body.sw-mode:not(.dark) .p3-base { fill: #059669; }
+    body.sw-mode.dark       .p3-base { fill: #f97316; }
+
+    /* ── Spaceship colors ─────────────────────────────────── */
+    body.sw-mode:not(.dark) .ship-hull   { fill: rgba(37,99,235,0.15);  stroke: rgba(37,99,235,0.28); }
+    body.sw-mode.dark       .ship-hull   { fill: rgba(220,38,38,0.15);  stroke: rgba(220,38,38,0.28); }
+    body.sw-mode:not(.dark) .ship-engine { fill: rgba(37,99,235,0.35); }
+    body.sw-mode.dark       .ship-engine { fill: rgba(220,38,38,0.35); }
+    body.sw-mode:not(.dark) .ship-window { fill: rgba(37,99,235,0.50); }
+    body.sw-mode.dark       .ship-window { fill: rgba(220,38,38,0.50); }
+    body.sw-mode:not(.dark) .ship-glow   { fill: rgba(37,99,235,0.55); }
+    body.sw-mode.dark       .ship-glow   { fill: rgba(220,38,38,0.55); }
+
+    /* Engine glow pulse */
+    @keyframes enginePulse {
+      0%, 100% { opacity: 0.4; transform: scale(1);    }
+      50%       { opacity: 1.0; transform: scale(1.55); }
+    }
+    .ship-glow { transform-origin: center; animation: enginePulse 2.8s ease-in-out infinite; }
+
+    /* ── Planet & ship positioning ────────────────────────── */
+    .sw-planet-1 {
+      position: fixed; top: -5%; right: -4%;
+      width: 150px; height: 150px;
+      will-change: transform; transition: opacity 0.4s;
+    }
+    .sw-planet-2 {
+      position: fixed; bottom: -3%; left: -3%;
+      width: 160px; height: 88px;
+      will-change: transform; transition: opacity 0.4s;
+    }
+    .sw-planet-3 {
+      position: fixed; top: 15%; left: 3%;
+      width: 45px; height: 45px;
+      will-change: transform; transition: opacity 0.4s;
+    }
+    .sw-ship {
+      position: fixed; bottom: 8%; right: 2%;
+      width: 200px; height: 63px;
+      will-change: transform; transition: opacity 0.4s;
+    }
+
+    /* ── Default opacities ────────────────────────────────── */
+    .sw-planet-1 { opacity: 0.20; }
+    .sw-planet-2 { opacity: 0.18; }
+    .sw-planet-3 { opacity: 0.12; }
+    .sw-ship      { opacity: 0.12; }
+
+    /* ── Per-view opacity adjustments ────────────────────── */
+    #sw-bg[data-view="cal"]     .sw-planet-1 { opacity: 0.22; }
+    #sw-bg[data-view="cal"]     .sw-ship     { opacity: 0.14; }
+    #sw-bg[data-view="tasks"]   .sw-planet-2 { opacity: 0.22; }
+    #sw-bg[data-view="water"]   .sw-planet-1 { opacity: 0.15; }
+    #sw-bg[data-view="water"]   .sw-planet-3 { opacity: 0.18; }
+    #sw-bg[data-view="workout"] .sw-ship     { opacity: 0.18; }
+    #sw-bg[data-view="stim"]    .sw-planet-2 { opacity: 0.20; }
+    #sw-bg[data-view="stim"]    .sw-planet-3 { opacity: 0.16; }
   </style>
 </head>
 <body>
+
+<!-- ══ Star Wars Background ══════════════════════════ -->
+<div id="sw-bg" aria-hidden="true">
+
+  <!-- Star layers (box-shadows injected by starfieldInit()) -->
+  <div class="star-layer star-layer-1"></div>
+  <div class="star-layer star-layer-2"></div>
+  <div class="star-layer star-layer-3"></div>
+
+  <!-- Planet 1: Gas giant, top-right -->
+  <svg class="sw-planet-1" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+    <circle class="p1-base" cx="75" cy="75" r="68"/>
+    <ellipse cx="75" cy="58"  rx="62" ry="8"  fill="rgba(255,255,255,0.08)"/>
+    <ellipse cx="75" cy="78"  rx="64" ry="10" fill="rgba(255,255,255,0.06)"/>
+    <ellipse cx="75" cy="97"  rx="60" ry="7"  fill="rgba(255,255,255,0.07)"/>
+    <circle  cx="52" cy="45" r="18" fill="rgba(255,255,255,0.12)"/>
+    <circle  cx="75" cy="75" r="68" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+  </svg>
+
+  <!-- Planet 2: Saturn-like with ring, bottom-left -->
+  <svg class="sw-planet-2" viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg">
+    <ellipse class="p2-ring-back"  cx="100" cy="62" rx="95" ry="18"
+             fill="none" stroke-width="13"
+             stroke-dasharray="215 215" stroke-dashoffset="0"/>
+    <circle class="p2-base" cx="100" cy="55" r="42"/>
+    <circle cx="82" cy="38" r="14" fill="rgba(255,255,255,0.12)"/>
+    <ellipse class="p2-ring-front" cx="100" cy="62" rx="95" ry="18"
+             fill="none" stroke-width="13"
+             stroke-dasharray="215 215" stroke-dashoffset="215"/>
+  </svg>
+
+  <!-- Planet 3: Tiny distant, upper-left -->
+  <svg class="sw-planet-3" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+    <circle class="p3-base" cx="25" cy="25" r="22"/>
+    <circle cx="17" cy="18" r="7" fill="rgba(255,255,255,0.14)"/>
+  </svg>
+
+  <!-- Spaceship: wedge cruiser, bottom-right, nose pointing left -->
+  <svg class="sw-ship" viewBox="0 0 220 70" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="ship-hull" points="5,35 60,10 200,18 210,35 200,52 60,60" stroke-width="1.5"/>
+    <polygon class="ship-hull" points="140,52 190,52 200,62 145,62" stroke-width="1"/>
+    <polygon class="ship-hull" points="140,18 190,18 200,8  145,8"  stroke-width="1"/>
+    <ellipse class="ship-window" cx="72" cy="35" rx="9" ry="6"/>
+    <ellipse class="ship-engine" cx="196" cy="24" rx="11" ry="5"/>
+    <ellipse class="ship-engine" cx="196" cy="46" rx="11" ry="5"/>
+    <circle  class="ship-glow"   cx="207" cy="24" r="4"/>
+    <circle  class="ship-glow"   cx="207" cy="46" r="4"/>
+  </svg>
+
+</div><!-- /#sw-bg -->
 
 <div class="card">
   <!-- Header -->
@@ -2129,7 +2271,67 @@
     const radSW     = document.getElementById('mode-starwars');
     if (radNormal) radNormal.checked = !isSW;
     if (radSW)     radSW.checked     = isSW;
+    if (isSW) starfieldInit();
     renderWater();
+  }
+
+  // ══ SW BACKGROUND SYSTEM ══════════════════════════════
+  let swBgInitialized = false;
+
+  function starfieldInit() {
+    if (swBgInitialized) return;
+    swBgInitialized = true;
+    const W = Math.round(window.innerWidth  * 1.5);
+    const H = Math.round(window.innerHeight * 1.5);
+    function makeShadows(count, color) {
+      const p = [];
+      for (let i = 0; i < count; i++) {
+        p.push(Math.round(Math.random()*W) + 'px ' + Math.round(Math.random()*H) + 'px 0 ' + color);
+      }
+      return p.join(',');
+    }
+    const far  = makeShadows(180, 'rgba(255,255,255,0.80)');
+    const mid  = makeShadows(90,  'rgba(224,247,255,0.70)');
+    const near = makeShadows(45,  'rgba(179,217,255,0.65)');
+    const s = document.createElement('style');
+    s.id = 'sw-star-style';
+    s.textContent =
+      '.star-layer-1{box-shadow:' + far  + '}' +
+      '.star-layer-2{box-shadow:' + mid  + '}' +
+      '.star-layer-3{box-shadow:' + near + '}';
+    document.head.appendChild(s);
+  }
+
+  // ── Parallax ─────────────────────────────────────────
+  const swPx = { raf: null, x: 0, y: 0, tx: 0, ty: 0 };
+  if (!('ontouchstart' in window)) {
+    document.addEventListener('mousemove', function(e) {
+      if (!document.body.classList.contains('sw-mode')) return;
+      swPx.tx = (e.clientX / window.innerWidth  - 0.5) * 2;
+      swPx.ty = (e.clientY / window.innerHeight - 0.5) * 2;
+      if (!swPx.raf) swPx.raf = requestAnimationFrame(swParallaxLoop);
+    });
+  }
+  function swParallaxLoop() {
+    swPx.raf = null;
+    swPx.x += (swPx.tx - swPx.x) * 0.06;
+    swPx.y += (swPx.ty - swPx.y) * 0.06;
+    const x = swPx.x, y = swPx.y;
+    [
+      ['.star-layer-1',  6,  6],
+      ['.star-layer-2', 18, 18],
+      ['.star-layer-3', 32, 32],
+      ['.sw-planet-1',  14, 14],
+      ['.sw-planet-2',  11, 11],
+      ['.sw-planet-3',   9,  9],
+      ['.sw-ship',      17, 17]
+    ].forEach(function(e) {
+      var el = document.querySelector(e[0]);
+      if (el) el.style.transform = 'translate(' + (x*e[1]) + 'px,' + (y*e[2]) + 'px)';
+    });
+    if (Math.abs(swPx.tx - swPx.x) > 0.003 || Math.abs(swPx.ty - swPx.y) > 0.003) {
+      swPx.raf = requestAnimationFrame(swParallaxLoop);
+    }
   }
 
   function setAppMode(mode) {
@@ -3853,6 +4055,8 @@
   };
 
   function switchTab(tab) {
+    var bg = document.getElementById('sw-bg');
+    if (bg) bg.dataset.view = tab;
     closeViewMenu();
     ['tasks', 'water', 'cal', 'workout', 'stim'].forEach(t => {
       const panel = document.getElementById('panel-' + t);
