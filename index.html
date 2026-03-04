@@ -826,6 +826,16 @@
     }
     .btn-wotd-random:hover  { background: #6d28d9; }
     .btn-wotd-random:active { transform: scale(0.96); }
+    .btn-wotd-random:disabled {
+      background: var(--task-bg); color: var(--muted);
+      border: 1.5px solid var(--border); cursor: not-allowed;
+      transform: none !important; font-size: 0.78rem; line-height: 1.4;
+    }
+    .btn-wotd-random:disabled:hover { background: var(--task-bg); }
+    .wotd-limit-msg {
+      font-size: 0.75rem; color: var(--muted); text-align: right;
+      margin-top: 6px; display: none; font-style: italic;
+    }
     .wotd-footer {
       font-size: 0.72rem; color: var(--muted); text-align: center;
       padding-top: 12px; border-top: 1px solid var(--border);
@@ -1657,8 +1667,9 @@
       <p class="wotd-definition" id="wotd-definition"></p>
       <blockquote class="wotd-example" id="wotd-example"></blockquote>
       <div class="wotd-actions">
-        <button class="btn-wotd-random" onclick="randomizeWotd()">Give me another &rarr;</button>
+        <button class="btn-wotd-random" id="btn-wotd-random" onclick="randomizeWotd()">Give me another &rarr;</button>
       </div>
+      <div class="wotd-limit-msg" id="wotd-limit-msg">slow down buddy. no chance you remember allat. come back tomorrow</div>
       <div class="wotd-footer" id="wotd-footer"></div>
     </div>
   </div><!-- /panel-stim -->
@@ -3369,13 +3380,17 @@
   }
 
   function randomizeWotd() {
-    const t = today();
+    const t          = today();
+    const shuffleKey = 'wotd-shuffles-' + t;
+    const count      = parseInt(lsGet(shuffleKey, '0'), 10);
+    if (count >= 2) return;
     const current = WORD_LIBRARY.indexOf(getActiveWotd());
     let next = current;
     if (WORD_LIBRARY.length > 1) {
       while (next === current) next = Math.floor(Math.random() * WORD_LIBRARY.length);
     }
     lsSet('wotd-override-' + t, String(next));
+    lsSet(shuffleKey, String(count + 1));
     renderStimTab();
   }
 
@@ -3393,23 +3408,27 @@
     document.getElementById('wotd-footer').textContent     =
       'Updated daily \u2022 ' + WORD_LIBRARY.length + ' words in library';
 
+    // Shuffle limit UI
+    const shuffleCount = parseInt(lsGet('wotd-shuffles-' + today(), '0'), 10);
+    const btn          = document.getElementById('btn-wotd-random');
+    const limitMsg     = document.getElementById('wotd-limit-msg');
+    if (btn)      btn.disabled           = shuffleCount >= 2;
+    if (limitMsg) limitMsg.style.display = shuffleCount >= 2 ? 'block' : 'none';
+
+    // Image — picsum.photos: free, reliable, deterministic per word seed, no API key
     img.style.display = '';
     img.classList.remove('loaded'); img.classList.add('loading');
     skeleton.classList.remove('hidden');
-    img.alt = entry.word;
-
-    const preloader = new Image();
-    const imgUrl    = 'https://source.unsplash.com/featured/800x400/?' + encodeURIComponent(entry.word);
-    preloader.onload = function() {
-      img.src = imgUrl;
+    img.alt    = entry.word;
+    img.onload = function() {
       img.classList.remove('loading'); img.classList.add('loaded');
       skeleton.classList.add('hidden');
     };
-    preloader.onerror = function() {
+    img.onerror = function() {
       skeleton.classList.add('hidden');
       img.style.display = 'none';
     };
-    preloader.src = imgUrl;
+    img.src = 'https://picsum.photos/seed/' + encodeURIComponent(entry.word) + '/800/400';
   }
 
   function onStimActivityChange() {
