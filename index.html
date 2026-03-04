@@ -1764,6 +1764,71 @@
     #sw-bg[data-view="workout"] .sw-ship     { opacity: 0.18; }
     #sw-bg[data-view="stim"]    .sw-planet-2 { opacity: 0.20; }
     #sw-bg[data-view="stim"]    .sw-planet-3 { opacity: 0.16; }
+    #sw-bg[data-view="journal"] .sw-planet-1 { opacity: 0.18; }
+
+    /* ══ JOURNAL ════════════════════════════════════════ */
+    .cal-dot-journal { background: #8b5cf6; }
+
+    .journal-date-header { text-align: center; margin-bottom: 12px; }
+    .journal-date-label {
+      font-size: 0.97rem; font-weight: 700; color: var(--heading);
+      transition: color 0.3s;
+    }
+    .journal-mini-cal { margin-bottom: 10px; }
+    .journal-mini-cal .cal-grid { margin-bottom: 4px; }
+    .journal-mini-cal .cal-nav { margin-bottom: 8px; }
+    .journal-return-row { text-align: center; margin-bottom: 14px; }
+    .journal-return-btn {
+      font-size: 0.78rem; background: none; border: 1px solid var(--border);
+      border-radius: 8px; padding: 4px 14px; cursor: pointer;
+      color: var(--muted); font-family: inherit;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .journal-return-btn:hover { border-color: #6366f1; color: #6366f1; }
+    .journal-future-msg {
+      text-align: center; color: var(--muted); font-size: 0.9rem;
+      padding: 32px 0; font-style: italic;
+    }
+    .journal-section-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 10px;
+    }
+    /* Mood row */
+    .journal-mood-section { margin-bottom: 20px; }
+    .journal-mood-row {
+      display: flex; gap: 7px; justify-content: space-between;
+    }
+    .mood-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      gap: 5px; padding: 10px 4px; border-radius: 12px;
+      border: 2.5px solid transparent; cursor: pointer;
+      opacity: 0.42; font-family: inherit;
+      transition: opacity 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.12s;
+    }
+    .mood-btn:hover { opacity: 0.72; transform: translateY(-2px); }
+    .mood-btn.selected {
+      opacity: 1; border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.18);
+    }
+    .mood-btn[data-mood="4"] { background: #22c55e; }
+    .mood-btn[data-mood="3"] { background: #86efac; }
+    .mood-btn[data-mood="2"] { background: #fbbf24; }
+    .mood-btn[data-mood="1"] { background: #3b82f6; }
+    .mood-btn[data-mood="0"] { background: #dc2626; }
+    .mood-emoji { font-size: 1.75rem; line-height: 1; }
+    .mood-label { font-size: 0.66rem; color: var(--text); font-weight: 600; opacity: 0.8; }
+    /* Notes */
+    .journal-notes-section { margin-bottom: 6px; }
+    .journal-textarea {
+      width: 100%; min-height: 180px; resize: vertical;
+      border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 14px 14px; font-size: 0.92rem; line-height: 1.65;
+      font-family: inherit; color: var(--text); background: var(--input-bg);
+      outline: none; box-sizing: border-box;
+      transition: border-color 0.2s, background 0.3s, color 0.3s;
+    }
+    .journal-textarea:focus { border-color: #6366f1; }
+    .journal-textarea:disabled { opacity: 0.45; cursor: not-allowed; }
 
     /* ══ GOOGLE CALENDAR + LEGEND ════════════════════════ */
     body { --gcal-arm-color: #9d174e; }
@@ -1977,6 +2042,7 @@
       <button class="view-item" data-tab="water"   onclick="switchTab('water')"  >💧 Water Drank</button>
       <button class="view-item" data-tab="workout" onclick="switchTab('workout')">💪 Workout</button>
       <button class="view-item" data-tab="stim"    onclick="switchTab('stim')"   >✨ Quick Stim</button>
+      <button class="view-item" data-tab="journal" onclick="switchTab('journal')">📔 Journal</button>
     </div>
   </div>
 
@@ -2226,6 +2292,74 @@
     </div>
   </div><!-- /panel-stim -->
 
+  <!-- ══ JOURNAL PANEL ══ -->
+  <div id="panel-journal" class="hidden">
+    <!-- Selected date label -->
+    <div class="journal-date-header">
+      <span class="journal-date-label" id="journal-date-label"></span>
+    </div>
+    <!-- Mini calendar -->
+    <div class="journal-mini-cal">
+      <div class="cal-nav">
+        <button class="btn-cal-nav" onclick="journalPrevMonth()" aria-label="Previous month">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <span class="cal-month-label" id="journal-cal-month-label"></span>
+        <button class="btn-cal-nav" id="journal-cal-next-btn" onclick="journalNextMonth()" aria-label="Next month">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+      <div class="cal-weekdays">
+        <div class="cal-weekday">Su</div>
+        <div class="cal-weekday">Mo</div>
+        <div class="cal-weekday">Tu</div>
+        <div class="cal-weekday">We</div>
+        <div class="cal-weekday">Th</div>
+        <div class="cal-weekday">Fr</div>
+        <div class="cal-weekday">Sa</div>
+      </div>
+      <div class="cal-grid" id="journal-cal-grid"></div>
+    </div>
+    <!-- Return to today -->
+    <div class="journal-return-row hidden" id="journal-return-row">
+      <button class="journal-return-btn" onclick="journalGoToday()">↩ Return to Today</button>
+    </div>
+    <!-- Future date message -->
+    <div class="journal-future-msg hidden" id="journal-future-msg">No entry (future date)</div>
+    <!-- Mood selector -->
+    <div class="journal-mood-section" id="journal-mood-section">
+      <div class="journal-section-label">How are you feeling?</div>
+      <div class="journal-mood-row">
+        <button class="mood-btn" data-mood="4" onclick="setJournalMood(4)" title="Very Happy">
+          <span class="mood-emoji">😄</span><span class="mood-label">Great</span>
+        </button>
+        <button class="mood-btn" data-mood="3" onclick="setJournalMood(3)" title="Happy">
+          <span class="mood-emoji">🙂</span><span class="mood-label">Good</span>
+        </button>
+        <button class="mood-btn" data-mood="2" onclick="setJournalMood(2)" title="Neutral">
+          <span class="mood-emoji">😐</span><span class="mood-label">Okay</span>
+        </button>
+        <button class="mood-btn" data-mood="1" onclick="setJournalMood(1)" title="Very Sad">
+          <span class="mood-emoji">😔</span><span class="mood-label">Low</span>
+        </button>
+        <button class="mood-btn" data-mood="0" onclick="setJournalMood(0)" title="Very Angry">
+          <span class="mood-emoji">😠</span><span class="mood-label">Angry</span>
+        </button>
+      </div>
+    </div>
+    <!-- Notes textarea -->
+    <div class="journal-notes-section" id="journal-notes-section">
+      <div class="journal-section-label">Notes</div>
+      <textarea class="journal-textarea" id="journal-textarea"
+                placeholder="What's on your mind today?"
+                onblur="saveJournalNotes()"></textarea>
+    </div>
+  </div><!-- /panel-journal -->
+
 </div><!-- /card -->
 
 <!-- Import overlay -->
@@ -2353,6 +2487,12 @@
   let gcalEvents    = {};
   let gcalCacheTime = parseInt(lsGet('gcalCacheTime', '0'), 10);
   let gcalSyncTimer = null;
+
+  // ── Journal state ─────────────────────────────────
+  let journal          = JSON.parse(lsGet('journal', 'null')) || {};
+  let journalDate      = today();
+  let journalCalYear   = new Date().getFullYear();
+  let journalCalMonth  = new Date().getMonth();   // 0-indexed
 
   // ── Theme & Mode ─────────────────────────────────────
   let appMode = lsGet('appMode', 'normal');
@@ -4166,14 +4306,15 @@
     cal:     '📅 Calendar',
     water:   '💧 Water Drank',
     workout: '💪 Workout',
-    stim:    '✨ Quick Stim'
+    stim:    '✨ Quick Stim',
+    journal: '📔 Journal'
   };
 
   function switchTab(tab) {
     var bg = document.getElementById('sw-bg');
     if (bg) bg.dataset.view = tab;
     closeViewMenu();
-    ['tasks', 'water', 'cal', 'workout', 'stim'].forEach(t => {
+    ['tasks', 'water', 'cal', 'workout', 'stim', 'journal'].forEach(t => {
       const panel = document.getElementById('panel-' + t);
       const show  = tab === t;
       if (show && panel.classList.contains('hidden')) {
@@ -4199,6 +4340,7 @@
     }
     if (tab === 'workout') renderWorkoutTab();
     if (tab === 'stim')    renderStimTab();
+    if (tab === 'journal') renderJournal();
   }
 
   // ══════════════════════════════════════════════════════
@@ -4327,6 +4469,7 @@
     if (data.waterStreak) { waterStreak = data.waterStreak; if (!waterStreak.history) waterStreak.history = {}; lsSet('waterStreak', JSON.stringify(waterStreak)); }
     if (data.water)       { water       = data.water;       lsSet('water',       JSON.stringify(water)); }
     if (data.gymData)     { gymData     = data.gymData;     if (!gymData.history) gymData.history = {};     lsSet('gymData',     JSON.stringify(gymData)); }
+    if (data.journal)     { journal     = data.journal;     lsSet('journal',      JSON.stringify(journal)); }
     if (data.priorityDate){ lsSet('priorityDate', data.priorityDate); }
     if (data.dark !== undefined) {
       dark = data.dark === 'true';
@@ -4346,7 +4489,7 @@
       db.collection('users').doc(currentUser.uid).set({
         tasks, reminders, collapsed,
         dark: String(dark),
-        waterStreak, water, gymData,
+        waterStreak, water, gymData, journal,
         priorityDate: lsGet('priorityDate', ''),
       }).then(() => {
         document.getElementById('auth-btn').classList.remove('syncing');
@@ -4577,6 +4720,172 @@
       bdayHtml + primHtml + '</div>';
   }
 
+
+  // ══════════════════════════════════════════════════════
+  // JOURNAL
+  // ══════════════════════════════════════════════════════
+
+  function saveJournal() {
+    lsSet('journal', JSON.stringify(journal));
+    saveToFirestore();
+  }
+
+  function journalPrevMonth() {
+    if (journalCalMonth === 0) { journalCalMonth = 11; journalCalYear--; }
+    else journalCalMonth--;
+    renderJournalMiniCal();
+  }
+
+  function journalNextMonth() {
+    const t = new Date();
+    if (journalCalYear === t.getFullYear() && journalCalMonth === t.getMonth()) return;
+    if (journalCalMonth === 11) { journalCalMonth = 0; journalCalYear++; }
+    else journalCalMonth++;
+    renderJournalMiniCal();
+  }
+
+  function selectJournalDay(ds) {
+    if (ds > today()) return;
+    journalDate = ds;
+    renderJournal();
+  }
+
+  function renderJournalMiniCal() {
+    const todayStr    = today();
+    const t           = new Date();
+    const firstDay    = new Date(journalCalYear, journalCalMonth, 1).getDay();
+    const daysInMonth = new Date(journalCalYear, journalCalMonth + 1, 0).getDate();
+
+    // Month label
+    const monthLabel = document.getElementById('journal-cal-month-label');
+    if (monthLabel) {
+      monthLabel.textContent = new Date(journalCalYear, journalCalMonth, 1)
+        .toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    }
+
+    // Disable next-month button when already at current month
+    const atCurrentMonth = journalCalYear === t.getFullYear() && journalCalMonth === t.getMonth();
+    const nextBtn = document.getElementById('journal-cal-next-btn');
+    if (nextBtn) {
+      nextBtn.disabled    = atCurrentMonth;
+      nextBtn.style.opacity = atCurrentMonth ? '0.3' : '';
+      nextBtn.style.cursor  = atCurrentMonth ? 'not-allowed' : '';
+    }
+
+    let cells = '';
+
+    // Leading blank cells
+    for (let i = 0; i < firstDay; i++) {
+      cells += `<div class="cal-day cal-day-other"></div>`;
+    }
+
+    // Day cells
+    for (let d = 1; d <= daysInMonth; d++) {
+      const mm = String(journalCalMonth + 1).padStart(2, '0');
+      const dd = String(d).padStart(2, '0');
+      const ds = `${journalCalYear}-${mm}-${dd}`;
+      const isToday    = ds === todayStr;
+      const isSelected = ds === journalDate;
+      const isFuture   = ds > todayStr;
+      const entry      = journal[ds];
+      const hasEntry   = !!(entry && (entry.mood !== null && entry.mood !== undefined || entry.notes));
+
+      let cls = 'cal-day';
+      if (isToday)    cls += ' cal-day-today';
+      if (isSelected) cls += ' cal-day-selected';
+      if (isFuture)   cls += ' cal-day-other';
+
+      const dot = (hasEntry && !isFuture)
+        ? `<div class="cal-dot-row"><span class="cal-dot cal-dot-journal"></span></div>`
+        : '';
+      const click = isFuture ? '' : `onclick="selectJournalDay('${ds}')"`;
+
+      cells += `<div class="${cls}" ${click}>${d}${dot}</div>`;
+    }
+
+    // Trailing blank cells
+    const total = firstDay + daysInMonth;
+    const trail = total % 7 === 0 ? 0 : 7 - (total % 7);
+    for (let i = 0; i < trail; i++) {
+      cells += `<div class="cal-day cal-day-other"></div>`;
+    }
+
+    const grid = document.getElementById('journal-cal-grid');
+    if (grid) grid.innerHTML = cells;
+  }
+
+  function journalGoToday() {
+    journalDate = today();
+    journalCalYear  = new Date().getFullYear();
+    journalCalMonth = new Date().getMonth();
+    renderJournal();
+  }
+
+  function setJournalMood(value) {
+    if (journalDate > today()) return;
+    if (!journal[journalDate]) journal[journalDate] = { mood: null, notes: '' };
+    journal[journalDate].mood = value;
+    saveJournal();
+    document.querySelectorAll('.mood-btn').forEach(function(btn) {
+      btn.classList.toggle('selected', parseInt(btn.dataset.mood) === value);
+    });
+  }
+
+  function saveJournalNotes() {
+    if (journalDate > today()) return;
+    const ta = document.getElementById('journal-textarea');
+    if (!ta) return;
+    if (!journal[journalDate]) journal[journalDate] = { mood: null, notes: '' };
+    journal[journalDate].notes = ta.value;
+    saveJournal();
+  }
+
+  function renderJournal() {
+    const t        = today();
+    const isFuture = journalDate > t;
+    const isToday  = journalDate === t;
+
+    // Selected date label
+    const [y, m, d] = journalDate.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    const labelEl = document.getElementById('journal-date-label');
+    if (labelEl) {
+      labelEl.textContent = isToday
+        ? 'Today — ' + dateObj.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
+        : dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    // Mini calendar
+    renderJournalMiniCal();
+
+    // Return to today button
+    const returnRow = document.getElementById('journal-return-row');
+    if (returnRow) returnRow.classList.toggle('hidden', isToday);
+
+    // Future vs normal state
+    const futureMsg    = document.getElementById('journal-future-msg');
+    const moodSection  = document.getElementById('journal-mood-section');
+    const notesSection = document.getElementById('journal-notes-section');
+    if (futureMsg)    futureMsg.classList.toggle('hidden', !isFuture);
+    if (moodSection)  moodSection.classList.toggle('hidden', isFuture);
+    if (notesSection) notesSection.classList.toggle('hidden', isFuture);
+    if (isFuture) return;
+
+    // Populate entry
+    const entry = journal[journalDate] || {};
+
+    // Mood buttons
+    document.querySelectorAll('.mood-btn').forEach(function(btn) {
+      btn.classList.toggle('selected',
+        entry.mood !== null && entry.mood !== undefined &&
+        parseInt(btn.dataset.mood) === entry.mood
+      );
+    });
+
+    // Notes
+    const ta = document.getElementById('journal-textarea');
+    if (ta) ta.value = entry.notes || '';
+  }
 
   // ── Init ─────────────────────────────────────────────
   // Init gcal — load cached events
