@@ -4407,7 +4407,7 @@
         if (gcalTokenValid()) {
           gcalSyncStart();
         } else {
-          gcalRefreshToken();
+          gcalShowReconnect();
         }
       } else {
         if (_unsubscribe) { _unsubscribe(); _unsubscribe = null; }
@@ -4465,6 +4465,8 @@
 
   function gcalSyncStart() {
     gcalSyncStop();
+    const rc = document.getElementById('gcal-reconnect');
+    if (rc) rc.classList.add('hidden');
     gcalSync();
     gcalSyncTimer = setInterval(gcalSync, 10000);
   }
@@ -4474,7 +4476,7 @@
   }
 
   function gcalSync() {
-    if (!gcalTokenValid()) { gcalRefreshToken(); return; }
+    if (!gcalTokenValid()) { gcalSyncStop(); gcalShowReconnect(); return; }
     const TEN_MIN = 10 * 60 * 1000;
     if (Date.now() - gcalCacheTime < TEN_MIN && gcalEvents.primary) {
       const calPanel = document.getElementById('panel-cal');
@@ -4495,6 +4497,7 @@
       // 1. Get calendar list to find Birthdays calendar ID
       const listResp = await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', { headers });
       if (listResp.status === 401) { gcalHandleExpired(); return; }
+      if (!listResp.ok) { gcalShowReconnect(); return; }
       const listData = await listResp.json();
       const bdayCal  = (listData.items || []).find(c =>
         c.summary === 'Birthdays' || (c.id || '').includes('contacts@group.v.calendar')
@@ -4511,6 +4514,10 @@
         'https://www.googleapis.com/calendar/v3/calendars/primary/events?' + base, { headers }
       );
       let primaryEvents = [];
+      if (!primResp.ok) {
+        if (primResp.status === 401) { gcalHandleExpired(); return; }
+        gcalShowReconnect(); return;
+      }
       if (primResp.ok) {
         const pd = await primResp.json();
         primaryEvents = (pd.items || []).map(function(e) {
@@ -4559,7 +4566,7 @@
     } catch(err) {
       console.warn('GCal sync error:', err);
     } finally {
-      if (dot) dot.style.display = 'none';
+      if (dot) setTimeout(function() { dot.style.display = 'none'; }, 1500);
     }
   }
 
