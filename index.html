@@ -1786,10 +1786,8 @@
     }
     .cal-legend-dot-gcal {
       width: 9px; height: 9px; border-radius: 50%;
-      background: var(--gcal-arm-color); cursor: pointer; flex-shrink: 0;
-      transition: transform 0.15s;
+      background: var(--gcal-arm-color); flex-shrink: 0;
     }
-    .cal-legend-dot-gcal:hover { transform: scale(1.3); }
 
     /* ── GCal sync indicator ─────────────────────────── */
     .gcal-sync-dot {
@@ -1833,21 +1831,6 @@
       -webkit-box-orient: vertical; overflow: hidden;
     }
 
-    /* ── Settings: Calendar color presets ────────────── */
-    .gcal-color-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 16px;
-    }
-    .gcal-color-label {
-      font-size: 0.9rem; font-weight: 500; color: var(--text);
-    }
-    .gcal-color-presets { display: flex; gap: 7px; }
-    .gcal-color-btn {
-      width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent;
-      cursor: pointer; transition: transform 0.15s, border-color 0.15s;
-    }
-    .gcal-color-btn:hover { transform: scale(1.2); }
-    .gcal-color-btn.active { border-color: var(--text); }
   </style>
 </head>
 <body>
@@ -1974,21 +1957,6 @@
               <span>Dark Mode</span>
               <div class="settings-toggle-pill" id="settings-dark-pill"></div>
             </button>
-          </div>
-        </div>
-        <div class="settings-divider"></div>
-        <div class="settings-section">
-          <div class="settings-section-title">Calendar</div>
-          <div class="gcal-color-row">
-            <span class="gcal-color-label">Event Color</span>
-            <div class="gcal-color-presets">
-              <button class="gcal-color-btn" data-color="#9d174e" style="background:#9d174e" onclick="setGcalArmColor('#9d174e')" title="Radicchio"></button>
-              <button class="gcal-color-btn" data-color="#1d4ed8" style="background:#1d4ed8" onclick="setGcalArmColor('#1d4ed8')" title="Blue"></button>
-              <button class="gcal-color-btn" data-color="#15803d" style="background:#15803d" onclick="setGcalArmColor('#15803d')" title="Green"></button>
-              <button class="gcal-color-btn" data-color="#7c3aed" style="background:#7c3aed" onclick="setGcalArmColor('#7c3aed')" title="Purple"></button>
-              <button class="gcal-color-btn" data-color="#c2410c" style="background:#c2410c" onclick="setGcalArmColor('#c2410c')" title="Orange"></button>
-              <button class="gcal-color-btn" data-color="#be185d" style="background:#be185d" onclick="setGcalArmColor('#be185d')" title="Pink"></button>
-            </div>
           </div>
         </div>
       </div>
@@ -2198,7 +2166,7 @@
         <span class="cal-legend-dot" style="background:#0ea5e9"></span><span>Water Goal</span>
       </div>
       <div class="cal-legend-item">
-        <span class="cal-legend-dot-gcal" onclick="openGcalColorPicker()" title="Click to change color"></span><span>My Calendar</span>
+        <span class="cal-legend-dot-gcal"></span><span>My Calendar</span>
       </div>
       <div class="cal-legend-item">
         <span style="font-size:0.9rem;line-height:1">🎂</span><span>Birthdays</span>
@@ -2382,7 +2350,6 @@
   }
 
   // ── Google Calendar state ─────────────────────────
-  let gcalArmColor  = lsGet('gcalArmColor', '#9d174e');
   let gcalEvents    = {};
   let gcalCacheTime = parseInt(lsGet('gcalCacheTime', '0'), 10);
   let gcalSyncTimer = null;
@@ -4610,30 +4577,9 @@
       bdayHtml + primHtml + '</div>';
   }
 
-  function setGcalArmColor(color) {
-    gcalArmColor = color;
-    lsSet('gcalArmColor', color);
-    document.documentElement.style.setProperty('--gcal-arm-color', color);
-    document.querySelectorAll('.gcal-color-btn').forEach(function(btn) {
-      btn.classList.toggle('active', btn.dataset.color === color);
-    });
-  }
-
-  function openGcalColorPicker() {
-    const menu = document.getElementById('settings-menu');
-    if (menu) {
-      menu.classList.remove('hidden');
-      const pill = document.getElementById('settings-dark-pill');
-      if (pill) pill.classList.toggle('on', dark);
-    }
-  }
 
   // ── Init ─────────────────────────────────────────────
-  // Init gcal color + load cached events
-  document.documentElement.style.setProperty('--gcal-arm-color', gcalArmColor);
-  document.querySelectorAll('.gcal-color-btn').forEach(function(btn) {
-    btn.classList.toggle('active', btn.dataset.color === gcalArmColor);
-  });
+  // Init gcal — load cached events
   const _cachedGcal = lsGet('gcalCache', '');
   if (_cachedGcal) { try { gcalEvents = JSON.parse(_cachedGcal); } catch(e) { gcalEvents = {}; } }
 
