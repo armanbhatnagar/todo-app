@@ -11,6 +11,8 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%236366f1' width='192' height='192'/><text x='50%' y='50%' font-size='120' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>✓</text></svg>" />
   <title>My Daily To-Do</title>
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore-compat.js"></script>
@@ -19,89 +21,132 @@
 
     /* ── Color tokens (light mode) ── */
     body {
-      --bg-from: #e0e7ff; --bg-to: #f0fdf4;
-      --card:    #ffffff;
-      --text:    #1f2937;
-      --heading: #1e1b4b;
-      --subtle:  #6b7280;
-      --muted:   #9ca3af;
-      --border:  #e5e7eb;
-      --task-bg: #f9fafb;
-      --input-bg:#ffffff;
+      --bg: #edf1f5;
+      --card: #ffffff;
+      --border: #d8dfe7;
+      --accent: #3a8db8;
+      --accent-soft: #3a8db820;
+      --text: #1a2030;
+      --text-dim: #8a94a0;
+      --heading: #0d1520;
+      --subtle: #5a6575;
+      --input-bg: #ffffff;
+      --task-bg: #f4f7fa;
+      --shadow: rgba(0,0,0,0.08);
       --del-hover-bg: #fff1f2;
-      --shadow:  rgba(0,0,0,0.10);
-      /* water */
-      --water:          #0ea5e9;
-      --water-dark:     #0284c7;
-      --water-fill-top: #38bdf8;
-      --water-fill-bot: #0369a1;
+      --water-track: #d8dfe7;
+      --water-grad: linear-gradient(90deg, #3a8db8, #5eaed6);
+      --water-label: #4a6a80;
+      --tag-work: #3a8db8;
+      --tag-health: #2a9d6e;
+      --tag-personal: #7b6bbd;
+      --pri-high: #3a8db8;
+      --pri-med: #8a94a0;
+      --pri-low: #c8d0d8;
+      --check-fill: #3a8db8;
+      --check-mark: #ffffff;
+      --dashed: #d8dfe7;
+      --add-task-text: #8a94a0;
+      --top-line: linear-gradient(90deg, transparent, #3a8db8, transparent);
+      --noise-opacity: 0.025;
+      --success-text: #2a9d6e;
+      --success-bg: #2a9d6e15;
+      --success-border: #2a9d6e30;
     }
 
     /* ── Dark mode overrides ── */
     body.dark {
-      --bg-from: #0f0f1a; --bg-to: #0f0f1a;
-      --card:    #1e1e2e;
-      --text:    #e5e7eb;
-      --heading: #c7d2fe;
-      --subtle:  #9ca3af;
-      --muted:   #6b7280;
-      --border:  #3f3f5a;
-      --task-bg: #2a2a3e;
-      --input-bg:#2a2a3e;
-      --del-hover-bg: #3b1f1f;
-      --shadow:  rgba(0,0,0,0.40);
-      --water-fill-top: #0ea5e9;
-      --water-fill-bot: #0c4a6e;
+      --bg: #0b0e11;
+      --card: #12161b;
+      --border: #1b2028;
+      --accent: #5eaed6;
+      --accent-soft: #5eaed620;
+      --text: #d0d6de;
+      --text-dim: #3e4650;
+      --heading: #edf0f4;
+      --subtle: #4a535e;
+      --input-bg: #12161b;
+      --task-bg: #12161b;
+      --shadow: rgba(0,0,0,0.40);
+      --del-hover-bg: #1f1215;
+      --water-track: #1b2028;
+      --water-grad: linear-gradient(90deg, #5eaed6, #8bcae8);
+      --water-label: #4a6a80;
+      --tag-work: #5eaed6;
+      --tag-health: #6ec89b;
+      --tag-personal: #b39ddb;
+      --pri-high: #5eaed6;
+      --pri-med: #3e4650;
+      --pri-low: #252b33;
+      --check-fill: #5eaed6;
+      --check-mark: #0b0e11;
+      --dashed: #1b2028;
+      --add-task-text: #3e4650;
+      --top-line: linear-gradient(90deg, transparent, #5eaed6, transparent);
+      --noise-opacity: 0.025;
+      --success-text: #6ec89b;
+      --success-bg: #6ec89b15;
+      --success-border: #6ec89b30;
     }
 
     /* ══ STAR WARS MODE ══════════════════════════════════ */
 
     /* Light Side — Jedi Temple palette */
     body.sw-mode:not(.dark) {
-      --bg-from:       #e8e8e8;
-      --bg-to:         #f0f0f0;
-      --card:          #f5f5f5;
-      --text:          #1a1a1a;
-      --heading:       #0a3a66;
-      --subtle:        #4a5568;
-      --muted:         #6b7280;
-      --border:        #d0d0d0;
-      --task-bg:       #f0f0f0;
-      --input-bg:      #ffffff;
-      --del-hover-bg:  #fff5f5;
-      --shadow:        rgba(0,0,0,0.12);
-      --water:         #2563eb;
-      --water-dark:    #1d4ed8;
-      --water-fill-top:#3b82f6;
-      --water-fill-bot:#1e40af;
-      --saber-color:   #00a8ff;
-      --saber-glow:    rgba(0,168,255,0.75);
+      --bg: #e8e8e8;
+      --bg-from: #e8e8e8;
+      --bg-to: #f0f0f0;
+      --card: #f5f5f5;
+      --border: #d0d0d0;
+      --accent: #2563eb;
+      --accent-soft: #2563eb20;
+      --text: #1a1a1a;
+      --heading: #0a3a66;
+      --subtle: #4a5568;
+      --muted: #6b7280;
+      --task-bg: #f0f0f0;
+      --input-bg: #ffffff;
+      --del-hover-bg: #fff5f5;
+      --shadow: rgba(0,0,0,0.12);
+      --water-track: #d0d0d0;
+      --water-grad: linear-gradient(90deg, #2563eb, #3b82f6);
+      --text-dim: #8a94a0;
+      --pri-high: #2563eb;
+      --check-fill: #2563eb;
+      --check-mark: #ffffff;
+      --saber-color: #00a8ff;
+      --saber-glow: rgba(0,168,255,0.75);
       --saber-glow-outer: rgba(0,168,255,0.25);
-      --sw-accent:     #2563eb;
+      --sw-accent: #2563eb;
     }
 
     /* Dark Side — Sith palette */
     body.sw-mode.dark {
-      --bg-from:       #0a0a0a;
-      --bg-to:         #1a1a1a;
-      --card:          #1a1a1a;
-      --text:          #e5e7eb;
-      --heading:       #ff6b6b;
-      --subtle:        #a0a0a0;
-      --muted:         #808080;
-      --border:        #3a3a3a;
-      --task-bg:       #252525;
-      --input-bg:      #2a2a2a;
-      --del-hover-bg:  #2d1111;
-      --shadow:        rgba(0,0,0,0.70);
-      --water:         #dc2626;
-      --water-dark:    #b91c1c;
-      --water-fill-top:#ef4444;
-      --water-fill-bot:#991b1b;
-      --saber-color:   #ff2020;
-      --saber-glow:    rgba(255,32,32,0.75);
+      --bg: #0a0a0a;
+      --bg-from: #0a0a0a;
+      --bg-to: #1a1a1a;
+      --card: #1a1a1a;
+      --border: #2a2a2a;
+      --accent: #ff4444;
+      --accent-soft: #ff444420;
+      --text: #e5e7eb;
+      --heading: #ff6b6b;
+      --subtle: #808080;
+      --muted: #808080;
+      --task-bg: #252525;
+      --input-bg: #2a2a2a;
+      --del-hover-bg: #2d1111;
+      --shadow: rgba(0,0,0,0.70);
+      --water-track: #2a2a2a;
+      --water-grad: linear-gradient(90deg, #ff4444, #ff6666);
+      --text-dim: #6b7280;
+      --pri-high: #ff4444;
+      --check-fill: #ff4444;
+      --check-mark: #ffffff;
+      --saber-color: #ff2020;
+      --saber-glow: rgba(255,32,32,0.75);
       --saber-glow-outer: rgba(255,32,32,0.25);
-      --sw-accent:     #dc2626;
+      --sw-accent: #dc2626;
     }
 
     /* Theme button glow in SW mode */
@@ -123,71 +168,59 @@
     body.sw-mode.dark .icon-jedi   { display: none; }
     body.sw-mode.dark .icon-empire { display: block; }
 
-    /* ══ LIGHTSABER WATER VIZ ════════════════════════════ */
+    /* ══ LIGHTSABER WATER VIZ (HORIZONTAL) ══════════════ */
+    /* HORIZONTAL LIGHTSABER (replaces vertical) */
     .saber-container {
-      display: flex; justify-content: center; margin: 20px 0 16px;
+      display: none;
+      width: 100%; margin: 0 0 12px; align-items: center; gap: 0;
     }
-    .saber-wrapper {
-      display: flex; flex-direction: column; align-items: center;
+    body.sw-mode .saber-container { display: flex; }
+    body.sw-mode .water-bar-track { display: none; }
+
+    .saber-hilt-h {
+      width: 28px; height: 12px; flex-shrink: 0;
+      background: linear-gradient(90deg, #909090, #c8c8c8, #a0a0a0, #686868, #b0b0b0);
+      border-radius: 3px 2px 2px 3px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+      position: relative;
     }
-    .saber-blade-track {
-      width: 14px; height: 200px;
+    .saber-hilt-h::before {
+      content: '';
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--sw-accent);
+      box-shadow: 0 0 4px var(--saber-glow);
+    }
+    .saber-blade-track-h {
+      flex: 1; height: 10px; position: relative;
       background: rgba(128,128,128,0.12);
-      border: 1px solid rgba(128,128,128,0.18);
-      border-radius: 7px 7px 0 0;
-      position: relative; overflow: hidden;
+      border-radius: 0 5px 5px 0; overflow: hidden;
     }
-    .saber-blade {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 0%;
-      background: linear-gradient(to top, var(--saber-color), rgba(255,255,255,0.95) 95%, #fff 100%);
-      border-radius: 7px 7px 0 0;
-      box-shadow:
-        0 0 4px  var(--saber-color),
-        0 0 10px var(--saber-color),
-        0 0 24px var(--saber-glow),
-        0 0 50px var(--saber-glow-outer);
-      transition: height 0.65s cubic-bezier(0.34, 1.2, 0.64, 1);
+    .saber-blade-h {
+      position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--saber-color), rgba(255,255,255,0.9), #fff);
+      border-radius: 0 5px 5px 0;
+      box-shadow: 0 0 4px var(--saber-color), 0 0 10px var(--saber-color), 0 0 24px var(--saber-glow), 0 0 50px var(--saber-glow-outer);
       animation: saberFlicker 4s ease-in-out infinite;
+      transition: width 0.4s ease;
     }
-    .saber-blade::after {
+    .saber-blade-h::after {
       content: '';
       position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 40%);
-      border-radius: inherit;
+      background: linear-gradient(90deg, rgba(255,255,255,0.25) 0%, transparent 40%);
     }
-    .saber-hilt {
-      width: 28px; height: 56px;
-      background: linear-gradient(160deg,
-        #d0d0d0 0%, #a0a0a0 18%, #c8c8c8 32%,
-        #686868 50%, #909090 64%, #c4c4c4 80%, #808080 100%
-      );
-      border-radius: 3px 3px 8px 8px;
-      position: relative; overflow: hidden;
-      box-shadow:
-        inset 1px 0 0 rgba(255,255,255,0.45),
-        inset -1px 0 0 rgba(0,0,0,0.35),
-        0 3px 10px rgba(0,0,0,0.5),
-        0 1px 3px rgba(0,0,0,0.4);
+    .saber-blade-h.saber-active {
+      animation: saberActivate 0.55s ease-out, saberFlicker 4s ease-in-out 0.55s infinite;
     }
-    .saber-hilt::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent 0px, transparent 5px,
-        rgba(0,0,0,0.12) 5px, rgba(0,0,0,0.12) 6px
-      );
+    .saber-power-label {
+      font-size: 0.68rem; font-weight: 700; text-align: center;
+      color: var(--saber-color); letter-spacing: 0.08em;
+      margin-top: 4px; text-shadow: 0 0 8px var(--saber-glow);
+      display: none;
     }
-    .saber-hilt::before {
-      content: '';
-      position: absolute;
-      top: 10px; left: 50%; transform: translateX(-50%);
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--sw-accent, #555);
-      box-shadow: 0 0 4px var(--saber-glow, rgba(0,0,0,0.3));
-      z-index: 1;
-    }
+    body.sw-mode .saber-power-label { display: block; }
+
     @keyframes saberFlicker {
       0%, 100% { opacity: 1; }
       48%       { opacity: 0.94; }
@@ -209,16 +242,13 @@
       85%  { filter: brightness(1); }
       100% { filter: brightness(1); }
     }
-    .saber-blade.saber-active {
-      animation: saberActivate 0.55s ease-out, saberFlicker 4s ease-in-out 0.55s infinite;
-    }
 
     .hidden { display: none !important; }
 
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, var(--bg-from) 0%, var(--bg-to) 100%);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      font-family: 'Satoshi', 'DM Sans', system-ui, sans-serif;
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -236,28 +266,6 @@
       transition: background 0.3s, box-shadow 0.3s;
       position: relative;
       z-index: 1;
-    }
-
-    /* ── Header ── */
-    .header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--heading);
-      margin-bottom: 4px;
-      transition: color 0.3s;
-    }
-
-    .subtitle {
-      font-size: 0.875rem;
-      color: var(--subtle);
-      transition: color 0.3s;
     }
 
     /* ── Dark mode toggle ── */
@@ -335,61 +343,12 @@
       0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
     }
 
-    /* ══ VIEW SWITCHER ════════════════════════════════════ */
-    .view-switcher {
-      position: relative;
-      margin-bottom: 24px;
-    }
-    .view-trigger {
-      display: flex; align-items: center; justify-content: space-between;
-      width: 100%; padding: 12px 16px;
-      background: rgba(255,255,255,0.55);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      border: 1.5px solid rgba(255,255,255,0.35);
-      border-radius: 14px; cursor: pointer;
-      color: var(--text); font-size: 0.96rem; font-weight: 600;
-      transition: background 0.2s, border-color 0.2s; font-family: inherit;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .view-trigger:hover { background: rgba(255,255,255,0.75); border-color: rgba(99,102,241,0.3); }
-    body.dark .view-trigger {
-      background: rgba(30,30,50,0.65); border-color: rgba(255,255,255,0.12);
-    }
-    body.dark .view-trigger:hover { background: rgba(40,40,65,0.85); }
-    .view-chevron {
-      flex-shrink: 0; transition: transform 0.2s ease; color: var(--muted);
-    }
-    .view-chevron.open { transform: rotate(180deg); }
-    .view-menu {
-      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-      z-index: 100;
-      background: rgba(255,255,255,0.90);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1.5px solid rgba(255,255,255,0.4);
-      border-radius: 14px; overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
-    }
-    body.dark .view-menu {
-      background: rgba(18,18,32,0.94); border-color: rgba(255,255,255,0.1);
-    }
-    .view-item {
-      display: block; width: 100%; padding: 14px 16px;
-      text-align: left; background: none; border: none;
-      color: var(--text); font-size: 0.93rem; font-weight: 500;
-      cursor: pointer; transition: background 0.15s, color 0.15s;
-      font-family: inherit; border-bottom: 1px solid rgba(128,128,128,0.08);
-    }
-    .view-item:last-child { border-bottom: none; }
-    .view-item:hover { background: rgba(99,102,241,0.07); }
-    .view-item.active { color: #6366f1; font-weight: 700; background: rgba(99,102,241,0.10); }
-    body.dark .view-item.active { color: #818cf8; background: rgba(99,102,241,0.15); }
-
     /* ══ SETTINGS BUTTON & MENU ══════════════════════════ */
     .btn-settings {
       background: var(--task-bg); border: 2px solid var(--border);
       border-radius: 10px; cursor: pointer; padding: 7px;
       display: flex; align-items: center; justify-content: center;
-      color: var(--muted); min-width: 44px; min-height: 44px;
+      color: var(--text-dim); min-width: 44px; min-height: 44px;
       flex-shrink: 0; touch-action: manipulation;
       transition: border-color 0.2s, color 0.2s;
     }
@@ -411,7 +370,7 @@
     .settings-section { padding: 6px 0; }
     .settings-section-title {
       font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--muted);
+      text-transform: uppercase; color: var(--text-dim);
       padding: 6px 16px 4px;
     }
     .settings-radio-item {
@@ -457,19 +416,15 @@
     .panel-fade-in { animation: panelFadeIn 0.2s ease-out forwards; }
 
     /* ══ WATER BAR / SABER MODE SWITCHING ════════════════ */
-    /* Normal mode: show water bar, hide saber */
-    .saber-container { display: none; }
-    /* SW mode: show saber, hide water bar */
-    body.sw-mode .saber-container { display: flex; }
-    body.sw-mode .water-bar-track { display: none; }
+    /* (Handled in saber CSS above) */
 
     /* ── Add Task button (replaces inline form) ── */
     .btn-open-modal {
       width: 100%;
       padding: 13px;
       background: var(--task-bg);
-      color: #6366f1;
-      border: 2px dashed var(--border);
+      color: var(--accent);
+      border: 2px dashed var(--dashed);
       border-radius: 12px;
       font-size: 0.95rem;
       font-weight: 600;
@@ -483,11 +438,10 @@
       touch-action: manipulation;
     }
     .btn-open-modal:hover {
-      background: #eef2ff;
-      border-color: #6366f1;
+      background: var(--accent-soft);
+      border-color: var(--accent);
       border-style: solid;
     }
-    body.dark .btn-open-modal:hover { background: #1e1b4b; }
 
     /* ── REMINDERS ── */
     .reminders-block {
@@ -517,7 +471,7 @@
     .reminders-done-count {
       font-size: 0.75rem;
       font-weight: 600;
-      color: var(--muted);
+      color: var(--text-dim);
     }
     .reminder-item {
       display: flex;
@@ -559,11 +513,11 @@
       transition: color 0.15s;
       word-break: break-word;
     }
-    .reminder-item.done-today .reminder-text { text-decoration: line-through; color: var(--muted); }
+    .reminder-item.done-today .reminder-text { text-decoration: line-through; color: var(--text-dim); }
     .btn-del-reminder {
       background: none;
       border: none;
-      color: var(--muted);
+      color: var(--text-dim);
       cursor: pointer;
       padding: 4px;
       border-radius: 6px;
@@ -576,7 +530,7 @@
     .btn-del-reminder:hover { color: #ef4444; background: var(--del-hover-bg); }
     .reminders-empty {
       font-size: 0.82rem;
-      color: var(--muted);
+      color: var(--text-dim);
       text-align: center;
       padding: 6px 0 8px;
     }
@@ -601,7 +555,7 @@
       transition: border-color 0.2s, background 0.3s, color 0.3s;
     }
     .reminder-input:focus { border-color: #0d9488; }
-    .reminder-input::placeholder { color: var(--muted); }
+    .reminder-input::placeholder { color: var(--text-dim); }
     .btn-reminder-add {
       padding: 8px 14px;
       background: #0d9488;
@@ -646,14 +600,14 @@
 
     .section-count {
       font-size: 0.78rem;
-      color: var(--muted);
+      color: var(--text-dim);
       font-weight: 500;
       flex: 1;
       transition: color 0.3s;
     }
 
     .section-chevron {
-      color: var(--muted);
+      color: var(--text-dim);
       transition: transform 0.2s, color 0.3s;
       display: flex;
     }
@@ -667,7 +621,7 @@
       text-align: center;
       padding: 20px 0 12px;
     }
-    .empty p { font-size: 0.875rem; color: var(--muted); }
+    .empty p { font-size: 0.875rem; color: var(--text-dim); }
 
     /* ── Task item ── */
     .task {
@@ -711,16 +665,16 @@
       flex-shrink: 0;
     }
 
-    .section-block[data-section="school"] .task input[type="checkbox"]:checked { background: #6366f1; border-color: #6366f1; }
-    .section-block[data-section="work"]   .task input[type="checkbox"]:checked { background: #10b981; border-color: #10b981; }
-    .section-block[data-section="misc"]   .task input[type="checkbox"]:checked { background: #f59e0b; border-color: #f59e0b; }
+    .section-block[data-section="school"] .task input[type="checkbox"]:checked { background: var(--check-fill); border-color: var(--check-fill); }
+    .section-block[data-section="work"]   .task input[type="checkbox"]:checked { background: var(--check-fill); border-color: var(--check-fill); }
+    .section-block[data-section="misc"]   .task input[type="checkbox"]:checked { background: var(--check-fill); border-color: var(--check-fill); }
 
     .task input[type="checkbox"]:checked::after {
       content: "";
       display: block;
       width: 5px;
       height: 9px;
-      border: 2px solid #fff;
+      border: 2px solid var(--check-mark);
       border-top: none;
       border-left: none;
       transform: rotate(45deg) translateY(-1px);
@@ -742,7 +696,7 @@
       transition: color 0.15s;
       touch-action: manipulation;
     }
-    .task.done .task-text { text-decoration: line-through; color: var(--muted); }
+    .task.done .task-text { text-decoration: line-through; color: var(--text-dim); }
 
     /* Sublabel + due date meta row */
     .task-meta {
@@ -768,7 +722,7 @@
       padding: 2px 8px;
       border-radius: 8px;
       background: var(--task-bg);
-      color: var(--muted);
+      color: var(--text-dim);
       border: 1.5px solid var(--border);
       display: inline-flex;
       align-items: center;
@@ -787,7 +741,7 @@
       cursor: pointer;
       padding: 5px;
       border-radius: 7px;
-      color: var(--muted);
+      color: var(--text-dim);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -811,7 +765,7 @@
       border-radius: 7px;
       font-size: 1.05rem;
       line-height: 1;
-      color: var(--muted);
+      color: var(--text-dim);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -901,7 +855,7 @@
       border-radius: 12px; font-size: 0.85rem; font-weight: 500;
       color: var(--subtle); transition: color 0.3s; min-height: 20px;
     }
-    .wst-sep { color: var(--muted); }
+    .wst-sep { color: var(--text-dim); }
 
     /* Weekly summary bar */
     .weekly-summary-bar {
@@ -910,7 +864,7 @@
       font-size: 0.8rem; color: var(--text);
       display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
     }
-    .wk-label { color: var(--muted); font-weight: 600; }
+    .wk-label { color: var(--text-dim); font-weight: 600; }
     .wk-chip {
       background: var(--card); border: 1.5px solid var(--border);
       border-radius: 6px; padding: 2px 8px; font-size: 0.75rem;
@@ -956,7 +910,7 @@
       padding: 2px 0; border-bottom: 1.5px solid var(--border); min-width: 0;
     }
     .exercise-name-input:focus { outline: none; border-bottom-color: #22c55e; }
-    .exercise-name-input::placeholder { color: var(--muted); }
+    .exercise-name-input::placeholder { color: var(--text-dim); }
     .pr-badge {
       font-size: 0.65rem; font-weight: 700;
       background: #fef3c7; color: #d97706;
@@ -965,13 +919,13 @@
     }
     body.dark .pr-badge { background: #3a2a00; color: #fbbf24; border-color: #fbbf24; }
     .ex-remove, .set-remove {
-      background: none; border: none; color: var(--muted);
+      background: none; border: none; color: var(--text-dim);
       cursor: pointer; font-size: 0.75rem; padding: 2px 4px;
       border-radius: 4px; transition: color 0.15s, background 0.15s;
     }
     .ex-remove:hover, .set-remove:hover { color: #ef4444; background: #fee2e2; }
     .set-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
-    .set-num { font-size: 0.72rem; color: var(--muted); min-width: 38px; }
+    .set-num { font-size: 0.72rem; color: var(--text-dim); min-width: 38px; }
     .set-input {
       width: 58px; padding: 4px 6px;
       border: 1.5px solid var(--border); border-radius: 6px;
@@ -979,11 +933,11 @@
       font-size: 0.82rem; font-family: inherit; text-align: center;
     }
     .set-input:focus { outline: none; border-color: #22c55e; }
-    .set-x { color: var(--muted); font-size: 0.78rem; }
+    .set-x { color: var(--text-dim); font-size: 0.78rem; }
     .btn-add-set, .btn-add-exercise {
       margin-top: 6px; padding: 4px 10px;
       border: 1.5px dashed var(--border); border-radius: 6px;
-      background: transparent; color: var(--muted);
+      background: transparent; color: var(--text-dim);
       font-size: 0.78rem; cursor: pointer;
       transition: color 0.15s, border-color 0.15s; touch-action: manipulation;
     }
@@ -993,7 +947,7 @@
     .intensity-btn {
       width: 32px; height: 32px; border-radius: 8px;
       border: 2px solid var(--border); background: var(--card);
-      color: var(--muted); font-size: 0.85rem; font-weight: 700;
+      color: var(--text-dim); font-size: 0.85rem; font-weight: 700;
       cursor: pointer; transition: all 0.15s; touch-action: manipulation;
     }
     .intensity-btn.active { background: #22c55e; border-color: #22c55e; color: #fff; }
@@ -1004,7 +958,7 @@
       font-size: 0.82rem; font-family: inherit; resize: vertical; box-sizing: border-box;
     }
     .workout-notes:focus { outline: none; border-color: #22c55e; }
-    .workout-notes::placeholder { color: var(--muted); }
+    .workout-notes::placeholder { color: var(--text-dim); }
 
     /* SPINNERS */
     .spinner-group {
@@ -1025,15 +979,166 @@
       font-size: 0.88rem; font-weight: 600; color: var(--text); padding: 0 2px;
     }
     .spinner-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-    .spinner-label { font-size: 0.62rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .spinner-label { font-size: 0.62rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
     .set-actions { display: flex; gap: 8px; margin: 3px 0 6px 42px; }
     .set-action-btn {
-      font-size: 0.72rem; color: var(--muted); background: none;
+      font-size: 0.72rem; color: var(--text-dim); background: none;
       border: 1px solid var(--border); border-radius: 5px;
       padding: 3px 8px; cursor: pointer; touch-action: manipulation;
       transition: color 0.15s, border-color 0.15s;
     }
     .set-action-btn:hover { color: #6366f1; border-color: #6366f1; }
+
+    /* ══ APP HEADER (minimal) ══ */
+    .app-header {
+      display: flex; justify-content: flex-end; align-items: center;
+      padding: 10px 0 4px; margin-bottom: 0;
+    }
+    .app-header-actions { display: flex; gap: 8px; align-items: center; }
+
+    /* ══ HOMEPAGE ══ */
+    .home-accent-line {
+      height: 1px; width: 100%;
+      background: var(--top-line);
+      margin-bottom: 20px;
+    }
+    .home-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .home-header-left { flex: 1; }
+    .home-header-right { flex-shrink: 0; }
+    .home-date-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 500; color: var(--accent); display: block; margin-bottom: 4px; }
+    .home-heading { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: var(--heading); margin: 0 0 2px; line-height: 1.1; font-family: 'Satoshi', 'DM Sans', system-ui, sans-serif; }
+    .home-subtitle { font-size: 13px; color: var(--subtle); margin: 0; }
+    .btn-settings-home {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--card); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--subtle); transition: color 0.15s;
+    }
+    .btn-settings-home:hover { color: var(--accent); }
+
+    .home-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 16px; margin-bottom: 12px;
+    }
+    .home-card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px;
+    }
+    .home-card-title { font-size: 13px; font-weight: 700; color: var(--heading); margin-left: 4px; }
+
+    .water-card-header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+    .water-card-label { font-size: 13px; font-weight: 700; color: var(--heading); flex: 1; }
+    .water-card-count { font-size: 13px; font-weight: 600; color: var(--accent); }
+
+    .water-bar-track {
+      height: 6px; border-radius: 4px; background: var(--water-track);
+      overflow: hidden; margin-bottom: 12px;
+    }
+    .water-fill {
+      height: 100%; border-radius: 4px; width: 0%;
+      background: var(--water-grad); transition: width 0.4s ease; position: relative;
+      overflow: hidden;
+    }
+    .water-controls {
+      display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 10px;
+    }
+    .btn-water-ctrl {
+      width: 40px; height: 40px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--card);
+      color: var(--text); font-size: 1.3rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.15s; touch-action: manipulation;
+    }
+    .btn-water-ctrl:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-water-plus {
+      border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      color: var(--accent);
+    }
+    .water-count-display { text-align: center; }
+    .water-count-num { display: block; font-size: 24px; font-weight: 700; color: var(--heading); line-height: 1; }
+    .water-count-unit { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-dim); text-transform: uppercase; }
+    .water-goal-banner {
+      margin-top: 10px; padding: 8px 12px;
+      background: var(--success-bg); border: 1px solid var(--success-border);
+      border-radius: 8px; color: var(--success-text);
+      font-size: 13px; font-weight: 600; text-align: center;
+    }
+    .water-goal-banner.hidden { display: none; }
+
+    .home-section-header {
+      font-size: 13px; font-weight: 700; color: var(--heading);
+      margin: 16px 0 8px; letter-spacing: -0.01em;
+    }
+
+    /* TASK ROW priority left bar */
+    .task-row { position: relative; }
+    .task-row::before {
+      content: ''; position: absolute; left: 0; top: 4px; bottom: 4px;
+      width: 3px; border-radius: 2px;
+      background: var(--pri-low);
+    }
+    .task-row.priority-high::before { background: var(--pri-high); }
+    .task-row.priority-med::before  { background: var(--pri-med); }
+    .task-row.done::before { background: var(--border); }
+
+    /* TASK ACTIONS (hover reveal) */
+    .task-actions {
+      display: flex; gap: 4px; flex-shrink: 0;
+      opacity: 0; pointer-events: none; transition: opacity 0.15s;
+    }
+    .task-row:hover .task-actions { opacity: 1; pointer-events: auto; }
+    @media (hover: none) { .task-actions { opacity: 1; pointer-events: auto; } }
+    .btn-edit-task {
+      width: 28px; height: 28px; border-radius: 6px; border: none; cursor: pointer;
+      background: var(--accent-soft); color: var(--accent);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .btn-delete-task {
+      width: 28px; height: 28px; border-radius: 6px; border: none; cursor: pointer;
+      background: #ff444415; color: #ff6666;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    /* BOTTOM NAV */
+    .home-bottom-nav {
+      display: flex; justify-content: center; gap: 8px;
+      padding: 14px 0 20px; margin-top: 16px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .home-nav-pill {
+      font-size: 11px; font-weight: 500; color: var(--subtle);
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 12px; cursor: pointer;
+      transition: color 0.15s, border-color 0.15s; touch-action: manipulation;
+      font-family: 'Satoshi', 'DM Sans', system-ui, sans-serif;
+    }
+    .home-nav-pill:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* BACK BAR on secondary tabs */
+    .tab-back-bar {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .btn-back-home {
+      font-size: 0.78rem; font-weight: 600; color: var(--accent);
+      background: var(--accent-soft); border: none; border-radius: 8px;
+      padding: 5px 10px; cursor: pointer; touch-action: manipulation;
+    }
+    .tab-back-title {
+      font-size: 0.9rem; font-weight: 700; color: var(--heading);
+    }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: var(--noise-opacity, 0.025);
+      pointer-events: none; z-index: 0;
+    }
 
     /* ══ QUICK STIM PANEL ══ */
     .stim-activity-row {
@@ -1105,17 +1210,17 @@
     .btn-wotd-random:hover  { background: #6d28d9; }
     .btn-wotd-random:active { transform: scale(0.96); }
     .btn-wotd-random:disabled {
-      background: var(--task-bg); color: var(--muted);
+      background: var(--task-bg); color: var(--text-dim);
       border: 1.5px solid var(--border); cursor: not-allowed;
       transform: none !important; font-size: 0.78rem; line-height: 1.4;
     }
     .btn-wotd-random:disabled:hover { background: var(--task-bg); }
     .wotd-limit-msg {
-      font-size: 0.75rem; color: var(--muted); text-align: right;
+      font-size: 0.75rem; color: var(--text-dim); text-align: right;
       margin-top: 6px; display: none; font-style: italic;
     }
     .wotd-footer {
-      font-size: 0.72rem; color: var(--muted); text-align: center;
+      font-size: 0.72rem; color: var(--text-dim); text-align: center;
       padding-top: 12px; border-top: 1px solid var(--border);
     }
 
@@ -1147,11 +1252,11 @@
       display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;
     }
     .cal-workout-badge { font-size: 0.8rem; font-weight: 700; color: #22c55e; }
-    .cal-workout-intensity { font-size: 0.75rem; color: var(--muted); }
+    .cal-workout-intensity { font-size: 0.75rem; color: var(--text-dim); }
     .cal-summary-groups { font-size: 0.8rem; color: var(--text); margin-bottom: 4px; }
-    .cal-summary-vol { font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+    .cal-summary-vol { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 4px; }
     .cal-summary-vol strong { color: #22c55e; }
-    .cal-summary-notes { font-size: 0.75rem; color: var(--muted); font-style: italic; margin-bottom: 6px; }
+    .cal-summary-notes { font-size: 0.75rem; color: var(--text-dim); font-style: italic; margin-bottom: 6px; }
     .btn-edit-workout {
       font-size: 0.75rem; font-weight: 600; color: #22c55e;
       background: none; border: 1.5px solid #22c55e44;
@@ -1164,7 +1269,7 @@
     .footer {
       margin-top: 16px;
       font-size: 0.78rem;
-      color: var(--muted);
+      color: var(--text-dim);
       text-align: right;
       transition: color 0.3s;
     }
@@ -1184,7 +1289,7 @@
       border: none;
       cursor: pointer;
       font-size: 0.78rem;
-      color: var(--muted);
+      color: var(--text-dim);
       padding: 6px 4px;
       border-radius: 6px;
       transition: color 0.15s;
@@ -1231,7 +1336,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--muted);
+      color: var(--text-dim);
       padding: 4px;
       border-radius: 6px;
       display: flex;
@@ -1251,7 +1356,7 @@
       letter-spacing: 0.06em;
       margin-bottom: 6px;
     }
-    .modal-lbl span { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--muted); }
+    .modal-lbl span { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--text-dim); }
 
     .modal-input {
       width: 100%;
@@ -1266,7 +1371,7 @@
       transition: border-color 0.2s, background 0.3s, color 0.3s;
     }
     .modal-input:focus { border-color: #6366f1; }
-    .modal-input::placeholder { color: var(--muted); }
+    .modal-input::placeholder { color: var(--text-dim); }
 
     .modal-form-row {
       display: grid;
@@ -1332,7 +1437,7 @@
       touch-action: manipulation;
       transition: border-color 0.15s;
     }
-    .btn-modal-cancel:hover { border-color: var(--muted); }
+    .btn-modal-cancel:hover { border-color: var(--text-dim); }
     .btn-modal-save {
       padding: 10px 20px;
       background: #6366f1;
@@ -1460,7 +1565,7 @@
     .cal-weekday {
       font-size: 0.68rem;
       font-weight: 700;
-      color: var(--muted);
+      color: var(--text-dim);
       text-transform: uppercase;
       letter-spacing: 0.04em;
       padding: 4px 0;
@@ -1491,7 +1596,7 @@
       touch-action: manipulation;
     }
     .cal-day:hover:not(.cal-day-other) { background: var(--task-bg); }
-    .cal-day-other { color: var(--muted); cursor: default; opacity: 0.45; }
+    .cal-day-other { color: var(--text-dim); cursor: default; opacity: 0.45; }
     .cal-day-other:hover { background: none; }
     .cal-day-today {
       background: #eef2ff;
@@ -1540,7 +1645,7 @@
     }
     .cal-tasks-empty {
       font-size: 0.85rem;
-      color: var(--muted);
+      color: var(--text-dim);
       text-align: center;
       padding: 20px 0;
     }
@@ -1567,91 +1672,9 @@
     }
 
     /* ══════════════════════════════════════════════════════
-       WATER TRACKER
+       WATER TRACKER — styles now in homepage CSS block above
     ══════════════════════════════════════════════════════ */
-    .water-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 28px;
-    }
-    .water-drop { font-size: 2.2rem; line-height: 1; flex-shrink: 0; }
-    .water-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--heading);
-      margin-bottom: 3px;
-      transition: color 0.3s;
-    }
-    .water-sub { font-size: 0.78rem; color: var(--muted); }
-
-    .bottle-counter {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      margin-bottom: 10px;
-    }
-    .btn-water-ctrl {
-      width: 50px; height: 50px;
-      border-radius: 50%;
-      background: var(--water);
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s, transform 0.1s, opacity 0.2s;
-      touch-action: manipulation;
-      box-shadow: 0 3px 10px rgba(14,165,233,0.40);
-      flex-shrink: 0;
-    }
-    .btn-water-ctrl:hover  { background: var(--water-dark); }
-    .btn-water-ctrl:active { transform: scale(0.92); }
-    .btn-water-ctrl:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
-
-    .bottle-display { text-align: center; min-width: 90px; }
-    .bottle-num {
-      display: block;
-      font-size: 3rem;
-      font-weight: 800;
-      color: var(--water);
-      line-height: 1;
-      transition: color 0.3s;
-      font-variant-numeric: tabular-nums;
-    }
-    .bottle-label { font-size: 0.78rem; color: var(--muted); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
-
-    .water-oz-text { text-align: center; font-size: 0.9rem; color: var(--subtle); margin-bottom: 22px; transition: color 0.3s; }
-
-    .water-bar-track {
-      width: 100%; height: 54px;
-      border-radius: 14px;
-      background: var(--task-bg);
-      border: 2px solid var(--border);
-      overflow: hidden;
-      position: relative;
-      margin-bottom: 10px;
-      transition: background 0.3s, border-color 0.3s;
-    }
-    .water-fill {
-      height: 100%; width: 0%;
-      background: linear-gradient(180deg, var(--water-fill-top) 0%, var(--water-fill-bot) 100%);
-      border-radius: 12px;
-      position: relative;
-      overflow: hidden;
-      transition: width 0.65s cubic-bezier(0.34, 1.2, 0.64, 1);
-    }
-    .water-fill::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 40%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 100%);
-      border-radius: 12px 12px 0 0;
-      pointer-events: none;
-    }
+    /* Wave animation kept for water bar */
     .wave {
       position: absolute;
       top: -10px; left: -100%;
@@ -1667,31 +1690,6 @@
       75%  { transform: translateX(-6%) scaleY(0.88); }
       100% { transform: translateX(0)   scaleY(1);    }
     }
-    .water-stats {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.82rem;
-      color: var(--muted);
-      margin-bottom: 18px;
-      transition: color 0.3s;
-    }
-    .water-pct-label { font-weight: 700; color: var(--water); font-size: 0.9rem; }
-    .water-complete {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: #ecfdf5;
-      border: 2px solid #6ee7b7;
-      border-radius: 12px;
-      padding: 13px 16px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #065f46;
-      animation: fadeInUp 0.35s ease;
-    }
-    body.dark .water-complete { background: #064e3b; border-color: #059669; color: #6ee7b7; }
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -1803,17 +1801,17 @@
     .journal-return-btn {
       font-size: 0.78rem; background: none; border: 1px solid var(--border);
       border-radius: 8px; padding: 4px 14px; cursor: pointer;
-      color: var(--muted); font-family: inherit;
+      color: var(--text-dim); font-family: inherit;
       transition: border-color 0.2s, color 0.2s;
     }
     .journal-return-btn:hover { border-color: #6366f1; color: #6366f1; }
     .journal-future-msg {
-      text-align: center; color: var(--muted); font-size: 0.9rem;
+      text-align: center; color: var(--text-dim); font-size: 0.9rem;
       padding: 32px 0; font-style: italic;
     }
     .journal-section-label {
       font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 10px;
+      letter-spacing: 0.07em; color: var(--text-dim); margin-bottom: 10px;
     }
     /* Mood row */
     .journal-mood-section { margin-bottom: 20px; }
@@ -1889,7 +1887,7 @@
       text-align: center; padding: 6px 0 10px;
     }
     .gcal-reconnect button {
-      font-size: 0.8rem; color: var(--muted); background: none;
+      font-size: 0.8rem; color: var(--text-dim); background: none;
       border: 1px solid var(--border); border-radius: 8px;
       padding: 5px 12px; cursor: pointer; font-family: inherit;
       transition: border-color 0.2s, color 0.2s;
@@ -1903,7 +1901,7 @@
     }
     .cal-gcal-section-title {
       font-size: 0.74rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 10px;
+      letter-spacing: 0.07em; color: var(--text-dim); margin-bottom: 10px;
     }
     .cal-gcal-event-item {
       display: flex; align-items: flex-start; gap: 9px;
@@ -1911,7 +1909,7 @@
     }
     .cal-gcal-event-item:last-child { border-bottom: none; }
     .cal-gcal-event-name { font-size: 0.88rem; font-weight: 600; color: var(--text); }
-    .cal-gcal-event-time { font-size: 0.77rem; color: var(--muted); margin-top: 2px; }
+    .cal-gcal-event-time { font-size: 0.77rem; color: var(--text-dim); margin-top: 2px; }
     .cal-gcal-event-desc {
       font-size: 0.77rem; color: var(--subtle); margin-top: 3px;
       display: -webkit-box; -webkit-line-clamp: 2;
@@ -1973,20 +1971,10 @@
 </div><!-- /#sw-bg -->
 
 <div class="card">
-  <!-- Header -->
-  <div class="header">
-    <div>
-      <h1>My Day</h1>
-      <p class="subtitle">Stay on top of your day</p>
-    </div>
-    <div class="header-actions">
-      <button class="btn-auth" id="auth-btn" onclick="handleAuthClick()" aria-label="Sign in to sync" title="Sign in to sync across devices">
-        <svg class="auth-icon-cloud" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
-        </svg>
-        <span class="auth-avatar" id="auth-avatar"></span>
-      </button>
-      <button class="btn-theme" id="theme-btn" aria-label="Toggle dark mode">
+  <!-- App Header (minimal — just auth + theme) -->
+  <div class="app-header">
+    <div class="app-header-actions">
+      <button class="btn-theme" id="theme-btn" onclick="toggleDark()" aria-label="Toggle theme">
         <svg class="icon-moon" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
         </svg>
@@ -2018,198 +2006,176 @@
           <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>
         </svg>
       </button>
-      <div class="settings-wrapper">
-        <button class="btn-settings" id="settings-btn" onclick="toggleSettingsMenu()" aria-label="Settings">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
-        </button>
-        <div class="settings-menu hidden" id="settings-menu">
-          <div class="settings-section">
-            <div class="settings-section-title">Modes</div>
-            <label class="settings-radio-item">
-              <input type="radio" name="appMode" value="normal" id="mode-normal" onchange="setAppMode('normal')">
-              Normal
-            </label>
-            <label class="settings-radio-item">
-              <input type="radio" name="appMode" value="starWars" id="mode-starwars" onchange="setAppMode('starWars')">
-              ⚡ Star Wars
-            </label>
-          </div>
-          <div class="settings-divider"></div>
-          <div class="settings-section">
-            <div class="settings-section-title">Theme</div>
-            <button class="settings-theme-row" onclick="toggleDark()">
-              <span>Dark Mode</span>
-              <div class="settings-toggle-pill" id="settings-dark-pill"></div>
-            </button>
+      <button class="btn-auth" id="auth-btn" onclick="handleAuthClick()" aria-label="Sign in to sync" title="Sign in to sync across devices">
+        <svg class="auth-icon-cloud" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+        </svg>
+        <span class="auth-avatar" id="auth-avatar"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Hidden view-menu stub (needed by closeViewMenu() JS calls) -->
+  <div class="view-menu hidden" id="view-menu" style="display:none!important"></div>
+
+  <!-- ══ HOME PANEL ══ -->
+  <div id="panel-home">
+    <div class="home-accent-line"></div>
+
+    <!-- Homepage Header -->
+    <div class="home-header">
+      <div class="home-header-left">
+        <span class="home-date-label" id="home-date-label">LOADING...</span>
+        <h1 class="home-heading" id="home-heading">Today</h1>
+        <p class="home-subtitle" id="home-subtitle">Loading tasks...</p>
+      </div>
+      <div class="home-header-right">
+        <div class="settings-wrapper">
+          <button class="btn-settings-home" onclick="toggleSettingsMenu()" aria-label="Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+          <div class="settings-menu hidden" id="settings-menu">
+            <div class="settings-section">
+              <div class="settings-section-title">Modes</div>
+              <label class="settings-radio-item">
+                <input type="radio" name="appMode" value="normal" id="mode-normal" onchange="setAppMode('normal')">
+                Normal
+              </label>
+              <label class="settings-radio-item">
+                <input type="radio" name="appMode" value="starWars" id="mode-starwars" onchange="setAppMode('starWars')">
+                ⚡ Star Wars
+              </label>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="settings-section">
+              <div class="settings-section-title">Theme</div>
+              <button class="settings-theme-row" onclick="toggleDark()">
+                <span>Dark Mode</span>
+                <div class="settings-toggle-pill" id="settings-dark-pill"></div>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- View Switcher -->
-  <div class="view-switcher" id="view-switcher">
-    <button class="view-trigger" id="view-trigger" onclick="toggleViewMenu()" aria-haspopup="listbox">
-      <span id="view-trigger-label">📅 Calendar</span>
-      <svg class="view-chevron" id="view-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 9l6 6 6-6"/>
-      </svg>
-    </button>
-    <div class="view-menu hidden" id="view-menu" role="listbox">
-      <button class="view-item" data-tab="cal"     onclick="switchTab('cal')"    >📅 Calendar</button>
-      <button class="view-item" data-tab="tasks"   onclick="switchTab('tasks')"  >📋 My Tasks</button>
-      <button class="view-item" data-tab="water"   onclick="switchTab('water')"  >💧 Water Drank</button>
-      <button class="view-item" data-tab="workout" onclick="switchTab('workout')">💪 Workout</button>
-      <button class="view-item" data-tab="stim"    onclick="switchTab('stim')"   >✨ Quick Stim</button>
-      <button class="view-item" data-tab="journal" onclick="switchTab('journal')">📔 Journal</button>
-    </div>
-  </div>
-
-  <!-- ══ TASKS PANEL ══ -->
-  <div id="panel-tasks">
-    <!-- Add Task button -->
-    <button class="btn-open-modal" onclick="openTaskModal(-1)">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
-      Add Task
-    </button>
-
-    <!-- Reminders -->
-    <div class="reminders-block">
-      <div class="reminders-header">
-        <div class="reminders-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="23 4 23 10 17 10"/>
-            <path d="M20.49 15a9 9 0 1 1-.18-3.5"/>
-          </svg>
-          Daily Reminders
+    <!-- Water Tracker Card -->
+    <div class="home-card">
+      <div class="water-card-header">
+        <span>💧</span>
+        <span class="water-card-label">Water intake</span>
+        <span class="water-card-count" id="water-card-count">0 / 5 glasses</span>
+      </div>
+      <div class="water-bar-track">
+        <div class="water-fill" id="water-fill">
+          <div class="wave" id="water-wave"></div>
         </div>
+      </div>
+      <div class="saber-container">
+        <div class="saber-hilt-h"></div>
+        <div class="saber-blade-track-h">
+          <div class="saber-blade-h" id="saber-blade"></div>
+        </div>
+      </div>
+      <div class="saber-power-label" id="saber-power-label"></div>
+      <div class="water-controls">
+        <button class="btn-water-ctrl" id="btn-minus" onclick="adjustBottles(-1)" aria-label="Remove bottle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="water-count-display">
+          <span class="water-count-num" id="bottle-num">0</span>
+          <span class="water-count-unit">GLASSES</span>
+        </div>
+        <button class="btn-water-ctrl btn-water-plus" id="btn-plus" onclick="adjustBottles(1)" aria-label="Add bottle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+      <div class="water-goal-banner hidden" id="water-complete">🎉 Goal reached! Nice work.</div>
+    </div>
+
+    <!-- Daily Reminders Card -->
+    <div class="home-card">
+      <div class="home-card-header">
+        <span style="display:flex;align-items:center;gap:6px;">
+          <span>🔄</span>
+          <span class="home-card-title">Daily Reminders</span>
+        </span>
         <span class="reminders-done-count" id="reminders-done-count"></span>
       </div>
       <div id="reminders-list"></div>
       <div class="reminder-add-row">
-        <input class="reminder-input" id="reminder-input" type="text"
-               placeholder="Add a recurring reminder…" maxlength="100" autocomplete="off" />
+        <input class="reminder-input" id="reminder-input" type="text" placeholder="Add a recurring reminder…" maxlength="100" autocomplete="off" onkeydown="if(event.key==='Enter')addReminder()"/>
         <button class="btn-reminder-add" onclick="addReminder()">Add</button>
       </div>
     </div>
 
-    <!-- Top 3 Today -->
+    <!-- Tasks Section -->
+    <div class="home-section-header">Tasks</div>
+
     <div id="top3-section" class="top3-section hidden">
       <div class="top3-header">
         <span class="top3-title">⭐ Top 3 Today</span>
         <span class="top3-count" id="top3-count">0 / 3</span>
       </div>
-      <p id="priority-limit-msg" class="priority-limit-msg hidden">
-        Only 3 priorities allowed today — deselect one first.
-      </p>
+      <p id="priority-limit-msg" class="priority-limit-msg hidden">Only 3 priorities allowed today — deselect one first.</p>
       <ul id="list-top3" class="top3-list"></ul>
     </div>
 
-    <!-- School section -->
     <div class="section-block" id="block-school" data-section="school">
-      <div class="section-header" id="hdr-school">
+      <div class="section-header" id="hdr-school" onclick="toggleSection('school')">
         <span class="section-pill pill-school">School</span>
         <span class="section-count" id="count-school"></span>
-        <span class="section-chevron">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-          </svg>
-        </span>
+        <span class="section-chevron" id="chev-school"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
       </div>
       <ul class="section-list" id="list-school"></ul>
     </div>
 
-    <!-- Work section -->
     <div class="section-block" id="block-work" data-section="work">
-      <div class="section-header" id="hdr-work">
+      <div class="section-header" id="hdr-work" onclick="toggleSection('work')">
         <span class="section-pill pill-work">Work</span>
         <span class="section-count" id="count-work"></span>
-        <span class="section-chevron">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-          </svg>
-        </span>
+        <span class="section-chevron" id="chev-work"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
       </div>
       <ul class="section-list" id="list-work"></ul>
     </div>
 
-    <!-- Misc section -->
     <div class="section-block" id="block-misc" data-section="misc">
-      <div class="section-header" id="hdr-misc">
+      <div class="section-header" id="hdr-misc" onclick="toggleSection('misc')">
         <span class="section-pill pill-misc">Misc</span>
         <span class="section-count" id="count-misc"></span>
-        <span class="section-chevron">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-          </svg>
-        </span>
+        <span class="section-chevron" id="chev-misc"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
       </div>
       <ul class="section-list" id="list-misc"></ul>
     </div>
 
-    <p class="footer" id="footer"></p>
+    <button class="btn-open-modal" onclick="openTaskModal(-1)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add task
+    </button>
 
+    <p class="footer" id="footer"></p>
     <div class="sync-row">
       <button class="btn-sync" id="export-btn">↑ Export tasks</button>
       <button class="btn-sync" id="import-btn">↓ Import tasks</button>
     </div>
-  </div><!-- /panel-tasks -->
 
-  <!-- ══ WATER PANEL ══ -->
-  <div id="panel-water" class="hidden">
-    <div class="water-header">
-      <span class="water-drop">💧</span>
-      <div>
-        <p class="water-title">Today's Water Intake</p>
-        <p class="water-sub">26 oz per bottle · Goal: 128 oz (1 gallon)</p>
-      </div>
-    </div>
-    <div class="bottle-counter">
-      <button class="btn-water-ctrl" id="btn-minus" onclick="adjustBottles(-1)" aria-label="Remove one bottle">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-      </button>
-      <div class="bottle-display">
-        <span class="bottle-num" id="bottle-num">0</span>
-        <span class="bottle-label">bottles</span>
-      </div>
-      <button class="btn-water-ctrl" id="btn-plus" onclick="adjustBottles(1)" aria-label="Add one bottle">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-      </button>
-    </div>
-    <p class="water-oz-text" id="water-oz-text">0 oz consumed</p>
-    <div class="water-bar-track">
-      <div class="water-fill" id="water-fill">
-        <div class="wave" id="water-wave"></div>
-      </div>
-    </div>
-    <div class="saber-container">
-      <div class="saber-wrapper">
-        <div class="saber-blade-track">
-          <div class="saber-blade" id="saber-blade"></div>
-        </div>
-        <div class="saber-hilt"></div>
-      </div>
-    </div>
-    <div class="water-stats">
-      <span><span class="water-pct-label" id="water-pct">0%</span> of daily goal</span>
-      <span id="water-remaining">128 oz to go</span>
-    </div>
-    <div class="water-complete hidden" id="water-complete">
-      🎉 Daily goal reached — well done!
-    </div>
-  </div><!-- /panel-water -->
+    <nav class="home-bottom-nav" aria-label="Navigation">
+      <button class="home-nav-pill" onclick="switchTab('cal')">📅 Calendar</button>
+      <button class="home-nav-pill" onclick="switchTab('workout')">💪 Workout</button>
+      <button class="home-nav-pill" onclick="switchTab('stim')">✨ Stim</button>
+      <button class="home-nav-pill" onclick="switchTab('journal')">📔 Journal</button>
+    </nav>
+  </div><!-- /panel-home -->
+
+  <!-- ══ TASKS PANEL (empty — content moved to panel-home) ══ -->
+  <div id="panel-tasks" class="hidden"></div>
+
+  <!-- ══ WATER PANEL (empty — content moved to panel-home) ══ -->
+  <div id="panel-water" class="hidden"></div>
 
   <!-- ══ CALENDAR PANEL ══ -->
   <div id="panel-cal" class="hidden">
+    <div class="tab-back-bar"><button class="btn-back-home" onclick="switchTab('home')">← Home</button><span class="tab-back-title">📅 Calendar</span></div>
     <div class="streak-bars-container">
       <div id="water-streak-bar" class="streak-bar-row"></div>
       <div id="gym-streak-bar"   class="streak-bar-row"></div>
@@ -2264,6 +2230,7 @@
 
   <!-- ══ WORKOUT PANEL ══ -->
   <div id="panel-workout" class="hidden">
+    <div class="tab-back-bar"><button class="btn-back-home" onclick="switchTab('home')">← Home</button><span class="tab-back-title">💪 Workout</span></div>
     <div class="workout-date-nav">
       <button class="btn-cal-nav" onclick="workoutPrevDay()" aria-label="Previous day">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -2289,6 +2256,7 @@
 
   <!-- ══ QUICK STIM PANEL ══ -->
   <div id="panel-stim" class="hidden">
+    <div class="tab-back-bar"><button class="btn-back-home" onclick="switchTab('home')">← Home</button><span class="tab-back-title">✨ Quick Stim</span></div>
     <div class="stim-activity-row">
       <select class="stim-activity-select" id="stim-activity" onchange="onStimActivityChange()">
         <option value="wotd">Word of the Day</option>
@@ -2316,6 +2284,7 @@
 
   <!-- ══ JOURNAL PANEL ══ -->
   <div id="panel-journal" class="hidden">
+    <div class="tab-back-bar"><button class="btn-back-home" onclick="switchTab('home')">← Home</button><span class="tab-back-title">📔 Journal</span></div>
     <!-- Selected date label -->
     <div class="journal-date-header">
       <span class="journal-date-label" id="journal-date-label"></span>
@@ -2529,6 +2498,7 @@
     if (radSW)     radSW.checked     = isSW;
     if (isSW) starfieldInit();
     renderWater();
+    if (typeof updateHomeHeader === 'function') updateHomeHeader();
   }
 
   // ══ SW BACKGROUND SYSTEM ══════════════════════════════
@@ -2604,14 +2574,16 @@
     saveToFirestore();
     const pill = document.getElementById('settings-dark-pill');
     if (pill) pill.classList.toggle('on', dark);
+    if (typeof updateHomeHeader === 'function') updateHomeHeader();
   }
 
   if (dark) document.body.classList.add('dark');
-  document.getElementById('theme-btn').addEventListener('click', toggleDark);
+  // Note: theme-btn onclick is handled inline in HTML
 
   // Settings menu
   function toggleSettingsMenu() {
     const menu = document.getElementById('settings-menu');
+    if (!menu) return;
     const isOpen = !menu.classList.contains('hidden');
     if (isOpen) { menu.classList.add('hidden'); }
     else {
@@ -2622,29 +2594,23 @@
     }
   }
   function closeSettingsMenu() {
-    document.getElementById('settings-menu').classList.add('hidden');
+    const m = document.getElementById('settings-menu');
+    if (m) m.classList.add('hidden');
   }
 
-  // View menu
+  // View menu (stub — view switcher removed in redesign)
   function toggleViewMenu() {
-    const menu    = document.getElementById('view-menu');
-    const chevron = document.getElementById('view-chevron');
-    const isOpen  = !menu.classList.contains('hidden');
-    menu.classList.toggle('hidden', isOpen);
-    chevron.classList.toggle('open', !isOpen);
-    if (!isOpen) closeSettingsMenu();
+    closeSettingsMenu();
   }
   function closeViewMenu() {
-    document.getElementById('view-menu').classList.add('hidden');
+    const viewMenu = document.getElementById('view-menu');
+    if (viewMenu) viewMenu.classList.add('hidden');
     const chevron = document.getElementById('view-chevron');
     if (chevron) chevron.classList.remove('open');
   }
 
   // Close menus on outside click
   document.addEventListener('click', function(e) {
-    if (!e.target.closest('#view-switcher') && !document.getElementById('view-menu').classList.contains('hidden')) {
-      closeViewMenu();
-    }
     if (!e.target.closest('.settings-wrapper') && !document.getElementById('settings-menu').classList.contains('hidden')) {
       closeSettingsMenu();
     }
@@ -2775,23 +2741,24 @@
     });
 
     const footer = document.getElementById('footer');
-    if (totalAll === 0) {
-      footer.textContent = '';
-    } else if (totalDone === totalAll) {
-      footer.textContent = `All ${totalAll} task${totalAll !== 1 ? 's' : ''} complete!`;
-    } else {
-      footer.textContent = `${totalDone} of ${totalAll} complete`;
+    if (footer) {
+      if (totalAll === 0) {
+        footer.textContent = '';
+      } else if (totalDone === totalAll) {
+        footer.textContent = `All ${totalAll} task${totalAll !== 1 ? 's' : ''} complete!`;
+      } else {
+        footer.textContent = `${totalDone} of ${totalAll} complete`;
+      }
     }
+    if (typeof updateHomeHeader === 'function') updateHomeHeader();
   }
 
   // ── Collapse toggle ───────────────────────────────────
-  SECTIONS.forEach(sec => {
-    document.getElementById('hdr-' + sec).addEventListener('click', () => {
-      collapsed[sec] = !collapsed[sec];
-      saveCollapsed();
-      render();
-    });
-  });
+  function toggleSection(sec) {
+    collapsed[sec] = !collapsed[sec];
+    saveCollapsed();
+    render();
+  }
 
   // ── Toggle / Remove ───────────────────────────────────
   function toggle(i) {
@@ -3030,14 +2997,14 @@
     const { currentStreak: wCur, longestStreak: wBest } = computeWaterStreaks();
     wsBar.innerHTML = (wCur > 0 || wBest > 0)
       ? `<span>💧 <strong style="color:#0ea5e9">${wCur}</strong>-day streak <span class="wst-sep">·</span> 🏆 Best: <strong style="color:#0ea5e9">${wBest}</strong> day${wBest!==1?'s':''}</span>`
-      : `<span>💧</span><span style="color:var(--muted)">Hit your water goal to start a streak</span>`;
+      : `<span>💧</span><span style="color:var(--text-dim)">Hit your water goal to start a streak</span>`;
 
     // Gym streak bar
     const gsBar = document.getElementById('gym-streak-bar');
     const { currentStreak: gCur, longestStreak: gBest } = computeGymStreaks();
     gsBar.innerHTML = (gCur > 0 || gBest > 0)
       ? `<span>💪 <strong style="color:#22c55e">${gCur}</strong>-day streak <span class="wst-sep">·</span> 🏆 Best: <strong style="color:#22c55e">${gBest}</strong> day${gBest!==1?'s':''}</span>`
-      : `<span>💪</span><span style="color:var(--muted)">Log a workout to start a gym streak</span>`;
+      : `<span>💪</span><span style="color:var(--text-dim)">Log a workout to start a gym streak</span>`;
 
     // Weekly summary
     renderWeeklySummary();
@@ -3725,15 +3692,13 @@
   function renderWater() {
     const oz   = water.bottles * BOTTLE_OZ;
     const pct  = Math.min(100, Math.round((oz / GOAL_OZ) * 100));
-    const rem  = Math.max(0, GOAL_OZ - oz);
     const done = oz >= GOAL_OZ;
 
-    document.getElementById('bottle-num').textContent      = water.bottles;
-    document.getElementById('water-oz-text').textContent   = `${oz} oz consumed`;
-    document.getElementById('water-pct').textContent       = pct + '%';
-    document.getElementById('water-remaining').textContent = done ? '🎉 Goal reached!' : `${rem} oz to go`;
-    document.getElementById('water-complete').classList.toggle('hidden', !done);
-    document.getElementById('btn-minus').disabled          = water.bottles === 0;
+    const bottleNumEl = document.getElementById('bottle-num');
+    if (bottleNumEl) bottleNumEl.textContent = water.bottles;
+
+    const btnMinus = document.getElementById('btn-minus');
+    if (btnMinus) btnMinus.disabled = water.bottles === 0;
 
     // Horizontal water bar (Normal mode)
     const fill = document.getElementById('water-fill');
@@ -3741,12 +3706,16 @@
     if (fill) fill.style.width = pct + '%';
     if (wave) wave.style.display = water.bottles > 0 ? 'block' : 'none';
 
-    // Lightsaber blade (Star Wars mode)
+    // Goal banner
+    const completeEl = document.getElementById('water-complete');
+    if (completeEl) completeEl.classList.toggle('hidden', !done);
+
+    // Horizontal lightsaber blade (Star Wars mode)
     const blade = document.getElementById('saber-blade');
     if (blade) {
-      const prev = parseFloat(blade.style.height) || 0;
-      blade.style.height = pct + '%';
-      if (done && prev < 100) {
+      const prevW = parseFloat(blade.style.width) || 0;
+      blade.style.width = pct + '%';
+      if (done && prevW < 100) {
         blade.classList.remove('saber-active');
         void blade.offsetWidth;
         blade.classList.add('saber-active');
@@ -3754,6 +3723,14 @@
         blade.classList.remove('saber-active');
       }
     }
+
+    // Saber power label
+    const powerEl = document.getElementById('saber-power-label');
+    if (powerEl) powerEl.textContent = pct + '% POWER';
+
+    // Water card count
+    const cardCount = document.getElementById('water-card-count');
+    if (cardCount) cardCount.textContent = water.bottles + ' / ' + Math.ceil(GOAL_OZ / BOTTLE_OZ) + ' glasses';
   }
 
   // ══════════════════════════════════════════════════════
@@ -4383,9 +4360,8 @@
   // TAB SWITCHING
   // ══════════════════════════════════════════════════════
   const VIEW_LABELS = {
-    tasks:   '📋 My Tasks',
+    home:    '🏠 Home',
     cal:     '📅 Calendar',
-    water:   '💧 Water Drank',
     workout: '💪 Workout',
     stim:    '✨ Quick Stim',
     journal: '📔 Journal'
@@ -4395,9 +4371,10 @@
     var bg = document.getElementById('sw-bg');
     if (bg) bg.dataset.view = tab;
     closeViewMenu();
-    ['tasks', 'water', 'cal', 'workout', 'stim', 'journal'].forEach(t => {
+    ['home','cal','workout','stim','journal'].forEach(t => {
       const panel = document.getElementById('panel-' + t);
-      const show  = tab === t;
+      if (!panel) return;
+      const show = tab === t;
       if (show && panel.classList.contains('hidden')) {
         panel.classList.remove('hidden');
         panel.classList.remove('panel-fade-in');
@@ -4407,21 +4384,21 @@
         panel.classList.add('hidden');
       }
     });
-    document.querySelectorAll('.view-item').forEach(el => {
-      el.classList.toggle('active', el.dataset.tab === tab);
-    });
-    const label = document.getElementById('view-trigger-label');
-    if (label) label.textContent = VIEW_LABELS[tab] || tab;
     lsSet('active-tab', tab);
     if (tab === 'cal') {
       renderCalendar();
-      if (currentUser && gcalTokenValid()) gcalSyncStart();
+      if (typeof currentUser !== 'undefined' && currentUser && typeof gcalTokenValid === 'function' && gcalTokenValid()) gcalSyncStart();
     } else {
-      gcalSyncStop();
+      if (typeof gcalSyncStop === 'function') gcalSyncStop();
     }
     if (tab === 'workout') renderWorkoutTab();
     if (tab === 'stim')    renderStimTab();
     if (tab === 'journal') renderJournal();
+    if (tab === 'home') {
+      updateHomeHeader();
+      renderReminders();
+      renderWater();
+    }
   }
 
   // ══════════════════════════════════════════════════════
@@ -4454,6 +4431,22 @@
     reminders = reminders.filter(r => r.id !== id);
     saveReminders();
     renderReminders();
+  }
+
+  function updateHomeHeader() {
+    const dateEl = document.getElementById('home-date-label');
+    const headEl = document.getElementById('home-heading');
+    const subEl  = document.getElementById('home-subtitle');
+    if (dateEl) {
+      const d = new Date();
+      dateEl.textContent = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' }).toUpperCase();
+    }
+    const isSW = document.body.classList.contains('sw-mode');
+    if (headEl) headEl.textContent = isSW ? 'The Force Awaits' : 'Today';
+    const total = tasks.length;
+    const done  = tasks.filter(t => t.done).length;
+    const remaining = total - done;
+    if (subEl) subEl.textContent = total > 0 ? `${remaining} of ${total} remaining` : 'All clear';
   }
 
   function renderReminders() {
@@ -4489,9 +4482,7 @@
     }).join('');
   }
 
-  document.getElementById('reminder-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') addReminder();
-  });
+  // Note: reminder-input keydown handled by onkeydown inline in HTML
 
   // ── PWA Service Worker Registration ─────────────────────────────
   if ('serviceWorker' in navigator) {
@@ -4977,7 +4968,7 @@
   renderReminders();
   applyMode();
   renderWorkoutTab();
-  switchTab(lsGet('active-tab', 'cal'));
+  switchTab(lsGet('active-tab', 'home'));
   initAuth();
 </script>
 </body>
