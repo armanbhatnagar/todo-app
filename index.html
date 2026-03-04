@@ -754,6 +754,83 @@
     /* Workout tab active color */
     #tab-workout.active { color: #22c55e; border-bottom-color: #22c55e; }
 
+    /* Quick Stim tab active color */
+    #tab-stim.active { color: #7c3aed; border-bottom-color: #7c3aed; }
+
+    /* ══ QUICK STIM PANEL ══ */
+    .stim-activity-row {
+      display: flex; justify-content: flex-end; margin-bottom: 20px;
+    }
+    .stim-activity-select {
+      background: var(--task-bg); border: 1.5px solid var(--border);
+      border-radius: 8px; color: var(--subtle); font-size: 0.78rem;
+      font-weight: 600; padding: 6px 10px; cursor: pointer;
+      appearance: none; -webkit-appearance: none; outline: none;
+      transition: border-color 0.2s, color 0.2s; font-family: inherit;
+    }
+    .stim-activity-select:focus { border-color: #7c3aed; color: var(--text); }
+
+    .wotd-image-wrap {
+      width: 100%; aspect-ratio: 2 / 1; border-radius: 14px;
+      overflow: hidden; margin-bottom: 24px; background: var(--task-bg); position: relative;
+    }
+    .wotd-image-wrap img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      border-radius: 14px; transition: opacity 0.4s ease;
+    }
+    .wotd-image-wrap img.loading { opacity: 0; }
+    .wotd-image-wrap img.loaded  { opacity: 1; }
+    .wotd-skeleton {
+      position: absolute; inset: 0; border-radius: 14px;
+      background: linear-gradient(90deg, var(--task-bg) 25%, var(--border) 50%, var(--task-bg) 75%);
+      background-size: 200% 100%; animation: shimmer 1.6s infinite linear;
+    }
+    .wotd-skeleton.hidden { display: none; }
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to   { background-position: -200% 0; }
+    }
+    .wotd-word {
+      font-family: Georgia, 'Times New Roman', serif; font-size: 2.2rem;
+      font-weight: 700; color: var(--heading); letter-spacing: -0.02em;
+      line-height: 1.15; margin-bottom: 10px;
+    }
+    .wotd-meta-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap;
+    }
+    .wotd-phonetic {
+      font-size: 0.88rem; color: var(--subtle);
+      font-family: Georgia, 'Times New Roman', serif; font-style: italic;
+    }
+    .wotd-pos-pill {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; padding: 3px 10px; border-radius: 20px;
+      background: #7c3aed18; color: #7c3aed; border: 1.5px solid #7c3aed33;
+    }
+    body.dark .wotd-pos-pill { background: #7c3aed30; border-color: #7c3aed55; color: #a78bfa; }
+    .wotd-definition {
+      font-size: 0.97rem; color: var(--text); line-height: 1.65; margin-bottom: 20px;
+    }
+    .wotd-example {
+      border-left: 3px solid #7c3aed; padding: 10px 14px; margin: 0 0 28px;
+      background: var(--task-bg); border-radius: 0 10px 10px 0;
+      font-style: italic; font-size: 0.91rem; color: var(--subtle); line-height: 1.6;
+    }
+    body.dark .wotd-example { border-left-color: #a78bfa; }
+    .wotd-actions { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+    .btn-wotd-random {
+      background: #7c3aed; color: #fff; border: none; border-radius: 20px;
+      padding: 9px 18px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+      letter-spacing: 0.02em; transition: background 0.2s, transform 0.1s;
+      touch-action: manipulation; font-family: inherit;
+    }
+    .btn-wotd-random:hover  { background: #6d28d9; }
+    .btn-wotd-random:active { transform: scale(0.96); }
+    .wotd-footer {
+      font-size: 0.72rem; color: var(--muted); text-align: center;
+      padding-top: 12px; border-top: 1px solid var(--border);
+    }
+
     /* Workout tab date navigation */
     .workout-date-nav {
       display: flex; align-items: center; justify-content: space-between;
@@ -1367,6 +1444,7 @@
     <button class="tab-btn" id="tab-cal"     onclick="switchTab('cal')">Calendar</button>
     <button class="tab-btn" id="tab-water"   onclick="switchTab('water')">Water Drank</button>
     <button class="tab-btn" id="tab-workout" onclick="switchTab('workout')">Workout</button>
+    <button class="tab-btn" id="tab-stim"    onclick="switchTab('stim')">Quick Stim</button>
   </div>
 
   <!-- ══ TASKS PANEL ══ -->
@@ -1559,6 +1637,31 @@
     <div id="workout-panel"></div>
   </div><!-- /panel-workout -->
 
+  <!-- ══ QUICK STIM PANEL ══ -->
+  <div id="panel-stim" class="hidden">
+    <div class="stim-activity-row">
+      <select class="stim-activity-select" id="stim-activity" onchange="onStimActivityChange()">
+        <option value="wotd">Word of the Day</option>
+      </select>
+    </div>
+    <div id="stim-wotd">
+      <div class="wotd-image-wrap">
+        <div class="wotd-skeleton" id="wotd-skeleton"></div>
+        <img id="wotd-img" class="loading" src="" alt="" />
+      </div>
+      <div class="wotd-word" id="wotd-word"></div>
+      <div class="wotd-meta-row">
+        <span class="wotd-phonetic" id="wotd-phonetic"></span>
+        <span class="wotd-pos-pill" id="wotd-pos"></span>
+      </div>
+      <p class="wotd-definition" id="wotd-definition"></p>
+      <blockquote class="wotd-example" id="wotd-example"></blockquote>
+      <div class="wotd-actions">
+        <button class="btn-wotd-random" onclick="randomizeWotd()">Give me another &rarr;</button>
+      </div>
+      <div class="wotd-footer" id="wotd-footer"></div>
+    </div>
+  </div><!-- /panel-stim -->
 
 </div><!-- /card -->
 
@@ -2700,16 +2803,632 @@
   }
 
   // ══════════════════════════════════════════════════════
+  // QUICK STIM — WORD OF THE DAY
+  // ══════════════════════════════════════════════════════
+
+  const WORD_LIBRARY = [
+    { word: "sonder", phonetic: "/ˈsɒn.dər/", pos: "noun",
+      definition: "The sudden realization that every passerby has a life as vivid and complex as your own.",
+      example: "Walking through a packed subway car, I got hit with sonder — every face had a whole story I'd never know." },
+    { word: "petrichor", phonetic: "/ˈpɛt.rɪ.kɔːr/", pos: "noun",
+      definition: "The earthy, pleasant scent produced when rain falls on dry ground.",
+      example: "I had my window open and that petrichor hit — first rain in weeks, the whole room just smelled alive." },
+    { word: "limerence", phonetic: "/ˈlɪm.ər.əns/", pos: "noun",
+      definition: "An involuntary state of intense romantic obsession with another person.",
+      example: "It wasn't just a crush — the constant replaying of every text, that was full-on limerence." },
+    { word: "ephemeral", phonetic: "/ɪˈfɛm.ər.əl/", pos: "adjective",
+      definition: "Lasting for a very short time; transitory.",
+      example: "The whole thing felt so ephemeral — one week we were inseparable, the next it was like it never happened." },
+    { word: "liminal", phonetic: "/ˈlɪm.ɪ.nəl/", pos: "adjective",
+      definition: "Occupying a threshold position between two states or phases.",
+      example: "That whole post-graduation summer was liminal — done with school but not quite an adult yet." },
+    { word: "hiraeth", phonetic: "/ˈhɪər.aɪθ/", pos: "noun",
+      definition: "A Welsh longing for a home or era that may never have existed.",
+      example: "I get this weird hiraeth for the early 2000s even though I was like eight — nostalgia for a time that wasn't even that great." },
+    { word: "vellichor", phonetic: "/ˈvɛl.ɪ.kɔːr/", pos: "noun",
+      definition: "The strange wistfulness of used bookstores, full of lives you'll never know.",
+      example: "That little shop on the corner gave me serious vellichor — stacks of dog-eared paperbacks and the smell of old paper." },
+    { word: "kenopsia", phonetic: "/kɛˈnɒp.si.ə/", pos: "noun",
+      definition: "The eerie, unsettling atmosphere of a place that is usually busy but is now empty.",
+      example: "Walking through campus on a Saturday morning gave me pure kenopsia — all those empty lecture halls felt genuinely haunted." },
+    { word: "syzygy", phonetic: "/ˈsɪz.ɪ.dʒi/", pos: "noun",
+      definition: "The perfect alignment of three celestial bodies — or, by extension, any rare convergence of forces.",
+      example: "When your passion, your skills, and an actual opportunity line up — that's a career syzygy. Doesn't happen often." },
+    { word: "sempiternal", phonetic: "/ˌsɛm.pɪˈtɜːr.nəl/", pos: "adjective",
+      definition: "Lasting or existing forever; eternal and unchanging.",
+      example: "People act like social media is sempiternal but it all feels like it'll just vanish in ten years." },
+    { word: "chiaroscuro", phonetic: "/kiˌɑːr.əˈskjʊər.oʊ/", pos: "noun",
+      definition: "The treatment of light and shadow in visual art; strong contrasts between bright and dark.",
+      example: "The whole film had this chiaroscuro thing going — barely lit scenes made every bright moment hit harder." },
+    { word: "solipsism", phonetic: "/ˈsɒl.ɪp.sɪ.z(ə)m/", pos: "noun",
+      definition: "The philosophical view that only one's own mind can be known to exist.",
+      example: "At 2am when you can't sleep, solipsism doesn't feel like philosophy — it just feels true." },
+    { word: "lacuna", phonetic: "/ləˈkjuː.nə/", pos: "noun",
+      definition: "A missing portion or gap, especially in a series of events or a manuscript.",
+      example: "There's this whole lacuna in my memory between age six and eight — nothing, just blank." },
+    { word: "apophenia", phonetic: "/ˌæp.əˈfiː.ni.ə/", pos: "noun",
+      definition: "The tendency to perceive meaningful connections between unrelated things.",
+      example: "I kept seeing the same number everywhere for a week — classic apophenia, but it still felt like a sign." },
+    { word: "ineffable", phonetic: "/ɪˈnɛf.ə.bəl/", pos: "adjective",
+      definition: "Too great or extreme to be expressed or described in words.",
+      example: "I tried to explain what that concert felt like and couldn't — some experiences are just ineffable, you had to be there." },
+    { word: "numinous", phonetic: "/ˈnjuː.mɪ.nəs/", pos: "adjective",
+      definition: "Having a strong spiritual quality; suggesting the presence of something divine.",
+      example: "Standing at the edge of the Grand Canyon, the whole thing felt numinous — not religious exactly, just immense." },
+    { word: "palimpsest", phonetic: "/ˈpæl.ɪmp.sɛst/", pos: "noun",
+      definition: "Something altered but still bearing visible traces of an earlier form.",
+      example: "Cities are like palimpsests — you can see layers of old storefronts under new paint if you look." },
+    { word: "penumbra", phonetic: "/pɪˈnʌm.brə/", pos: "noun",
+      definition: "The partially shaded outer region of a shadow; a grey area between two states.",
+      example: "The ethics of that situation lived in the penumbra — not clearly wrong, but definitely not comfortable either." },
+    { word: "ataraxia", phonetic: "/ˌæt.əˈræk.si.ə/", pos: "noun",
+      definition: "A state of serene calmness and complete freedom from anxiety.",
+      example: "After a long anxious week, Sunday morning coffee with no plans felt like actual ataraxia." },
+    { word: "lachrymose", phonetic: "/ˈlæk.rɪ.moʊs/", pos: "adjective",
+      definition: "Tearful or given to weeping; causing tears.",
+      example: "I don't usually get lachrymose at movies but that ending genuinely got me — ugly cry and everything." },
+    { word: "susurrus", phonetic: "/suˈsʌr.əs/", pos: "noun",
+      definition: "A soft murmuring or whispering sound.",
+      example: "Fell asleep to the susurrus of rain on the window — one of the best sleeps I'd had in months." },
+    { word: "weltanschauung", phonetic: "/ˈvɛlt.ɑːnˌʃaʊ.ʊŋ/", pos: "noun",
+      definition: "A comprehensive worldview or philosophy of life.",
+      example: "His whole weltanschauung shifted after he moved abroad — he came back a fundamentally different person." },
+    { word: "crepuscular", phonetic: "/krɪˈpʌs.kjʊ.lər/", pos: "adjective",
+      definition: "Of or relating to twilight; active or appearing at dawn or dusk.",
+      example: "I'm honestly crepuscular by nature — I hate noon but love 6am and 9pm." },
+    { word: "eudaimonia", phonetic: "/ˌjuː.dɪˈmoʊ.ni.ə/", pos: "noun",
+      definition: "A state of human flourishing and deep well-being; Aristotle's vision of the good life.",
+      example: "Happiness sounds too shallow for what I want — eudaimonia is the better word. Actually living well." },
+    { word: "inchoate", phonetic: "/ɪnˈkoʊ.ɪt/", pos: "adjective",
+      definition: "Just begun and not yet fully formed; undeveloped.",
+      example: "I have this inchoate idea for a project but I can't explain it yet — it's still just a vibe." },
+    { word: "fugacious", phonetic: "/fjuːˈɡeɪ.ʃəs/", pos: "adjective",
+      definition: "Tending to disappear quickly; fleeting.",
+      example: "Good moods feel so fugacious when you're anxious — blink and they're gone." },
+    { word: "apocryphal", phonetic: "/əˈpɒk.rɪ.fəl/", pos: "adjective",
+      definition: "Of doubtful authenticity; widely circulated but probably not true.",
+      example: "Half the stories about that guy are almost certainly apocryphal — he's become more legend than person." },
+    { word: "ossify", phonetic: "/ˈɒs.ɪ.faɪ/", pos: "verb",
+      definition: "To become rigid and inflexible; to stop being open to change.",
+      example: "You can feel when someone's opinions have fully ossified — nothing you say even lands anymore." },
+    { word: "diaphanous", phonetic: "/daɪˈæf.ə.nəs/", pos: "adjective",
+      definition: "Light, delicate, and translucent.",
+      example: "The curtains were this diaphanous white fabric — the whole room just glowed in the morning." },
+    { word: "quiddity", phonetic: "/ˈkwɪd.ɪ.ti/", pos: "noun",
+      definition: "The inherent nature or essence of something; what makes it what it is.",
+      example: "I can't define what makes that album great — it's just the quiddity of it, something you can't break down." },
+    { word: "akrasia", phonetic: "/əˈkreɪ.zi.ə/", pos: "noun",
+      definition: "Acting against one's own better judgment; the inability to follow through on good intentions.",
+      example: "I knew I should sleep at 11 and still scrolled until 2 — that's akrasia in its purest form." },
+    { word: "anagnorisis", phonetic: "/ˌæn.æɡˈnɒr.ɪ.sɪs/", pos: "noun",
+      definition: "A moment of critical discovery or recognition, especially in a narrative.",
+      example: "The whole season built to one anagnorisis — the character finally understanding what had been driving her all along." },
+    { word: "perseverate", phonetic: "/pərˈsɛv.ər.eɪt/", pos: "verb",
+      definition: "To repeat or dwell on a thought or action compulsively beyond what is useful.",
+      example: "I kept perseverating over one thing I said at the party — couldn't let it go for three full days." },
+    { word: "lassitude", phonetic: "/ˈlæs.ɪ.tjuːd/", pos: "noun",
+      definition: "Physical or mental weariness; a lack of energy.",
+      example: "November hits and I get this total lassitude — it's like my body just refuses to do anything." },
+    { word: "pareidolia", phonetic: "/ˌpær.aɪˈdoʊ.li.ə/", pos: "noun",
+      definition: "The tendency to perceive a familiar pattern, especially a face, where none exists.",
+      example: "I can't look at wood grain without my brain doing pareidolia — faces everywhere." },
+    { word: "scintilla", phonetic: "/sɪnˈtɪl.ə/", pos: "noun",
+      definition: "A tiny trace or spark of something.",
+      example: "There's not a scintilla of evidence he did anything wrong — the whole accusation was baseless." },
+    { word: "fugue", phonetic: "/fjuːɡ/", pos: "noun",
+      definition: "A state of dissociation or altered consciousness where actions happen without full awareness.",
+      example: "I drove thirty minutes home and genuinely have no memory of it — total fugue state." },
+    { word: "catharsis", phonetic: "/kəˈθɑːr.sɪs/", pos: "noun",
+      definition: "The release of strong emotions through an overwhelming experience.",
+      example: "That long drive with loud music was pure catharsis — cried it all out and felt completely reset after." },
+    { word: "equanimity", phonetic: "/ˌɛk.wəˈnɪm.ɪ.ti/", pos: "noun",
+      definition: "Mental calmness and composure, especially in difficult situations.",
+      example: "He got the rejection and just shrugged — there's a kind of equanimity I genuinely admire in that." },
+    { word: "phosphene", phonetic: "/ˈfɒs.fiːn/", pos: "noun",
+      definition: "A visual sensation of light caused by pressure on the eyeball.",
+      example: "I rubbed my eyes too hard and got a full phosphene show — colors blooming in the dark for like ten seconds." },
+    { word: "ebullient", phonetic: "/ɪˈbʌl.i.ənt/", pos: "adjective",
+      definition: "Cheerful and full of energy; overflowing with enthusiasm.",
+      example: "She's annoyingly ebullient at 7am but honestly it's kind of infectious after a few minutes." },
+    { word: "lethologica", phonetic: "/ˌlɛθ.əˈlɒdʒ.ɪ.kə/", pos: "noun",
+      definition: "The temporary inability to recall the correct word for something.",
+      example: "I had brutal lethologica mid-presentation — totally blanked on the word 'correlation' for a full ten seconds." },
+    { word: "tsundoku", phonetic: "/ˌtsʊnˈdoʊ.kuː/", pos: "noun",
+      definition: "Buying books and letting them pile up, unread.",
+      example: "My nightstand is pure tsundoku at this point — twelve books I swear I'm going to read." },
+    { word: "fernweh", phonetic: "/ˈfɛrn.veɪ/", pos: "noun",
+      definition: "A deep craving for distant places; the opposite of homesickness.",
+      example: "Every time I see someone's travel photos I get this fernweh that I genuinely can't shake for days." },
+    { word: "chrysalism", phonetic: "/ˈkrɪs.ə.lɪ.z(ə)m/", pos: "noun",
+      definition: "The amniotic tranquility of being indoors during a storm.",
+      example: "Heavy rain outside while I'm in bed with coffee — that chrysalism feeling is unmatched." },
+    { word: "liberosis", phonetic: "/ˌlɪb.əˈroʊ.sɪs/", pos: "noun",
+      definition: "The desire to care less about things.",
+      example: "I've been trying to grow out of liberosis — it sounds freeing but it's mostly just checked out." },
+    { word: "jouissance", phonetic: "/ʒwiˈsɑːns/", pos: "noun",
+      definition: "A sense of intense, almost overwhelming enjoyment or pleasure.",
+      example: "That first bite of a really perfect meal — that's jouissance, not just good food." },
+    { word: "toska", phonetic: "/ˈtɒs.kə/", pos: "noun",
+      definition: "A Russian concept for a dull ache of the soul, a longing for one cannot quite name.",
+      example: "Sunday evenings in winter have this toska to them — restless and hollow at the same time." },
+    { word: "alexithymia", phonetic: "/əˌlɛk.sɪˈθaɪ.mi.ə/", pos: "noun",
+      definition: "Difficulty identifying and describing one's own emotions.",
+      example: "I've wondered if I have mild alexithymia — I can tell something's wrong but I genuinely can't name what." },
+    { word: "mellifluous", phonetic: "/mɛˈlɪf.lu.əs/", pos: "adjective",
+      definition: "Sweet or musical; pleasingly smooth and rich in sound.",
+      example: "His voice is so mellifluous it makes even boring lectures tolerable." },
+    { word: "iridescent", phonetic: "/ˌɪr.ɪˈdɛs.ənt/", pos: "adjective",
+      definition: "Showing luminous colors that change when seen from different angles.",
+      example: "Her jacket had this iridescent sheen in the sun — couldn't stop looking at it." },
+    { word: "tenebrous", phonetic: "/ˈtɛn.ɪ.brəs/", pos: "adjective",
+      definition: "Dark, shadowy, or obscure.",
+      example: "The basement bar had this tenebrous vibe — low ceilings, candles, honestly perfect." },
+    { word: "lambent", phonetic: "/ˈlæm.bənt/", pos: "adjective",
+      definition: "Softly bright or radiant; flickering gently over a surface.",
+      example: "The lambent glow of the fire made the whole cabin feel like a scene from a movie." },
+    { word: "gossamer", phonetic: "/ˈɡɒs.ə.mər/", pos: "adjective",
+      definition: "Light, delicate, and thin; almost transparent.",
+      example: "The morning fog was gossamer — gone by 8am like it was never there." },
+    { word: "patina", phonetic: "/ˈpæt.ɪ.nə/", pos: "noun",
+      definition: "A surface appearance of something grown beautiful, especially with age.",
+      example: "That old leather jacket has a patina that no new jacket can replicate — it took years." },
+    { word: "bioluminescence", phonetic: "/ˌbaɪ.oʊ.luː.mɪˈnɛs.əns/", pos: "noun",
+      definition: "The production and emission of light by living organisms.",
+      example: "Swam in bioluminescent water off the coast — every stroke lit up blue. Still think about it." },
+    { word: "entropy", phonetic: "/ˈɛn.trə.pi/", pos: "noun",
+      definition: "A measure of disorder or randomness; the tendency of systems to move toward chaos.",
+      example: "My apartment after a busy week is just entropy in physical form — maximum disorder." },
+    { word: "parallax", phonetic: "/ˈpær.ə.læks/", pos: "noun",
+      definition: "The apparent shift in an object's position when viewed from different angles.",
+      example: "It's like parallax — both of them were right, they were just seeing the situation from different angles." },
+    { word: "tessellation", phonetic: "/ˌtɛs.ɪˈleɪ.ʃən/", pos: "noun",
+      definition: "The covering of a surface with a pattern of geometric shapes, leaving no gaps.",
+      example: "The tiling on that mosque wall was pure tessellation — intricate patterns that went on forever." },
+    { word: "qualia", phonetic: "/ˈkweɪ.li.ə/", pos: "noun",
+      definition: "The subjective, conscious experiences — the redness of red, the pain of pain.",
+      example: "How do you know my experience of blue is anything like yours? That's the qualia problem, and it genuinely keeps me up." },
+    { word: "teleology", phonetic: "/ˌtɛl.iˈɒl.ə.dʒi/", pos: "noun",
+      definition: "The idea that things exist for a purpose or are directed toward a final goal.",
+      example: "I used to have a very teleological view of my life — like everything was building to something. Less so now." },
+    { word: "sublunary", phonetic: "/ˈsʌb.ljʊ.nɛ.ri/", pos: "adjective",
+      definition: "Belonging to the mortal, earthly world; beneath the moon.",
+      example: "All our problems feel very sublunary when you stare at a clear sky on a dark night." },
+    { word: "anhedonia", phonetic: "/ˌæn.hɪˈdoʊ.ni.ə/", pos: "noun",
+      definition: "The inability to feel pleasure in activities that are normally enjoyable.",
+      example: "I knew something was off when gaming stopped doing anything for me — that flat feeling is anhedonia." },
+    { word: "resplendent", phonetic: "/rɪˈsplɛn.dənt/", pos: "adjective",
+      definition: "Attractive and impressive through being richly colorful or radiant.",
+      example: "The skyline at golden hour was just resplendent — I actually stopped walking to look at it." },
+    { word: "crestfallen", phonetic: "/ˈkrɛst.fɔː.lən/", pos: "adjective",
+      definition: "Sad and disappointed, especially from having one's hopes dashed.",
+      example: "He came back from the interview completely crestfallen — they'd gone with someone else." },
+    { word: "melisma", phonetic: "/mɪˈlɪz.mə/", pos: "noun",
+      definition: "A singing technique where a single syllable is stretched across multiple notes.",
+      example: "She barely even needed the melisma — the song was strong enough — but when she did it, it just sent it." },
+    { word: "palaver", phonetic: "/pəˈlɑː.vər/", pos: "noun",
+      definition: "Prolonged and tedious fuss or discussion about something minor.",
+      example: "All that palaver over the seating chart for like six people — I nearly left before dinner started." },
+    { word: "solecism", phonetic: "/ˈsɒl.ɪ.sɪ.z(ə)m/", pos: "noun",
+      definition: "A grammatical error or a breach of good manners.",
+      example: "Using 'literally' wrong is the solecism everyone dunks on but everyone also commits." },
+    { word: "wabi-sabi", phonetic: "/ˌwɑː.biˈsɑː.bi/", pos: "noun",
+      definition: "A Japanese aesthetic of beauty found in imperfection and transience.",
+      example: "The cracked glaze on that coffee mug is the whole point — it's wabi-sabi. Perfection would ruin it." },
+    { word: "noctilucent", phonetic: "/ˌnɒk.tɪˈluː.sənt/", pos: "adjective",
+      definition: "Luminous at night; shining or phosphorescent in the dark.",
+      example: "The noctilucent clouds that night were surreal — glowing blue at altitude after everything else went dark." },
+    { word: "proprioception", phonetic: "/ˌproʊ.pri.oʊˈsɛp.ʃən/", pos: "noun",
+      definition: "The sense of one's own body position and movement in space.",
+      example: "Try closing your eyes and touching your nose — that's proprioception, and it's kind of wild it just works." },
+    { word: "estivate", phonetic: "/ˈɛs.tɪ.veɪt/", pos: "verb",
+      definition: "To spend a hot or dry period in a dormant state; the summer counterpart to hibernation.",
+      example: "July hits and I basically estivate — I turn the AC up and I don't leave the apartment." },
+    { word: "vestigial", phonetic: "/vɛˈstɪdʒ.i.əl/", pos: "adjective",
+      definition: "Remaining as a small, functionless remnant of something that once served a purpose.",
+      example: "My ability to wake up early is completely vestigial at this point — body still tries but nothing comes of it." },
+    { word: "simulacrum", phonetic: "/ˌsɪm.jʊˈleɪ.krəm/", pos: "noun",
+      definition: "An image or representation of something; a copy with no original.",
+      example: "Half the 'authentic experiences' on those travel apps are pure simulacrum — staged for the photo." },
+    { word: "ratiocinate", phonetic: "/ˌræʃ.iˈɒs.ɪ.neɪt/", pos: "verb",
+      definition: "To reason through something in a logical, methodical way.",
+      example: "He can't just feel things — he has to ratiocinate every decision down to a spreadsheet." },
+    { word: "laconic", phonetic: "/ləˈkɒn.ɪk/", pos: "adjective",
+      definition: "Using very few words; brief and understated in speech.",
+      example: "His whole review was laconic — three words, five stars. I trust it completely." },
+    { word: "recondite", phonetic: "/ˈrɛk.ən.daɪt/", pos: "adjective",
+      definition: "Not known by many people; obscure and dealing with a specialized subject.",
+      example: "He brings up the most recondite jazz albums in conversation — I never know what he's referencing." },
+    { word: "synesthesia", phonetic: "/ˌsɪn.ɪsˈθiː.zi.ə/", pos: "noun",
+      definition: "A blending of senses, where stimulation of one sense triggers another.",
+      example: "She has synesthesia — certain words have colors for her. 'Tuesday' is apparently a pale yellow." },
+    { word: "heliotrope", phonetic: "/ˈhiː.li.ə.troʊp/", pos: "noun",
+      definition: "A plant that turns to follow the sun; also a pinkish-purple color.",
+      example: "That shade of heliotrope on the wall — somewhere between pink and purple — completely changed the room." },
+    { word: "penultimate", phonetic: "/pɪˈnʌl.tɪ.mət/", pos: "adjective",
+      definition: "Second to last.",
+      example: "People always use 'penultimate' to mean 'the very best' but it literally just means second to last. Common mistake." },
+    { word: "obstreperous", phonetic: "/əbˈstrɛp.ər.əs/", pos: "adjective",
+      definition: "Noisy and difficult to control.",
+      example: "The table next to us was obstreperous the whole dinner — couldn't hear a word of our own conversation." },
+    { word: "lissome", phonetic: "/ˈlɪs.əm/", pos: "adjective",
+      definition: "Thin, supple, and graceful in figure or movement.",
+      example: "The way she moved through the crowd was totally lissome — effortless, like no one else was in the way." },
+    { word: "sesquipedalian", phonetic: "/ˌsɛs.kwɪ.pɪˈdeɪ.li.ən/", pos: "adjective",
+      definition: "Given to using long words.",
+      example: "He's so sesquipedalian in his texts that I need a dictionary to reply. Part of his charm, honestly." },
+    { word: "tergiversate", phonetic: "/tərˈdʒɪv.ər.seɪt/", pos: "verb",
+      definition: "To make excuses or change sides; to be evasive.",
+      example: "Every time I asked a direct question he'd just tergiversate — never a straight answer." },
+    { word: "defenestrate", phonetic: "/dɪˈfɛn.ɪ.streɪt/", pos: "verb",
+      definition: "To throw someone or something out of a window.",
+      example: "Every time my laptop freezes I just want to defenestrate it. Third floor window, goodbye." },
+    { word: "onomatopoeia", phonetic: "/ˌɒn.ə.ˌmæt.əˈpiː.ə/", pos: "noun",
+      definition: "A word that phonetically imitates the sound it describes.",
+      example: "Sizzle, crunch, buzz — onomatopoeia is one of the most satisfying things about language." },
+    { word: "peregrinate", phonetic: "/ˈpɛr.ɪ.ɡrɪ.neɪt/", pos: "verb",
+      definition: "To travel or wander from place to place.",
+      example: "He spent his twenties just peregrinating — new city every few months, no plan." },
+    { word: "sciamachy", phonetic: "/saɪˈæm.ə.ki/", pos: "noun",
+      definition: "Fighting with a shadow; arguing against imaginary opposition.",
+      example: "Half his argument was just sciamachy — he kept tearing down a position nobody actually held." },
+    { word: "tarantism", phonetic: "/ˈtær.ən.tɪ.z(ə)m/", pos: "noun",
+      definition: "An uncontrollable urge to dance, historically attributed to a spider bite.",
+      example: "That song hits and I get genuine tarantism — can't not move, doesn't matter where I am." },
+    { word: "supine", phonetic: "/ˈsuː.paɪn/", pos: "adjective",
+      definition: "Lying face upward; also, failing to act due to moral weakness.",
+      example: "I was supine on the floor for twenty minutes after that workout — genuinely could not stand up." },
+    { word: "caliginous", phonetic: "/kəˈlɪdʒ.ɪ.nəs/", pos: "adjective",
+      definition: "Misty and dark; gloomy.",
+      example: "The November sky had this caliginous weight to it — gray for weeks, no break in sight." },
+    { word: "frisson", phonetic: "/ˈfriː.sɒn/", pos: "noun",
+      definition: "A sudden, strong feeling of excitement or fear; a shiver of emotion.",
+      example: "The intro of that song gives me a frisson every single time — goosebumps, without fail." },
+    { word: "perspicacious", phonetic: "/ˌpɜːr.spɪˈkeɪ.ʃəs/", pos: "adjective",
+      definition: "Having a ready insight into things; unusually perceptive.",
+      example: "She's genuinely perspicacious about people — reads a situation within thirty seconds of walking in." },
+    { word: "verisimilitude", phonetic: "/ˌvɛr.ɪ.sɪˈmɪl.ɪ.tjuːd/", pos: "noun",
+      definition: "The appearance of being true or real.",
+      example: "The costume design gave the show real verisimilitude — you forgot it wasn't a documentary." },
+    { word: "contumacious", phonetic: "/ˌkɒn.tjʊˈmeɪ.ʃəs/", pos: "adjective",
+      definition: "Stubbornly resistant to authority; disobediently defiant.",
+      example: "He was completely contumacious in that meeting — wouldn't acknowledge the manager's point no matter what." },
+    { word: "callipygian", phonetic: "/ˌkæl.ɪˈpɪdʒ.i.ən/", pos: "adjective",
+      definition: "Having well-shaped buttocks.",
+      example: "There's a whole word for it — callipygian. Greek, naturally." },
+    { word: "impecunious", phonetic: "/ˌɪm.pɪˈkjuː.ni.əs/", pos: "adjective",
+      definition: "Having little or no money.",
+      example: "I was thoroughly impecunious in my first year out of college — ramen three nights a week kind of broke." },
+    { word: "loquacious", phonetic: "/loʊˈkweɪ.ʃəs/", pos: "adjective",
+      definition: "Tending to talk a great deal.",
+      example: "After one drink he goes from quiet to completely loquacious — can't get a word in." },
+    { word: "celerity", phonetic: "/sɪˈlɛr.ɪ.ti/", pos: "noun",
+      definition: "Swiftness of movement or action.",
+      example: "He responded to the email with surprising celerity — usually takes him three days." },
+    { word: "plethora", phonetic: "/ˈplɛθ.ər.ə/", pos: "noun",
+      definition: "A large or excessive amount of something.",
+      example: "There's a plethora of productivity apps but I genuinely just need a to-do list." },
+    { word: "melancholia", phonetic: "/ˌmɛl.ənˈkoʊ.li.ə/", pos: "noun",
+      definition: "A deep, pensive sadness; a contemplative form of sorrow.",
+      example: "There's this melancholia that comes with finishing a really good book — grief for characters who aren't real." },
+    { word: "oscitancy", phonetic: "/ˈɒs.ɪ.tən.si/", pos: "noun",
+      definition: "The state of being drowsy or inattentive; dullness.",
+      example: "By 3pm every day I get this oscitancy that no amount of coffee fully fixes." },
+    { word: "propitious", phonetic: "/prəˈpɪʃ.əs/", pos: "adjective",
+      definition: "Giving or indicating a good chance of success; favorable.",
+      example: "Starting the meeting on a Friday afternoon was not exactly propitious timing." },
+    { word: "sanguine", phonetic: "/ˈsæŋ.ɡwɪn/", pos: "adjective",
+      definition: "Optimistic or positive, especially in a difficult situation.",
+      example: "He remained sanguine about the whole mess — somehow convinced it would work out. I envied that." },
+    { word: "rumination", phonetic: "/ˌruː.mɪˈneɪ.ʃən/", pos: "noun",
+      definition: "Deep or prolonged thought about something; unhelpful repetitive focus on distress.",
+      example: "Bedtime rumination is the worst — your brain decides 11pm is the perfect time to replay every mistake." },
+    { word: "ephemeron", phonetic: "/ɪˈfɛm.ər.ɒn/", pos: "noun",
+      definition: "A thing that exists or is used for only a short time.",
+      example: "Snapchat stories were always meant to be ephemera — designed to disappear." },
+    { word: "halcyon", phonetic: "/ˈhæl.si.ən/", pos: "adjective",
+      definition: "Denoting a period of time that was idyllically happy and peaceful.",
+      example: "I look back at college with halcyon nostalgia now, even though it was stressful at the time." },
+    { word: "temerity", phonetic: "/tɪˈmɛr.ɪ.ti/", pos: "noun",
+      definition: "Excessive confidence or boldness; audacity.",
+      example: "He had the temerity to ask for a raise two weeks in — wild move, honestly kind of respect it." },
+    { word: "insouciant", phonetic: "/ɪnˈsuː.si.ənt/", pos: "adjective",
+      definition: "Showing a casual lack of concern; carefree.",
+      example: "He had this insouciant attitude toward the whole situation that I found both maddening and impressive." },
+    { word: "pulchritudinous", phonetic: "/ˌpʌl.krɪˈtjuː.dɪ.nəs/", pos: "adjective",
+      definition: "Beautiful.",
+      example: "Pulchritudinous is genuinely the ugliest-sounding word for beautiful. The contrast is sort of poetic." },
+    { word: "autodidact", phonetic: "/ˌɔː.toʊˈdaɪ.dækt/", pos: "noun",
+      definition: "A self-taught person.",
+      example: "He never went to college but he's the most well-read autodidact I've met — just taught himself everything." },
+    { word: "irredentism", phonetic: "/ɪˈrɛd.ən.tɪ.z(ə)m/", pos: "noun",
+      definition: "A policy of reclaiming territory once part of one's country or cultural group.",
+      example: "Most modern border conflicts have an irredentism element at their core — someone claiming something that used to be theirs." },
+    { word: "sycophant", phonetic: "/ˈsɪk.ə.fænt/", pos: "noun",
+      definition: "A person who excessively flatters someone important to gain favor.",
+      example: "Half the people in that meeting were just sycophants — every idea the boss had was brilliant, apparently." },
+    { word: "perspicuous", phonetic: "/pərˈspɪk.ju.əs/", pos: "adjective",
+      definition: "Easily understood; expressed clearly.",
+      example: "That was the most perspicuous explanation of quantum mechanics I've ever heard — finally clicked." },
+    { word: "wistful", phonetic: "/ˈwɪst.fʊl/", pos: "adjective",
+      definition: "Having or showing a feeling of vague or regretful longing.",
+      example: "I get wistful driving past my old neighborhood — not sad exactly, just quietly aware of what's gone." },
+    { word: "lucubrate", phonetic: "/ˈluː.kjʊ.breɪt/", pos: "verb",
+      definition: "To study or work by lamplight; to write in a laborious manner.",
+      example: "He spent months lucubrating over that thesis — ten pages a day, 1am every night." },
+    { word: "inefficacy", phonetic: "/ɪnˈɛf.ɪ.kə.si/", pos: "noun",
+      definition: "Failure to produce the desired effect.",
+      example: "The inefficacy of that supplement became obvious after three months — did absolutely nothing." },
+    { word: "veneration", phonetic: "/ˌvɛn.əˈreɪ.ʃən/", pos: "noun",
+      definition: "Great respect or reverence.",
+      example: "The way he talked about his grandfather was pure veneration — the man could do no wrong in his eyes." },
+    { word: "diurnal", phonetic: "/daɪˈɜːr.nəl/", pos: "adjective",
+      definition: "Of or during the day; occurring every day.",
+      example: "My diurnal rhythm is completely off — I'm awake at 3am and drowsy at noon." },
+    { word: "vicissitude", phonetic: "/vɪˈsɪs.ɪ.tjuːd/", pos: "noun",
+      definition: "A change of circumstances, especially one that is unwelcome.",
+      example: "The vicissitudes of the job market in your twenties are something nobody really prepares you for." },
+    { word: "quotidian", phonetic: "/kwɒˈtɪd.i.ən/", pos: "adjective",
+      definition: "Of or occurring every day; ordinary and everyday.",
+      example: "There's something worth appreciating in the quotidian stuff — same coffee, same route, same quiet morning." },
+    { word: "cogitate", phonetic: "/ˈkɒdʒ.ɪ.teɪt/", pos: "verb",
+      definition: "To think deeply about something.",
+      example: "I need like twenty minutes to cogitate before I can form an opinion on something that serious." },
+    { word: "panacea", phonetic: "/ˌpæn.əˈsiː.ə/", pos: "noun",
+      definition: "A solution or remedy for all difficulties or diseases.",
+      example: "Sleep is genuinely close to a panacea — most problems look different after eight hours." },
+    { word: "languid", phonetic: "/ˈlæŋ.ɡwɪd/", pos: "adjective",
+      definition: "Pleasantly relaxed and weak; characterized by unhurried ease.",
+      example: "That whole long weekend had a languid pace to it — nowhere to be, nothing urgent. Perfect." },
+    { word: "interstitial", phonetic: "/ˌɪn.tərˈstɪʃ.əl/", pos: "adjective",
+      definition: "Occupying or forming small gaps between things.",
+      example: "My best thinking happens in interstitial moments — waiting for coffee, walking to nowhere in particular." },
+    { word: "shibboleth", phonetic: "/ˈʃɪb.ə.lɛθ/", pos: "noun",
+      definition: "A word or custom that distinguishes insiders of a group from outsiders.",
+      example: "Calling it 'the city' without specifying which one is a shibboleth — immediately signals where you're from." },
+    { word: "tintinnabulation", phonetic: "/ˌtɪn.tɪ.næb.jʊˈleɪ.ʃən/", pos: "noun",
+      definition: "The ringing or sound of bells.",
+      example: "The tintinnabulation of the church bells every Sunday morning is actually what I missed most when I moved." },
+    { word: "defervescence", phonetic: "/ˌdɛf.ərˈvɛs.əns/", pos: "noun",
+      definition: "The period of decreasing fever; a cooling down.",
+      example: "After weeks of chaos at work, this quiet week feels like defervescence — finally cooling off." },
+    { word: "effulgent", phonetic: "/ɪˈfʌl.dʒənt/", pos: "adjective",
+      definition: "Radiant; shining brilliantly.",
+      example: "The sunrise that morning was effulgent — the kind of gold that makes you stop mid-step." },
+    { word: "cimmerian", phonetic: "/sɪˈmɪər.i.ən/", pos: "adjective",
+      definition: "Very dark or gloomy.",
+      example: "The inside of that bar was genuinely cimmerian — I was in there for an hour and forgot what daylight felt like." },
+    { word: "petulant", phonetic: "/ˈpɛtʃ.ʊ.lənt/", pos: "adjective",
+      definition: "Childishly sulky or bad-tempered.",
+      example: "He got petulant when he didn't get the credit — folded his arms and barely spoke for the rest of the meeting." },
+    { word: "nescience", phonetic: "/ˈnɛs.i.əns/", pos: "noun",
+      definition: "Lack of knowledge or awareness; ignorance.",
+      example: "My nescience about wine used to embarrass me at dinners — now I just say I prefer beer and own it." },
+    { word: "palliative", phonetic: "/ˈpæl.i.ə.tɪv/", pos: "adjective",
+      definition: "Relieving pain or distress without dealing with the cause; soothing.",
+      example: "A long walk isn't a solution — it's palliative. Helps me tolerate the problem, not fix it." },
+    { word: "anfractuous", phonetic: "/ænˈfræk.tju.əs/", pos: "adjective",
+      definition: "Winding and circuitous; full of twists and turns.",
+      example: "His explanation was thoroughly anfractuous — ten minutes in, nobody knew what the actual point was." },
+    { word: "panegyric", phonetic: "/ˌpæn.ɪˈdʒɪr.ɪk/", pos: "noun",
+      definition: "A public speech or text in praise of someone.",
+      example: "The toast at the wedding was a five-minute panegyric for the groom — some of it felt rehearsed, but still sweet." },
+    { word: "sophrosyne", phonetic: "/sɒˈfrɒs.ɪ.niː/", pos: "noun",
+      definition: "An ancient Greek concept of soundness of mind; healthy, balanced temperament.",
+      example: "Sophrosyne is basically what every therapist is trying to help you find — moderation, self-awareness, no extremes." },
+    { word: "nychthemeron", phonetic: "/nɪkˈθɛm.ər.ɒn/", pos: "noun",
+      definition: "A full period of 24 hours; one complete day and night cycle.",
+      example: "I went a full nychthemeron without checking my phone once — first time in years. Felt strange and good." },
+    { word: "objurgate", phonetic: "/ˈɒb.dʒər.ɡeɪt/", pos: "verb",
+      definition: "To scold or rebuke someone harshly.",
+      example: "She objurgated him in front of the whole team — probably deserved it, but rough to watch." },
+    { word: "labile", phonetic: "/ˈleɪ.baɪl/", pos: "adjective",
+      definition: "Easily altered; technically: liable to change; emotionally unstable.",
+      example: "My mood is really labile when I'm sleep-deprived — I'll go from fine to frustrated in thirty seconds." },
+    { word: "contrite", phonetic: "/kənˈtraɪt/", pos: "adjective",
+      definition: "Feeling or expressing remorse at the recognition of past wrongs.",
+      example: "He came in contrite, which I appreciated — it's easy to apologize but he actually seemed to mean it." },
+    { word: "asperity", phonetic: "/æˈspɛr.ɪ.ti/", pos: "noun",
+      definition: "Harshness of tone or manner; roughness.",
+      example: "He said it with some asperity — not cruel, but there was an edge that made the room go quiet." },
+    { word: "desultory", phonetic: "/ˈdɛs.əl.tər.i/", pos: "adjective",
+      definition: "Lacking a plan, purpose, or enthusiasm; going from one thing to another.",
+      example: "The conversation was desultory — we talked about five different things without finishing any of them." },
+    { word: "restive", phonetic: "/ˈrɛs.tɪv/", pos: "adjective",
+      definition: "Unable to remain still; restlessly impatient.",
+      example: "I get restive in long meetings with no clear agenda — physically uncomfortable staying seated." },
+    { word: "lissom", phonetic: "/ˈlɪs.əm/", pos: "adjective",
+      definition: "Slim, supple, and graceful.",
+      example: "The dancer moved with this completely lissom ease — it looked effortless even in the hard parts." },
+    { word: "clandestine", phonetic: "/klænˈdɛs.tɪn/", pos: "adjective",
+      definition: "Kept secret or done covertly.",
+      example: "They had this clandestine lunch meeting that everyone in the office noticed and pretended not to." },
+    { word: "obstinate", phonetic: "/ˈɒb.stɪ.nɪt/", pos: "adjective",
+      definition: "Stubbornly refusing to change one's opinion or chosen course of action.",
+      example: "He's so obstinate about that topic — you could have a perfect counterargument and he'd just wait for you to stop talking." },
+    { word: "limpid", phonetic: "/ˈlɪm.pɪd/", pos: "adjective",
+      definition: "Perfectly clear and transparent; free of complexity.",
+      example: "The water in that lagoon was limpid — I could see the bottom from the boat without even trying." },
+    { word: "vituperate", phonetic: "/vɪˈtjuː.pər.eɪt/", pos: "verb",
+      definition: "To blame or insult someone in an abusive manner.",
+      example: "He vituperated in the comment section for twenty minutes over an opinion piece — exhausting to watch." },
+    { word: "mnemonic", phonetic: "/nɪˈmɒn.ɪk/", pos: "adjective",
+      definition: "Assisting or intended to assist memory.",
+      example: "Every Good Boy Does Fine — the mnemonic for musical notes is so embedded I still use it." },
+    { word: "obstreperous", phonetic: "/əbˈstrɛp.ər.əs/", pos: "adjective",
+      definition: "Noisy, unruly, and difficult to control.",
+      example: "The group in the back of the restaurant was obstreperous the whole night — ruined the vibe for everyone." },
+    { word: "ennui", phonetic: "/ɒnˈwiː/", pos: "noun",
+      definition: "A feeling of listlessness and dissatisfaction arising from a lack of occupation or excitement.",
+      example: "Sunday evening ennui is its own specific feeling — not sad, just hollow and slightly restless." },
+    { word: "genuflect", phonetic: "/ˈdʒɛn.jʊ.flɛkt/", pos: "verb",
+      definition: "To lower one's body briefly by bending one knee in worship; to defer excessively.",
+      example: "Everyone in that company genuflects to the founder's opinion — no one will push back even when he's wrong." },
+    { word: "perspicacity", phonetic: "/ˌpɜːr.spɪˈkæs.ɪ.ti/", pos: "noun",
+      definition: "The quality of having a ready insight; shrewdness.",
+      example: "She had the perspicacity to see the problem before anyone else even knew there was one." },
+    { word: "liminality", phonetic: "/ˌlɪm.ɪˈnæl.ɪ.ti/", pos: "noun",
+      definition: "The quality of being in-between — on a threshold, between two states.",
+      example: "I've been living in liminality since I quit my job — not where I was, not where I'm going yet." },
+    { word: "numinosity", phonetic: "/ˌnjuː.mɪˈnɒs.ɪ.ti/", pos: "noun",
+      definition: "The quality of feeling divine, awe-inspiring, or deeply significant.",
+      example: "Standing at Machu Picchu at dawn — the numinosity of that place hit me before I could think about it." },
+    { word: "rhapsodize", phonetic: "/ˈræp.sə.daɪz/", pos: "verb",
+      definition: "To speak or write about something with intense enthusiasm.",
+      example: "He'll rhapsodize about that coffee shop for hours — the beans, the extraction temperature, the cup." },
+    { word: "incandescent", phonetic: "/ˌɪn.kænˈdɛs.ənt/", pos: "adjective",
+      definition: "Glowing with light from intense heat; informally: extremely bright or vivid with emotion.",
+      example: "She was incandescent with energy on stage — you couldn't look away for a second." },
+    { word: "osculate", phonetic: "/ˈɒs.kjʊ.leɪt/", pos: "verb",
+      definition: "To kiss; in mathematics, to be tangent at more than one point.",
+      example: "He built up to osculating her cheek like it was a final exam. Bro, it's a greeting." },
+    { word: "venal", phonetic: "/ˈviː.nəl/", pos: "adjective",
+      definition: "Open to corrupt influences and practices, especially bribery.",
+      example: "The whole permitting office was notoriously venal — everyone knew how things actually got done." },
+    { word: "trenchant", phonetic: "/ˈtrɛn.tʃənt/", pos: "adjective",
+      definition: "Vigorous or incisive in expression; sharply cutting.",
+      example: "Her critique was trenchant — accurate, direct, and kind of devastating." },
+    { word: "munificent", phonetic: "/mjuːˈnɪf.ɪ.sənt/", pos: "adjective",
+      definition: "Larger or more generous than is usual or necessary.",
+      example: "She left a munificent tip — like four times the bill — the server genuinely looked stunned." },
+    { word: "vitiate", phonetic: "/ˈvɪʃ.i.eɪt/", pos: "verb",
+      definition: "To make something less effective or impair its quality.",
+      example: "One bad actor in the group can vitiate the whole dynamic — drains all the trust." },
+    { word: "tendentious", phonetic: "/tɛnˈdɛn.ʃəs/", pos: "adjective",
+      definition: "Expressing or promoting a particular cause or viewpoint; biased.",
+      example: "That documentary was clearly tendentious — every interview subject had the same perspective." },
+    { word: "crepitate", phonetic: "/ˈkrɛp.ɪ.teɪt/", pos: "verb",
+      definition: "To make a crackling sound.",
+      example: "The fire crepitated in the background the whole night — that sound makes any conversation feel more intimate." },
+    { word: "turgid", phonetic: "/ˈtɜːr.dʒɪd/", pos: "adjective",
+      definition: "Swollen and distended; in writing, pompously inflated or overblown.",
+      example: "The essay was turgid — interesting ideas buried under sentences that went on for a paragraph each." },
+    { word: "sapient", phonetic: "/ˈseɪ.pi.ənt/", pos: "adjective",
+      definition: "Wise, or attempting to appear wise.",
+      example: "He had this sapient look on his face the whole meeting — like he was the only one who really understood." },
+    { word: "truculent", phonetic: "/ˈtrʌk.jʊ.lənt/", pos: "adjective",
+      definition: "Eager or quick to argue or fight; aggressively defiant.",
+      example: "He gets truculent when he's cornered — best not to push too hard or it becomes a whole thing." },
+    { word: "vicarious", phonetic: "/vɪˈkɛər.i.əs/", pos: "adjective",
+      definition: "Experienced through the feelings or actions of another person.",
+      example: "I live vicariously through travel accounts when I'm broke — those photos carry real weight then." },
+    { word: "peripatetic", phonetic: "/ˌpɛr.ɪ.pəˈtɛt.ɪk/", pos: "adjective",
+      definition: "Traveling from place to place; not settled in one location.",
+      example: "He's been peripatetic his whole career — a new city every two years." },
+    { word: "meretricious", phonetic: "/ˌmɛr.ɪˈtrɪʃ.əs/", pos: "adjective",
+      definition: "Apparently attractive but having in reality no value or integrity.",
+      example: "The branding was slick but meretricious — looked premium, delivered mediocre." },
+    { word: "sycophantic", phonetic: "/ˌsɪk.əˈfæn.tɪk/", pos: "adjective",
+      definition: "Obsequious and excessive in flattery, especially toward the powerful.",
+      example: "The whole conversation was sycophantic — every idea the boss floated got applauded." },
+    { word: "perspire", phonetic: "/pərˈspaɪər/", pos: "verb",
+      definition: "To give off sweat; to produce moisture through the pores.",
+      example: "Five minutes in that waiting room and I was perspiring — temperature, anxiety, both probably." },
+    { word: "circumlocution", phonetic: "/ˌsɜːr.kəm.ləˈkjuː.ʃən/", pos: "noun",
+      definition: "The use of many words where fewer would do; evasive language.",
+      example: "Ten minutes of circumlocution and he still hadn't said whether the answer was yes or no." },
+    { word: "ossification", phonetic: "/ˌɒs.ɪ.fɪˈkeɪ.ʃən/", pos: "noun",
+      definition: "The process of becoming rigid or inflexible; the hardening of attitudes.",
+      example: "There's a slow ossification that happens in every company — the longer it exists, the harder it is to change anything." },
+    { word: "propinquity", phonetic: "/prəˈpɪŋ.kwɪ.ti/", pos: "noun",
+      definition: "The state of being close to someone or something; proximity.",
+      example: "There's real propinquity in living with someone — you pick up their habits, their moods, their whole way of thinking." },
+    { word: "coruscate", phonetic: "/ˈkɒr.ʌ.skeɪt/", pos: "verb",
+      definition: "To flash or sparkle; to display brilliant or striking qualities.",
+      example: "The way she coruscated in that interview — clearly the sharpest person in the room by a margin." },
+    { word: "tautology", phonetic: "/tɔːˈtɒl.ə.dʒi/", pos: "noun",
+      definition: "Saying the same thing twice in different words; needless repetition.",
+      example: "'Free gift' is a tautology — a gift is by definition free. These things bother me more than they should." },
+    { word: "serendipity", phonetic: "/ˌsɛr.ənˈdɪp.ɪ.ti/", pos: "noun",
+      definition: "The occurrence of events by chance in a happy or beneficial way.",
+      example: "Pure serendipity that we sat next to each other on that flight — changed both our careers." },
+    { word: "mellisonant", phonetic: "/mɛˈlɪs.ə.nənt/", pos: "adjective",
+      definition: "Having a sweet or pleasing sound.",
+      example: "His laugh is so mellisonant — deep, genuine, fills a room without overwhelming it." },
+    { word: "incorrigible", phonetic: "/ɪnˈkɒr.ɪ.dʒɪ.bəl/", pos: "adjective",
+      definition: "Not able to be corrected or reformed; stubbornly persistent in bad behavior.",
+      example: "He's an incorrigible night owl — every new year he swears he'll fix his schedule, nothing changes." }
+  ];
+
+  function getWotdIndex(dateStr) {
+    let h = 5381;
+    for (let i = 0; i < dateStr.length; i++) {
+      h = (h * 33) ^ dateStr.charCodeAt(i);
+      h = h >>> 0;
+    }
+    return h % WORD_LIBRARY.length;
+  }
+
+  function getActiveWotd() {
+    const t = today();
+    const stored = lsGet('wotd-override-' + t, null);
+    if (stored !== null) {
+      const idx = parseInt(stored, 10);
+      if (!isNaN(idx) && idx >= 0 && idx < WORD_LIBRARY.length) return WORD_LIBRARY[idx];
+    }
+    return WORD_LIBRARY[getWotdIndex(t)];
+  }
+
+  function randomizeWotd() {
+    const t = today();
+    const current = WORD_LIBRARY.indexOf(getActiveWotd());
+    let next = current;
+    if (WORD_LIBRARY.length > 1) {
+      while (next === current) next = Math.floor(Math.random() * WORD_LIBRARY.length);
+    }
+    lsSet('wotd-override-' + t, String(next));
+    renderStimTab();
+  }
+
+  function renderStimTab() {
+    const entry    = getActiveWotd();
+    const img      = document.getElementById('wotd-img');
+    const skeleton = document.getElementById('wotd-skeleton');
+    if (!img) return;
+
+    document.getElementById('wotd-word').textContent       = entry.word;
+    document.getElementById('wotd-phonetic').textContent   = entry.phonetic;
+    document.getElementById('wotd-pos').textContent        = entry.pos;
+    document.getElementById('wotd-definition').textContent = entry.definition;
+    document.getElementById('wotd-example').textContent    = '\u201C' + entry.example + '\u201D';
+    document.getElementById('wotd-footer').textContent     =
+      'Updated daily \u2022 ' + WORD_LIBRARY.length + ' words in library';
+
+    img.style.display = '';
+    img.classList.remove('loaded'); img.classList.add('loading');
+    skeleton.classList.remove('hidden');
+    img.alt = entry.word;
+
+    const preloader = new Image();
+    const imgUrl    = 'https://source.unsplash.com/featured/800x400/?' + encodeURIComponent(entry.word);
+    preloader.onload = function() {
+      img.src = imgUrl;
+      img.classList.remove('loading'); img.classList.add('loaded');
+      skeleton.classList.add('hidden');
+    };
+    preloader.onerror = function() {
+      skeleton.classList.add('hidden');
+      img.style.display = 'none';
+    };
+    preloader.src = imgUrl;
+  }
+
+  function onStimActivityChange() {
+    document.getElementById('stim-wotd').classList.toggle(
+      'hidden', document.getElementById('stim-activity').value !== 'wotd');
+  }
+
+  // ══════════════════════════════════════════════════════
   // TAB SWITCHING
   // ══════════════════════════════════════════════════════
   function switchTab(tab) {
-    ['tasks', 'water', 'cal', 'workout'].forEach(t => {
+    ['tasks', 'water', 'cal', 'workout', 'stim'].forEach(t => {
       document.getElementById('panel-' + t).classList.toggle('hidden', tab !== t);
       document.getElementById('tab-'   + t).classList.toggle('active', tab === t);
     });
     lsSet('active-tab', tab);
     if (tab === 'cal')     renderCalendar();
     if (tab === 'workout') renderWorkoutTab();
+    if (tab === 'stim')    renderStimTab();
   }
 
   // ══════════════════════════════════════════════════════
