@@ -1101,35 +1101,118 @@
     }
 
     /* BOTTOM NAV */
-    .home-bottom-nav {
-      display: flex; justify-content: center; gap: 8px;
-      padding: 14px 0 20px; margin-top: 16px;
+    /* ── PERSISTENT BOTTOM NAV ── */
+    #panel-home, #panel-cal, #panel-workout, #panel-stim, #panel-journal {
+      padding-bottom: 72px;
+    }
+    .global-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      max-width: 480px; margin: 0 auto;
+      height: 62px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid var(--border);
-      flex-wrap: wrap;
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 0 4px; z-index: 100; transition: background 0.3s;
     }
-    .home-nav-pill {
-      font-size: 11px; font-weight: 500; color: var(--subtle);
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 8px; padding: 6px 12px; cursor: pointer;
-      transition: color 0.15s, border-color 0.15s; touch-action: manipulation;
-      font-family: 'Satoshi', 'DM Sans', system-ui, sans-serif;
+    body.dark .global-nav { background: rgba(10,10,18,0.94); }
+    .global-nav-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 2px; padding: 6px 8px; border-radius: 10px;
+      cursor: pointer; transition: all 0.2s;
+      min-width: 56px; border: none; background: none;
+      touch-action: manipulation; font-family: inherit;
     }
-    .home-nav-pill:hover { color: var(--accent); border-color: var(--accent); }
-
-    /* BACK BAR on secondary tabs */
-    .tab-back-bar {
+    .global-nav-item .gnav-icon { font-size: 1.12rem; line-height: 1; transition: transform 0.2s; }
+    .global-nav-item .gnav-label {
+      font-size: 0.55rem; font-weight: 600; color: var(--text-dim);
+      letter-spacing: 0.02em; transition: color 0.2s; white-space: nowrap;
+    }
+    .global-nav-item.active { background: rgba(34,197,94,0.08); }
+    .global-nav-item.active .gnav-label { color: #22c55e; }
+    .global-nav-item.active .gnav-icon { transform: scale(1.12); }
+    .gnav-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: #22c55e; opacity: 0; transition: opacity 0.2s;
+    }
+    .global-nav-item.active .gnav-dot { opacity: 1; }
+    .global-nav-item.gnav-more .gnav-icon {
+      color: var(--text-dim); font-size: 0.9rem; font-weight: 800; letter-spacing: 3px;
+    }
+    .global-nav-item.gnav-more.has-active { background: rgba(99,102,241,0.08); }
+    .global-nav-item.gnav-more.has-active .gnav-label { color: #6366f1; }
+    .global-nav-item.gnav-more.has-active .gnav-icon { color: #6366f1; }
+    .global-nav-item.gnav-more.has-active .gnav-dot { background: #6366f1; opacity: 1; }
+    .gnav-backdrop {
+      position: fixed; inset: 0; z-index: 98;
+      background: rgba(0,0,0,0.35); transition: opacity 0.2s;
+    }
+    .gnav-backdrop.hidden { opacity: 0; pointer-events: none; }
+    .gnav-drawer {
+      position: fixed; bottom: 70px; left: 8px; right: 8px;
+      max-width: 464px; margin: 0 auto;
+      background: var(--card);
+      backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--border); border-radius: 18px; padding: 8px;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.25); z-index: 99;
+      transform-origin: bottom center;
+      transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    body.dark .gnav-drawer { box-shadow: 0 -8px 40px rgba(0,0,0,0.55); }
+    .gnav-drawer.hidden { opacity: 0; pointer-events: none; transform: scale(0.94) translateY(10px); }
+    .gnav-drawer-title {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-dim); padding: 6px 12px 8px;
+    }
+    .gnav-drawer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    .gnav-drawer-item {
       display: flex; align-items: center; gap: 10px;
-      margin-bottom: 16px; padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
+      padding: 11px 14px; border-radius: 12px; cursor: pointer;
+      transition: background 0.15s; font-size: 0.82rem; font-weight: 500;
+      color: var(--subtle); border: none; background: none;
+      font-family: inherit; touch-action: manipulation; width: 100%; text-align: left;
     }
-    .btn-back-home {
-      font-size: 0.78rem; font-weight: 600; color: var(--accent);
-      background: var(--accent-soft); border: none; border-radius: 8px;
-      padding: 5px 10px; cursor: pointer; touch-action: manipulation;
+    .gnav-drawer-item:hover { background: var(--task-bg); }
+    .gnav-drawer-item.active { color: #22c55e; background: rgba(34,197,94,0.08); }
+    .gnav-drawer-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .nav-settings-title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-dim); padding: 6px 16px 4px;
     }
-    .tab-back-title {
-      font-size: 0.9rem; font-weight: 700; color: var(--heading);
+    .nav-pin-counter {
+      font-size: 0.72rem; color: var(--text-dim); font-weight: 600;
+      padding: 0 16px 6px; text-align: right;
     }
+    .nav-pin-counter .npc-count { color: #22c55e; font-weight: 700; }
+    .nav-pin-counter .npc-count.full { color: #f59e0b; }
+    .nav-config-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+      transition: background 0.15s;
+    }
+    .nav-config-item:hover { background: rgba(99,102,241,0.04); }
+    .nav-config-icon { font-size: 1rem; flex-shrink: 0; }
+    .nav-config-name { font-size: 0.85rem; font-weight: 600; color: var(--text); flex: 1; }
+    .nav-config-badge {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 2px 7px; border-radius: 4px; flex-shrink: 0;
+    }
+    .nav-config-badge.badge-bar { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .nav-config-badge.badge-more { background: rgba(99,102,241,0.1); color: #818cf8; }
+    body.dark .nav-config-badge.badge-bar { background: rgba(34,197,94,0.18); }
+    body.dark .nav-config-badge.badge-more { background: rgba(99,102,241,0.15); }
+    .nav-config-hint { font-size: 0.68rem; color: var(--text-dim); flex-shrink: 0; font-style: italic; }
+    .nav-pin-toggle {
+      width: 36px; height: 20px; border-radius: 10px; background: var(--border);
+      position: relative; cursor: pointer; flex-shrink: 0;
+      transition: background 0.2s; border: none;
+    }
+    .nav-pin-toggle.on { background: #22c55e; }
+    .nav-pin-toggle::after {
+      content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; top: 3px; left: 3px; transition: transform 0.2s;
+    }
+    .nav-pin-toggle.on::after { transform: translateX(16px); }
+    .nav-pin-toggle:disabled { opacity: 0.35; cursor: not-allowed; }
 
     /* NOISE OVERLAY */
     body::before {
@@ -2155,6 +2238,12 @@
                 <div class="settings-toggle-pill" id="settings-dark-pill"></div>
               </button>
             </div>
+            <div class="settings-divider"></div>
+            <div class="settings-section">
+              <div class="nav-settings-title">Navigation Bar</div>
+              <div class="nav-pin-counter">Pinned: <span class="npc-count" id="nav-pin-counter-num">4</span> / 4</div>
+              <div id="nav-settings-list"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -2260,12 +2349,6 @@
       <button class="btn-sync" id="import-btn">↓ Import tasks</button>
     </div>
 
-    <nav class="home-bottom-nav" aria-label="Navigation">
-      <button class="home-nav-pill" onclick="switchTab('cal')">📅 Calendar</button>
-      <button class="home-nav-pill" onclick="switchTab('workout')">💪 Workout</button>
-      <button class="home-nav-pill" onclick="switchTab('stim')">✨ Stim</button>
-      <button class="home-nav-pill" onclick="switchTab('journal')">📔 Journal</button>
-    </nav>
   </div><!-- /panel-home -->
 
   <!-- ══ TASKS PANEL (empty — content moved to panel-home) ══ -->
@@ -2276,7 +2359,6 @@
 
   <!-- ══ CALENDAR PANEL ══ -->
   <div id="panel-cal" class="hidden">
-    <div class="tab-back-bar"><button class="btn-back-home" onclick="switchTab('home')">← Home</button><span class="tab-back-title">📅 Calendar</span></div>
     <div class="streak-bars-container">
       <div id="water-streak-bar" class="streak-bar-row"></div>
       <div id="gym-streak-bar"   class="streak-bar-row"></div>
@@ -2331,7 +2413,6 @@
 
   <!-- ══ WORKOUT PANEL ══ -->
   <div id="panel-workout" class="hidden">
-    <div class="tab-back-bar"><button class="btn-back-home" onclick="switchTab('home')">← Home</button><span class="tab-back-title">💪 Workout</span></div>
     <div class="workout-date-nav">
       <button class="btn-cal-nav" onclick="workoutPrevDay()" aria-label="Previous day">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -2357,7 +2438,6 @@
 
   <!-- ══ QUICK STIM PANEL ══ -->
   <div id="panel-stim" class="hidden">
-    <div class="tab-back-bar"><button class="btn-back-home" onclick="switchTab('home')">← Home</button><span class="tab-back-title">✨ Quick Stim</span></div>
     <div class="stim-activity-row">
       <select class="stim-activity-select" id="stim-activity" onchange="onStimActivityChange()">
         <option value="wotd">Word of the Day</option>
@@ -2385,7 +2465,6 @@
 
   <!-- ══ JOURNAL PANEL ══ -->
   <div id="panel-journal" class="hidden">
-    <div class="tab-back-bar"><button class="btn-back-home" onclick="switchTab('home')">← Home</button><span class="tab-back-title">📔 Journal</span></div>
     <!-- Selected date label -->
     <div class="journal-date-header">
       <span class="journal-date-label" id="journal-date-label"></span>
@@ -2525,6 +2604,11 @@
   </div>
 </div>
 
+<!-- ══ GLOBAL BOTTOM NAV ══ -->
+<div class="gnav-backdrop hidden" id="gnav-backdrop" onclick="closeMoreDrawer()"></div>
+<div class="gnav-drawer hidden" id="gnav-drawer"></div>
+<nav class="global-nav" id="global-nav" aria-label="Main navigation"></nav>
+
 <script>
   // ── Firebase ──────────────────────────────────────────
   firebase.initializeApp({
@@ -2552,6 +2636,16 @@
   function lsSet(key, value) {
     try { localStorage.setItem(key, value); } catch(e) {}
   }
+
+  // ── Navigation config ──────────────────────────────────
+  let navConfig = JSON.parse(lsGet('navConfig', 'null')) || [
+    { id: 'home',    icon: '🏠', label: 'Home',     pinned: true,  locked: true },
+    { id: 'cal',     icon: '📅', label: 'Calendar',  pinned: true,  locked: false },
+    { id: 'workout', icon: '💪', label: 'Workout',   pinned: true,  locked: false },
+    { id: 'journal', icon: '📔', label: 'Journal',   pinned: true,  locked: false },
+    { id: 'stim',    icon: '✨', label: 'Stim',      pinned: false, locked: false },
+  ];
+  function saveNavConfig() { lsSet('navConfig', JSON.stringify(navConfig)); saveToFirestore(); }
 
   // ── Tasks state ───────────────────────────────────────
   let _spinTimer = null, _spinLongPressed = false;
@@ -2694,6 +2788,7 @@
       closeViewMenu();
       const pill = document.getElementById('settings-dark-pill');
       if (pill) pill.classList.toggle('on', dark);
+      renderNavSettings();
     }
   }
   function closeSettingsMenu() {
@@ -4684,6 +4779,144 @@
   }
 
   // ══════════════════════════════════════════════════════
+  // NAV BAR
+  // ══════════════════════════════════════════════════════
+
+  function migrateNavConfig() {
+    const KNOWN_TABS = [
+      { id: 'home',    icon: '🏠', label: 'Home' },
+      { id: 'cal',     icon: '📅', label: 'Calendar' },
+      { id: 'workout', icon: '💪', label: 'Workout' },
+      { id: 'journal', icon: '📔', label: 'Journal' },
+      { id: 'stim',    icon: '✨', label: 'Stim' },
+    ];
+    KNOWN_TABS.forEach(known => {
+      if (!navConfig.find(t => t.id === known.id)) {
+        navConfig.push({ id: known.id, icon: known.icon, label: known.label, pinned: false, locked: known.id === 'home' });
+      }
+    });
+    const home = navConfig.find(t => t.id === 'home');
+    if (home) { home.pinned = true; home.locked = true; }
+    let count = 0;
+    navConfig.forEach(t => {
+      if (t.pinned) count++;
+      if (count > 4 && !t.locked) t.pinned = false;
+    });
+    saveNavConfig();
+  }
+  migrateNavConfig();
+
+  function getPinnedTabs() { return navConfig.filter(t => t.pinned); }
+  function getOverflowTabs() { return navConfig.filter(t => !t.pinned); }
+
+  function renderNavBar() {
+    const bar = document.getElementById('global-nav');
+    if (!bar) return;
+    const pinned = getPinnedTabs();
+    const overflow = getOverflowTabs();
+    const activeTab = lsGet('active-tab', 'home');
+    const overflowActive = overflow.some(t => t.id === activeTab);
+    let html = '';
+    pinned.forEach(tab => {
+      const isActive = activeTab === tab.id;
+      html += `<button class="global-nav-item ${isActive ? 'active' : ''}" onclick="switchTab('${tab.id}')">
+        <span class="gnav-icon">${tab.icon}</span>
+        <span class="gnav-label">${tab.label}</span>
+        <div class="gnav-dot"></div>
+      </button>`;
+    });
+    html += `<button class="global-nav-item gnav-more ${overflowActive ? 'has-active' : ''}" onclick="toggleMoreDrawer()">
+      <span class="gnav-icon">•••</span>
+      <span class="gnav-label">More</span>
+      <div class="gnav-dot"></div>
+    </button>`;
+    bar.innerHTML = html;
+  }
+
+  function renderMoreDrawer() {
+    const drawer = document.getElementById('gnav-drawer');
+    if (!drawer) return;
+    const overflow = getOverflowTabs();
+    const activeTab = lsGet('active-tab', 'home');
+    if (overflow.length === 0) {
+      drawer.innerHTML = '<div class="gnav-drawer-title">All tabs are pinned!</div>';
+      return;
+    }
+    let html = '<div class="gnav-drawer-title">More</div><div class="gnav-drawer-grid">';
+    overflow.forEach(tab => {
+      const isActive = activeTab === tab.id;
+      html += `<button class="gnav-drawer-item ${isActive ? 'active' : ''}" onclick="switchTab('${tab.id}')">
+        <span class="gnav-drawer-icon">${tab.icon}</span> ${tab.label}
+      </button>`;
+    });
+    html += '</div>';
+    drawer.innerHTML = html;
+  }
+
+  function toggleMoreDrawer() {
+    const drawer = document.getElementById('gnav-drawer');
+    const backdrop = document.getElementById('gnav-backdrop');
+    if (!drawer || !backdrop) return;
+    const isOpen = !drawer.classList.contains('hidden');
+    drawer.classList.toggle('hidden', isOpen);
+    backdrop.classList.toggle('hidden', isOpen);
+  }
+
+  function closeMoreDrawer() {
+    const drawer = document.getElementById('gnav-drawer');
+    const backdrop = document.getElementById('gnav-backdrop');
+    if (drawer) drawer.classList.add('hidden');
+    if (backdrop) backdrop.classList.add('hidden');
+  }
+
+  function renderNavSettings() {
+    const container = document.getElementById('nav-settings-list');
+    if (!container) return;
+    const pinnedCount = navConfig.filter(t => t.pinned).length;
+    const counterEl = document.getElementById('nav-pin-counter-num');
+    if (counterEl) {
+      counterEl.textContent = pinnedCount;
+      counterEl.classList.toggle('full', pinnedCount >= 4);
+    }
+    let html = '';
+    navConfig.forEach((tab, i) => {
+      const badge = tab.pinned
+        ? '<span class="nav-config-badge badge-bar">Bar</span>'
+        : '<span class="nav-config-badge badge-more">More</span>';
+      let toggleHtml;
+      if (tab.locked) {
+        toggleHtml = '<span class="nav-config-hint">Always pinned</span>';
+      } else {
+        const isOn = tab.pinned;
+        const disabled = !isOn && pinnedCount >= 4;
+        toggleHtml = `<button class="nav-pin-toggle ${isOn ? 'on' : ''}" onclick="toggleNavPin(${i})" ${disabled ? 'disabled' : ''}></button>`;
+      }
+      html += `<div class="nav-config-item">
+        <span class="nav-config-icon">${tab.icon}</span>
+        <span class="nav-config-name">${tab.label}</span>
+        ${badge}
+        ${toggleHtml}
+      </div>`;
+    });
+    container.innerHTML = html;
+  }
+
+  function toggleNavPin(index) {
+    const tab = navConfig[index];
+    if (!tab || tab.locked) return;
+    if (tab.pinned) {
+      tab.pinned = false;
+    } else {
+      if (navConfig.filter(t => t.pinned).length >= 4) return;
+      tab.pinned = true;
+    }
+    saveNavConfig();
+    renderNavSettings();
+    renderNavBar();
+    renderMoreDrawer();
+  }
+
+  // ══════════════════════════════════════════════════════
   // TAB SWITCHING
   // ══════════════════════════════════════════════════════
   const VIEW_LABELS = {
@@ -4726,6 +4959,9 @@
       renderReminders();
       renderWater();
     }
+    closeMoreDrawer();
+    renderNavBar();
+    renderMoreDrawer();
   }
 
   // ══════════════════════════════════════════════════════
@@ -4888,7 +5124,7 @@
       db.collection('users').doc(currentUser.uid).set({
         tasks, reminders, collapsed,
         dark: String(dark),
-        waterStreak, water, gymData, journal,
+        waterStreak, water, gymData, journal, navConfig,
         priorityDate: lsGet('priorityDate', ''),
       }).then(() => {
         document.getElementById('auth-btn').classList.remove('syncing');
@@ -5295,6 +5531,8 @@
   renderReminders();
   applyMode();
   renderWorkoutTab();
+  renderNavBar();
+  renderMoreDrawer();
   switchTab(lsGet('active-tab', 'home'));
   initAuth();
 </script>
