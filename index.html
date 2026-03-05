@@ -1140,6 +1140,107 @@
       pointer-events: none; z-index: 0;
     }
 
+    /* ── WORKOUT REVAMP ── */
+    .spinner-input {
+      width: 52px; text-align: center; font-size: 0.88rem; font-weight: 600;
+      color: var(--text); background: transparent; border: none; outline: none;
+      padding: 0 2px; font-family: inherit;
+      -moz-appearance: textfield;
+    }
+    .spinner-input::-webkit-outer-spin-button,
+    .spinner-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .spinner-input:focus { color: var(--accent,#5eaed6); }
+    .reps-select {
+      height: 34px; padding: 0 4px;
+      border: 1.5px solid var(--border); border-radius: 6px;
+      background: var(--input-bg); color: var(--text);
+      font-size: 0.82rem; font-family: inherit; font-weight: 600;
+      cursor: pointer; outline: none; touch-action: manipulation;
+      min-width: 58px;
+    }
+    .reps-select:focus { border-color: #22c55e; }
+    .exercise-saved-card {
+      background: var(--card); border-radius: 8px; border: 1px solid var(--border);
+      border-left: 3px solid #22c55e; padding: 8px 12px; margin-bottom: 8px;
+      display: flex; align-items: flex-start; gap: 8px;
+      position: relative; overflow: hidden;
+    }
+    .exercise-saved-card.save-flash { animation: save-pulse 0.6s ease-out; }
+    @keyframes save-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.55); }
+      50%  { box-shadow: 0 0 0 8px rgba(34,197,94,0.15); }
+      100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    }
+    .save-indicator {
+      width: 7px; height: 7px; border-radius: 50%; background: #22c55e;
+      flex-shrink: 0; margin-top: 5px;
+    }
+    .exercise-saved-body { flex: 1; min-width: 0; }
+    .exercise-saved-name {
+      font-size: 0.88rem; font-weight: 700; color: var(--heading);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .exercise-saved-sets { font-size: 0.78rem; color: var(--subtle); margin-top: 2px; word-break: break-word; }
+    .btn-unsave {
+      flex-shrink: 0; background: none; border: 1px solid var(--border);
+      border-radius: 5px; padding: 2px 8px; font-size: 0.7rem;
+      color: var(--subtle); cursor: pointer; touch-action: manipulation;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-unsave:hover { color: var(--text); border-color: var(--text); }
+    .btn-save-exercise {
+      margin-top: 6px; padding: 4px 12px;
+      border: 1.5px solid #22c55e; border-radius: 6px;
+      background: rgba(34,197,94,0.08); color: #22c55e;
+      font-size: 0.78rem; font-weight: 600; cursor: pointer;
+      transition: background 0.15s; touch-action: manipulation;
+    }
+    .btn-save-exercise:hover { background: rgba(34,197,94,0.18); }
+    .goto-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .goto-chip {
+      padding: 4px 10px; border-radius: 16px;
+      border: 1.5px solid #22c55e; background: transparent;
+      color: var(--text); font-size: 0.72rem; font-weight: 600;
+      cursor: pointer; transition: background 0.15s; touch-action: manipulation;
+      text-align: left; line-height: 1.3;
+    }
+    .goto-chip:hover { background: rgba(34,197,94,0.12); }
+    .goto-last { font-size: 0.65rem; color: var(--subtle); font-weight: 400; display: block; }
+    .pr-board { margin: 10px 0; }
+    .pr-board-header {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--card); border: 1px solid #f59e0b44; border-radius: 8px;
+      padding: 8px 12px; cursor: pointer; touch-action: manipulation;
+      font-size: 0.82rem; font-weight: 700; color: var(--heading);
+    }
+    .pr-board-toggle { font-size: 0.7rem; color: var(--subtle); }
+    .pr-board-list {
+      margin-top: 4px; background: var(--card);
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    }
+    .pr-entry {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 12px; border-bottom: 1px solid var(--border); font-size: 0.78rem;
+    }
+    .pr-entry:last-child { border-bottom: none; }
+    .pr-entry-name { flex: 1; font-weight: 600; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pr-entry-weight { font-weight: 700; color: #f59e0b; flex-shrink: 0; }
+    .pr-entry-date { font-size: 0.7rem; color: var(--subtle); flex-shrink: 0; }
+    .pr-trend-up   { color: #22c55e; font-weight: 700; flex-shrink: 0; }
+    .pr-trend-same { color: var(--subtle); flex-shrink: 0; }
+    .pr-trend-down { color: #ef4444; font-weight: 700; flex-shrink: 0; }
+    .exercise-chart-wrap { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+    .exercise-chart-wrap.open { max-height: 120px; }
+    .exercise-chart-inner { padding: 8px 0 4px; }
+    .exercise-chart-svg { display: block; overflow: visible; }
+    .chart-empty { font-size: 0.75rem; color: var(--subtle); text-align: center; padding: 12px 0; }
+    .btn-chart {
+      background: none; border: none; cursor: pointer; padding: 2px 4px;
+      color: var(--subtle); font-size: 0.8rem; border-radius: 4px;
+      transition: color 0.15s; flex-shrink: 0; touch-action: manipulation;
+    }
+    .btn-chart:hover { color: #22c55e; }
+
     /* ══ QUICK STIM PANEL ══ */
     .stim-activity-row {
       display: flex; justify-content: flex-end; margin-bottom: 20px;
@@ -2454,6 +2555,8 @@
 
   // ── Tasks state ───────────────────────────────────────
   let _spinTimer = null, _spinLongPressed = false;
+  let _prBoardOpen = false;
+  let _openCharts = new Set();
   let tasks     = JSON.parse(lsGet('tasks',     '[]'));
   let collapsed = JSON.parse(lsGet('collapsed', '{}'));
   let dark      = lsGet('dark', 'false') === 'true';
@@ -3367,9 +3470,9 @@
   function spinPressUp(btn, dateStr, exIdx, setIdx, field, dir) {
     clearTimeout(_spinTimer);
     btn.classList.remove('pressing');
-    const delta = _spinLongPressed
-      ? (field === 'weight' ? dir * 5 : dir * 4)
-      : dir;
+    const delta = field === 'weight' ? dir * 5 : (
+      _spinLongPressed ? dir * 4 : dir
+    );
     _spinLongPressed = false;
     spinnerAdjust(dateStr, exIdx, setIdx, field, delta);
   }
@@ -3384,7 +3487,10 @@
     }
     saveGymData();
     const valEl = document.getElementById(`sv-${exIdx}-${setIdx}-${field}`);
-    if (valEl) valEl.textContent = set[field];
+    if (valEl) {
+      if (valEl.tagName === 'INPUT') valEl.value = set[field];
+      else valEl.textContent = set[field];
+    }
   }
   function duplicateGymSet(dateStr, exIdx, setIdx) {
     const day = ensureGymDay(dateStr);
@@ -3454,20 +3560,163 @@
   }
 
   // ── Exercise memory ───────────────────────────────────
-  function getExerciseSuggestions(group) {
-    const seen = new Set();
-    const result = [];
-    Object.keys(gymData.history).sort().reverse().forEach(ds => {
+  function getExerciseFrequency(group) {
+    const counts = {};
+    const lastSeen = {};
+    Object.keys(gymData.history).sort().forEach(ds => {
       const day = gymData.history[ds];
       if (!day || !day.exercises) return;
       day.exercises.forEach(ex => {
-        if (ex.name && ex.bodyGroup === group && !seen.has(ex.name.toLowerCase())) {
-          seen.add(ex.name.toLowerCase());
-          result.push(ex.name);
-        }
+        if (!ex.name || ex.bodyGroup !== group) return;
+        const key = ex.name.toLowerCase();
+        counts[key] = (counts[key] || 0) + 1;
+        const firstSet = (ex.sets || []).find(s => parseFloat(s.weight));
+        if (firstSet) lastSeen[key] = { name: ex.name, weight: parseFloat(firstSet.weight), date: ds };
       });
     });
-    return result;
+    return Object.keys(counts)
+      .sort((a, b) => counts[b] - counts[a])
+      .map(key => ({
+        name: lastSeen[key]?.name || key,
+        count: counts[key],
+        lastWeight: lastSeen[key]?.weight || 0,
+      }));
+  }
+
+  function getExerciseSuggestions(group) {
+    return getExerciseFrequency(group).map(e => e.name);
+  }
+
+  function formatSetSummary(sets) {
+    return (sets || [])
+      .filter(s => parseFloat(s.weight) || parseInt(s.reps))
+      .map(s => `${parseFloat(s.weight)||0}×${parseInt(s.reps)||0}`)
+      .join(', ') || '—';
+  }
+
+  function saveExercise(dateStr, exIdx) {
+    const day = ensureGymDay(dateStr);
+    if (!day.exercises[exIdx]) return;
+    day.exercises[exIdx].saved = true;
+    saveGymData();
+    renderWorkoutPanel(dateStr);
+    setTimeout(() => {
+      const card = document.querySelector(`.exercise-saved-card[data-exidx="${exIdx}"]`);
+      if (card) { card.classList.remove('save-flash'); void card.offsetWidth; card.classList.add('save-flash'); }
+    }, 50);
+  }
+
+  function unsaveExercise(dateStr, exIdx) {
+    const day = ensureGymDay(dateStr);
+    if (!day.exercises[exIdx]) return;
+    day.exercises[exIdx].saved = false;
+    saveGymData();
+    renderWorkoutPanel(dateStr);
+  }
+
+  function addGoToExercise(dateStr, group, name) {
+    const day = ensureGymDay(dateStr);
+    if (day.exercises.some(e => e.name && e.name.toLowerCase() === name.toLowerCase() && e.bodyGroup === group)) return;
+    const lastSets = getLastUsedSets(name, dateStr);
+    const sets = lastSets ? lastSets.map(s => ({ weight: s.weight, reps: s.reps })) : [{ weight: '', reps: '' }];
+    day.exercises.push({ name, bodyGroup: group, sets });
+    saveGymData();
+    renderWorkoutPanel(dateStr);
+    renderCalendarIfVisible();
+  }
+
+  function getAllPRs() {
+    const allTime = {};
+    const byDate = {};
+    Object.keys(gymData.history).sort().forEach(ds => {
+      const day = gymData.history[ds];
+      if (!day || !day.completed || !day.exercises) return;
+      day.exercises.forEach(ex => {
+        if (!ex.name) return;
+        const key = ex.name.toLowerCase();
+        const maxW = Math.max(0, ...(ex.sets||[]).map(s => parseFloat(s.weight)||0));
+        if (maxW === 0) return;
+        if (!allTime[key] || maxW > allTime[key].maxWeight) {
+          allTime[key] = { name: ex.name, maxWeight: maxW, maxDate: ds };
+        }
+        if (!byDate[key]) byDate[key] = [];
+        byDate[key].push({ date: ds, maxWeight: maxW });
+      });
+    });
+    return Object.keys(allTime).sort().map(key => {
+      const sessions = byDate[key] || [];
+      let trend = '—';
+      if (sessions.length >= 2) {
+        const last = sessions[sessions.length - 1].maxWeight;
+        const prev = sessions[sessions.length - 2].maxWeight;
+        trend = last > prev ? '↑' : last < prev ? '↓' : '—';
+      }
+      const d = new Date(allTime[key].maxDate + 'T00:00:00');
+      const dateLabel = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return { name: allTime[key].name, maxWeight: allTime[key].maxWeight, dateLabel, trend };
+    });
+  }
+
+  function togglePRBoard() {
+    _prBoardOpen = !_prBoardOpen;
+    const list = document.getElementById('pr-board-list');
+    const arrow = document.getElementById('pr-board-arrow');
+    if (list) list.style.display = _prBoardOpen ? 'block' : 'none';
+    if (arrow) arrow.textContent = _prBoardOpen ? '▲' : '▼';
+  }
+
+  function getExerciseProgressData(exerciseName) {
+    const data = [];
+    Object.keys(gymData.history).sort().forEach(ds => {
+      const day = gymData.history[ds];
+      if (!day || !day.exercises) return;
+      day.exercises.forEach(ex => {
+        if (!ex.name || ex.name.toLowerCase() !== exerciseName.toLowerCase()) return;
+        const maxW = Math.max(0, ...(ex.sets||[]).map(s => parseFloat(s.weight)||0));
+        if (maxW > 0) data.push({ date: ds, maxWeight: maxW });
+      });
+    });
+    return data;
+  }
+
+  function toggleExerciseChart(exerciseName) {
+    if (_openCharts.has(exerciseName)) _openCharts.delete(exerciseName);
+    else _openCharts.add(exerciseName);
+    const panel = document.getElementById('workout-panel');
+    if (panel && panel.dataset.dateStr) renderWorkoutPanel(panel.dataset.dateStr);
+  }
+
+  function renderExerciseSvg(exerciseName, excludeDate) {
+    const data = getExerciseProgressData(exerciseName).filter(d => d.date !== excludeDate);
+    if (data.length === 0) return '<p class="chart-empty">No history yet</p>';
+    const W = 280, H = 72, PX = 12, PY = 8;
+    const weights = data.map(d => d.maxWeight);
+    const minW = Math.min(...weights), maxW = Math.max(...weights);
+    const range = maxW - minW || 10;
+    const xStep = data.length > 1 ? (W - PX * 2) / (data.length - 1) : 0;
+    const pts = data.map((d, i) => ({
+      x: PX + (data.length > 1 ? i * xStep : (W - PX * 2) / 2),
+      y: PY + (1 - (d.maxWeight - minW) / range) * (H - PY * 2 - 12),
+      w: d.maxWeight
+    }));
+    const lineD = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+    const fillD = `${lineD} L ${pts[pts.length-1].x} ${H-10} L ${pts[0].x} ${H-10} Z`;
+    const gradId = `cg${Math.random().toString(36).slice(2,7)}`;
+    const dots = pts.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3" fill="#22c55e" stroke="var(--card)" stroke-width="1.5"/>`).join('');
+    return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" class="exercise-chart-svg">
+      <defs>
+        <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#22c55e" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${fillD}" fill="url(#${gradId})"/>
+      <path d="${lineD}" fill="none" stroke="#22c55e" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+      <text x="${PX}" y="${H-1}" font-size="9" fill="var(--subtle)">${minW} lbs</text>
+      <text x="${W-PX}" y="${H-1}" font-size="9" fill="var(--subtle)" text-anchor="end">${maxW} lbs</text>
+      <text x="${W/2}" y="${H-1}" font-size="9" fill="var(--subtle)" text-anchor="middle">${data.length} session${data.length>1?'s':''}</text>
+    </svg>`;
   }
 
   function getLastUsedSets(exerciseName, excludeDate) {
@@ -3581,6 +3830,7 @@
   function renderWorkoutPanel(dateStr) {
     const el = document.getElementById('workout-panel');
     if (!el) return;
+    el.dataset.dateStr = dateStr;
     const day = gymData.history[dateStr];
     if (!day || !day.completed) { el.innerHTML = ''; return; }
 
@@ -3596,12 +3846,43 @@
       return `<button class="bg-chip ${active?'active':''}" onclick="toggleBodyGroup('${dateStr}','${key}')">${g}</button>${recovery}`;
     }).join('');
 
+    // PR Board
+    const prs = getAllPRs();
+    const prBoardHtml = prs.length === 0 ? '' : `
+      <div class="pr-board">
+        <div class="pr-board-header" onclick="togglePRBoard()">
+          🏆 Personal Records (${prs.length})
+          <span class="pr-board-toggle" id="pr-board-arrow">${_prBoardOpen ? '▲' : '▼'}</span>
+        </div>
+        <div class="pr-board-list" id="pr-board-list" style="display:${_prBoardOpen ? 'block' : 'none'}">
+          ${prs.map(p => `
+            <div class="pr-entry">
+              <span class="pr-entry-name">${escapeHtml(p.name)}</span>
+              <span class="pr-entry-weight">${p.maxWeight} lbs</span>
+              <span class="pr-entry-date">${p.dateLabel}</span>
+              <span class="${p.trend === '↑' ? 'pr-trend-up' : p.trend === '↓' ? 'pr-trend-down' : 'pr-trend-same'}">${p.trend}</span>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
     let exercisesHtml = '';
     (day.bodyGroups || []).forEach(group => {
       const groupLabel = group[0].toUpperCase() + group.slice(1);
       const groupExercises = (day.exercises || []).filter(ex => ex.bodyGroup === group);
 
       const suggestions = getExerciseSuggestions(group);
+
+      // Go-To chips (top 3 by frequency)
+      const goTos = getExerciseFrequency(group).slice(0, 3);
+      const gotoHtml = goTos.length > 0 ? `
+        <div class="goto-row">
+          ${goTos.map(e => `
+            <button class="goto-chip" onclick="addGoToExercise('${dateStr}','${group}','${escapeHtml(e.name)}')">
+              ${escapeHtml(e.name)} (${e.count})
+              ${e.lastWeight ? `<span class="goto-last">Last: ${e.lastWeight} lbs</span>` : ''}
+            </button>`).join('')}
+        </div>` : '';
+
       const exHtml = groupExercises.map(ex => {
         const exIdx = day.exercises.indexOf(ex);
         const weights = (ex.sets||[]).map(s => parseFloat(s.weight)||0).filter(w => w > 0);
@@ -3609,24 +3890,63 @@
         const prevPR = getExercisePRExcluding(ex.name, dateStr);
         const isPR = ex.name && dayMax > 0 && dayMax > prevPR;
         const prBadge = isPR ? `<span class="pr-badge">🏆 New PR</span>` : '';
+        const chartOpen = _openCharts.has(ex.name || '');
+        const chartHtml = `
+          <div class="exercise-chart-wrap ${chartOpen ? 'open' : ''}" id="chart-${exIdx}">
+            <div class="exercise-chart-inner">${renderExerciseSvg(ex.name||'', dateStr)}</div>
+          </div>`;
+
+        if (ex.saved) {
+          // COMPACT VIEW
+          const summary = formatSetSummary(ex.sets);
+          return `
+            <div class="exercise-saved-card" data-exidx="${exIdx}">
+              <div class="save-indicator"></div>
+              <div class="exercise-saved-body">
+                <div class="exercise-saved-name">${escapeHtml(ex.name||'Unnamed')} ${prBadge}</div>
+                <div class="exercise-saved-sets">${summary}</div>
+              </div>
+              <button class="btn-chart" onclick="toggleExerciseChart('${escapeHtml(ex.name||'')}')">📈</button>
+              <button class="btn-unsave" onclick="unsaveExercise('${dateStr}',${exIdx})">Edit</button>
+            </div>
+            ${chartHtml}`;
+        }
+
+        // EXPANDED VIEW
         const datalistId = `ex-sug-${group}-${exIdx}`;
         const datalistHtml = suggestions.length > 0
           ? `<datalist id="${datalistId}">${suggestions.map(n => `<option value="${escapeHtml(n)}"></option>`).join('')}</datalist>`
           : '';
 
-        const mkSpinner = (di, si, field, val) => `
+        const mkWeightInput = (di, si, val) => `
           <div class="spinner-wrap">
-            <span class="spinner-label">${field === 'weight' ? 'lbs' : 'reps'}</span>
+            <span class="spinner-label">lbs</span>
             <div class="spinner-group">
               <button class="spinner-btn"
-                onmousedown="spinPressDown(this)" onmouseup="spinPressUp(this,'${dateStr}',${di},${si},'${field}',-1)"
-                ontouchstart="spinPressDown(this);event.preventDefault()" ontouchend="spinPressUp(this,'${dateStr}',${di},${si},'${field}',-1);event.preventDefault()">−</button>
-              <span class="spinner-value" id="sv-${di}-${si}-${field}">${val||0}</span>
+                onmousedown="spinPressDown(this)" onmouseup="spinPressUp(this,'${dateStr}',${di},${si},'weight',-1)"
+                ontouchstart="spinPressDown(this);event.preventDefault()" ontouchend="spinPressUp(this,'${dateStr}',${di},${si},'weight',-1);event.preventDefault()">−</button>
+              <input type="number" inputmode="decimal" class="spinner-input" id="sv-${di}-${si}-weight"
+                value="${parseFloat(val)||0}" min="0" max="999" step="5"
+                onblur="updateGymSet('${dateStr}',${di},${si},'weight',Math.max(0,Math.min(999,parseFloat(this.value)||0)));this.value=Math.max(0,Math.min(999,parseFloat(this.value)||0))"
+                onkeydown="if(event.key==='Enter')this.blur()">
               <button class="spinner-btn"
-                onmousedown="spinPressDown(this)" onmouseup="spinPressUp(this,'${dateStr}',${di},${si},'${field}',1)"
-                ontouchstart="spinPressDown(this);event.preventDefault()" ontouchend="spinPressUp(this,'${dateStr}',${di},${si},'${field}',1);event.preventDefault()">+</button>
+                onmousedown="spinPressDown(this)" onmouseup="spinPressUp(this,'${dateStr}',${di},${si},'weight',1)"
+                ontouchstart="spinPressDown(this);event.preventDefault()" ontouchend="spinPressUp(this,'${dateStr}',${di},${si},'weight',1);event.preventDefault()">+</button>
             </div>
           </div>`;
+
+        const mkRepsSelect = (di, si, val) => {
+          const cur = parseInt(val) || 0;
+          const opts = [...Array(19)].map((_,i) => i+1).map(n =>
+            `<option value="${n}" ${cur===n?'selected':''}>${n}</option>`
+          ).join('') + `<option value="20" ${cur>=20?'selected':''}>20+</option>`;
+          return `
+            <div class="spinner-wrap">
+              <span class="spinner-label">reps</span>
+              <select class="reps-select" onchange="updateGymSet('${dateStr}',${di},${si},'reps',this.value)">${opts}</select>
+            </div>`;
+        };
+
         const setsHtml = (ex.sets||[]).map((s,si) => {
           const actionsHtml = `
             <div class="set-actions">
@@ -3636,9 +3956,9 @@
           return `
           <div class="set-row">
             <span class="set-num">Set ${si+1}</span>
-            ${mkSpinner(exIdx, si, 'weight', s.weight)}
+            ${mkWeightInput(exIdx, si, s.weight)}
             <span class="set-x">×</span>
-            ${mkSpinner(exIdx, si, 'reps', s.reps)}
+            ${mkRepsSelect(exIdx, si, s.reps)}
             <button class="set-remove" onclick="removeGymSet('${dateStr}',${exIdx},${si})">✕</button>
           </div>${actionsHtml}`;
         }).join('');
@@ -3650,16 +3970,22 @@
                      list="${datalistId}"
                      onchange="updateGymExerciseName('${dateStr}',${exIdx},this.value)">${datalistHtml}
               ${prBadge}
+              <button class="btn-chart" onclick="toggleExerciseChart('${escapeHtml(ex.name||'')}')">📈</button>
               <button class="ex-remove" onclick="removeGymExercise('${dateStr}',${exIdx})">✕</button>
             </div>
+            ${chartHtml}
             ${setsHtml}
-            <button class="btn-add-set" onclick="addGymSet('${dateStr}',${exIdx})">+ Add Set</button>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <button class="btn-add-set" onclick="addGymSet('${dateStr}',${exIdx})">+ Add Set</button>
+              <button class="btn-save-exercise" onclick="saveExercise('${dateStr}',${exIdx})">✓ Save</button>
+            </div>
           </div>`;
       }).join('');
 
       exercisesHtml += `
         <div class="exercise-group">
           <div class="exercise-group-label">${groupLabel}</div>
+          ${gotoHtml}
           ${exHtml}
           <button class="btn-add-exercise" onclick="addGymExercise('${dateStr}','${group}')">+ Add Exercise</button>
         </div>`;
@@ -3673,6 +3999,7 @@
       <div class="workout-panel-inner">
         <div class="workout-section-label">Body Groups</div>
         <div class="body-group-chips">${chipsHtml}</div>
+        ${prBoardHtml}
         ${exercisesHtml}
         <div class="workout-section-label">Intensity</div>
         <div class="intensity-row">${intensityHtml}</div>
