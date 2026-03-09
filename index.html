@@ -1428,6 +1428,14 @@
       width: 18px; height: 18px; accent-color: #22c55e; cursor: pointer; flex-shrink: 0;
     }
 
+    .yoda-motivator {
+      display: block;
+      width: 180px;
+      margin: 12px auto 0;
+      pointer-events: none;
+      user-select: none;
+    }
+
     /* Calendar read-only workout summary */
     .cal-workout-read {
       border: 1.5px solid #22c55e44; border-radius: 10px;
@@ -2510,6 +2518,8 @@
         💪 Workout Completed
       </label>
     </div>
+    <img id="yoda-lazy-img" src="/yoda-lazy.png" alt="" class="yoda-motivator" style="display:none;">
+    <img id="yoda-buff-img" src="/yoda-buff.png" alt="" class="yoda-motivator" style="display:none;">
     <div id="workout-panel"></div>
   </div><!-- /panel-workout -->
 
@@ -2801,6 +2811,8 @@
     if (isSW) starfieldInit();
     renderWater();
     if (typeof updateHomeHeader === 'function') updateHomeHeader();
+    const wpEl = document.getElementById('workout-panel');
+    if (wpEl && wpEl.dataset.dateStr) updateYodaVisibility(wpEl.dataset.dateStr);
   }
 
   // ══ SW BACKGROUND SYSTEM ══════════════════════════════
@@ -3971,10 +3983,22 @@
     el.innerHTML = `<span class="wk-label">This week:</span> ${chips}`;
   }
 
+  function updateYodaVisibility(dateStr) {
+    const lazy = document.getElementById('yoda-lazy-img');
+    const buff = document.getElementById('yoda-buff-img');
+    if (!lazy || !buff) return;
+    const isSW = appMode === 'starWars';
+    const day  = gymData.history[dateStr];
+    const done = !!(day && day.completed);
+    lazy.style.display = (isSW && !done) ? 'block' : 'none';
+    buff.style.display = (isSW &&  done) ? 'block' : 'none';
+  }
+
   function renderWorkoutPanel(dateStr) {
     const el = document.getElementById('workout-panel');
     if (!el) return;
     el.dataset.dateStr = dateStr;
+    updateYodaVisibility(dateStr);
     const day = gymData.history[dateStr];
     if (!day || !day.completed) { el.innerHTML = ''; return; }
 
