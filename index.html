@@ -1058,6 +1058,7 @@
     .water-count-display { text-align: center; }
     .water-count-num { display: block; font-size: 24px; font-weight: 700; color: var(--heading); line-height: 1; }
     .water-count-unit { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-dim); text-transform: uppercase; }
+    .water-oz-sub { display: block; font-size: 10px; color: var(--text-dim); margin-top: 2px; }
     .water-goal-banner {
       margin-top: 10px; padding: 8px 12px;
       background: var(--success-bg); border: 1px solid var(--success-border);
@@ -2405,6 +2406,16 @@
             </div>
             <div class="settings-divider"></div>
             <div class="settings-section">
+              <div class="settings-section-title">Water</div>
+              <div class="settings-theme-row" style="gap:8px;">
+                <span>Bottle size (oz)</span>
+                <input type="number" id="bottle-oz-input" min="1" max="64"
+                  style="width:52px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text);font-size:13px;text-align:center;"
+                  value="26" onchange="setBottleOz(this.value)">
+              </div>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="settings-section">
               <div class="nav-settings-title">Navigation Bar</div>
               <div class="nav-pin-counter">Pinned: <span class="npc-count" id="nav-pin-counter-num">4</span> / 4</div>
               <div id="nav-settings-list"></div>
@@ -2440,6 +2451,7 @@
         <div class="water-count-display">
           <span class="water-count-num" id="bottle-num">0</span>
           <span class="water-count-unit">GLASSES</span>
+          <span class="water-oz-sub" id="water-oz-sub">0 / 128 oz</span>
         </div>
         <button class="btn-water-ctrl btn-water-plus" id="btn-plus" onclick="adjustBottles(1)" aria-label="Add bottle">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -3573,7 +3585,7 @@
   // ══════════════════════════════════════════════════════
   // WATER TRACKER
   // ══════════════════════════════════════════════════════
-  const BOTTLE_OZ = 26;
+  let BOTTLE_OZ = parseInt(lsGet('bottleOz', '26')) || 26;
   const GOAL_OZ   = 128;
 
   function loadWater() {
@@ -3588,6 +3600,15 @@
     return { date: t, bottles: 0 };
   }
   function saveWater() { lsSet('water', JSON.stringify(water)); saveToFirestore(); }
+  function setBottleOz(oz) {
+    BOTTLE_OZ = Math.max(1, Math.min(64, parseInt(oz) || 26));
+    lsSet('bottleOz', String(BOTTLE_OZ));
+    water.bottles = Math.min(water.bottles, Math.ceil(GOAL_OZ / BOTTLE_OZ));
+    saveWater();
+    renderWater();
+    const inp = document.getElementById('bottle-oz-input');
+    if (inp) inp.value = BOTTLE_OZ;
+  }
 
   let water = loadWater();
 
@@ -4310,7 +4331,7 @@
   }
 
   function adjustBottles(delta) {
-    water.bottles = Math.max(0, Math.min(10, water.bottles + delta));
+    water.bottles = Math.max(0, Math.min(Math.ceil(GOAL_OZ / BOTTLE_OZ), water.bottles + delta));
     renderWater();
     saveWater();
     checkWaterGoalHit();
@@ -4358,6 +4379,10 @@
     // Water card count
     const cardCount = document.getElementById('water-card-count');
     if (cardCount) cardCount.textContent = water.bottles + ' / ' + Math.ceil(GOAL_OZ / BOTTLE_OZ) + ' glasses';
+    const ozSub = document.getElementById('water-oz-sub');
+    if (ozSub) ozSub.textContent = oz + ' / ' + GOAL_OZ + ' oz';
+    const ozInp = document.getElementById('bottle-oz-input');
+    if (ozInp) ozInp.value = BOTTLE_OZ;
   }
 
   // ══════════════════════════════════════════════════════
@@ -5310,7 +5335,8 @@
     if (Array.isArray(data.reminders)) { reminders = data.reminders; lsSet('reminders', JSON.stringify(reminders)); }
     if (data.collapsed)   { collapsed   = data.collapsed;   lsSet('collapsed',   JSON.stringify(collapsed)); }
     if (data.waterStreak) { waterStreak = data.waterStreak; if (!waterStreak.history) waterStreak.history = {}; lsSet('waterStreak', JSON.stringify(waterStreak)); }
-    if (data.water)       { water       = data.water;       lsSet('water',       JSON.stringify(water)); }
+    if (data.water)       { const t = today(); water = (data.water && data.water.date === t) ? data.water : { date: t, bottles: 0 }; lsSet('water', JSON.stringify(water)); }
+    if (data.bottleOz)    { BOTTLE_OZ = parseInt(data.bottleOz) || 26; lsSet('bottleOz', String(BOTTLE_OZ)); }
     if (data.gymData)     { gymData     = data.gymData;     if (!gymData.history) gymData.history = {};     lsSet('gymData',     JSON.stringify(gymData)); }
     if (data.journal)     { journal     = data.journal;     lsSet('journal',      JSON.stringify(journal)); }
     if (data.priorityDate){ lsSet('priorityDate', data.priorityDate); }
@@ -5332,7 +5358,7 @@
       db.collection('users').doc(currentUser.uid).set({
         tasks, reminders, collapsed,
         dark: String(dark),
-        waterStreak, water, gymData, journal, navConfig,
+        waterStreak, water, gymData, journal, navConfig, bottleOz: BOTTLE_OZ,
         priorityDate: lsGet('priorityDate', ''),
       }).then(() => {
         document.getElementById('auth-btn').classList.remove('syncing');
