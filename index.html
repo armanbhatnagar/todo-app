@@ -1102,7 +1102,7 @@
 
     /* BOTTOM NAV */
     /* ── PERSISTENT BOTTOM NAV ── */
-    #panel-home, #panel-cal, #panel-workout, #panel-stim, #panel-journal {
+    #panel-home, #panel-cal, #panel-workout, #panel-stim, #panel-journal, #panel-econ {
       padding-bottom: 72px;
     }
     .global-nav {
@@ -2100,6 +2100,171 @@
       -webkit-box-orient: vertical; overflow: hidden;
     }
 
+    /* ══ ECONOMICS DASHBOARD ══ */
+    .econ-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    }
+    .econ-title {
+      font-size: 1.15rem; font-weight: 700; color: var(--heading);
+      letter-spacing: -0.02em; flex: 1;
+    }
+    .econ-subtitle {
+      font-size: 0.7rem; color: var(--text-dim); white-space: nowrap;
+    }
+    .econ-refresh-btn {
+      background: var(--task-bg); border: 1.5px solid var(--border);
+      border-radius: 8px; width: 34px; height: 34px;
+      font-size: 1.1rem; cursor: pointer; color: var(--text-dim);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; touch-action: manipulation;
+    }
+    .econ-refresh-btn:hover { border-color: #6366f1; color: #6366f1; }
+    .econ-refresh-btn.spinning { animation: econ-spin 0.8s ease; }
+    @keyframes econ-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .econ-section { margin-bottom: 20px; }
+    .econ-section-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--heading); margin-bottom: 10px;
+    }
+
+    .econ-rates-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .econ-rate-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px; transition: border-color 0.2s;
+    }
+    .econ-rate-name {
+      font-size: 0.7rem; font-weight: 600; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;
+    }
+    .econ-rate-value {
+      font-size: 1.3rem; font-weight: 700; color: var(--heading); line-height: 1.2;
+    }
+    .econ-rate-change {
+      font-size: 0.7rem; font-weight: 600; margin-top: 2px;
+    }
+    .econ-rate-change.up { color: #ef4444; }
+    .econ-rate-change.down { color: #22c55e; }
+    .econ-rate-change.flat { color: var(--text-dim); }
+    .econ-rate-date {
+      font-size: 0.6rem; color: var(--text-dim); margin-top: 4px;
+    }
+
+    .econ-markets-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .econ-market-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px;
+    }
+    .econ-market-name {
+      font-size: 0.72rem; font-weight: 600; color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+    .econ-market-price {
+      font-size: 1.2rem; font-weight: 700; color: var(--heading); line-height: 1.2;
+    }
+    .econ-market-change { font-size: 0.72rem; font-weight: 600; margin-top: 2px; }
+    .econ-market-change.positive { color: #22c55e; }
+    .econ-market-change.negative { color: #ef4444; }
+
+    .econ-events-list { display: flex; flex-direction: column; gap: 6px; }
+    .econ-event-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .econ-event-badge {
+      font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 2px 7px; border-radius: 4px;
+      flex-shrink: 0; white-space: nowrap;
+    }
+    .econ-event-badge.fomc { background: rgba(245,158,11,0.12); color: #f59e0b; }
+    .econ-event-badge.cpi  { background: rgba(59,130,246,0.12);  color: #3b82f6; }
+    .econ-event-badge.jobs { background: rgba(34,197,94,0.12);   color: #22c55e; }
+    body.dark .econ-event-badge.fomc { background: rgba(245,158,11,0.18); }
+    body.dark .econ-event-badge.cpi  { background: rgba(59,130,246,0.18); }
+    body.dark .econ-event-badge.jobs { background: rgba(34,197,94,0.18); }
+    .econ-event-label {
+      flex: 1; font-size: 0.82rem; font-weight: 600; color: var(--text);
+    }
+    .econ-event-date {
+      font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; text-align: right;
+    }
+    .econ-event-countdown {
+      font-size: 0.68rem; font-weight: 700; color: var(--subtle); display: block;
+    }
+    .econ-event-countdown.today { color: #ef4444; }
+
+    .econ-chart-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px; margin-bottom: 10px;
+    }
+    .econ-chart-title {
+      font-size: 0.82rem; font-weight: 700; color: var(--heading); margin-bottom: 2px;
+    }
+    .econ-chart-subtitle {
+      font-size: 0.68rem; color: var(--text-dim); margin-bottom: 10px;
+    }
+    .econ-chart-svg { display: block; overflow: visible; }
+
+    .econ-news-list { display: flex; flex-direction: column; gap: 8px; }
+    .econ-news-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px; cursor: pointer;
+      transition: border-color 0.15s; text-decoration: none; display: block;
+    }
+    .econ-news-card:hover { border-color: var(--text-dim); }
+    .econ-news-title {
+      font-size: 0.85rem; font-weight: 700; color: var(--text);
+      line-height: 1.35; margin-bottom: 4px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .econ-news-meta {
+      font-size: 0.68rem; color: var(--text-dim); margin-bottom: 4px;
+    }
+    .econ-news-snippet {
+      font-size: 0.75rem; color: var(--subtle); line-height: 1.4;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .econ-loading-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px; position: relative; overflow: hidden;
+    }
+    .econ-loading-card::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+      animation: econ-shimmer 1.5s infinite;
+    }
+    body.dark .econ-loading-card::after {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
+    }
+    @keyframes econ-shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .econ-loading-bar {
+      height: 12px; border-radius: 4px; background: var(--task-bg); margin-bottom: 6px;
+    }
+    .econ-loading-bar.short { width: 40%; }
+    .econ-loading-bar.medium { width: 70%; }
+    .econ-loading-bar.long { width: 90%; }
+
+    .econ-api-missing {
+      text-align: center; padding: 20px; color: var(--text-dim);
+      font-size: 0.82rem; font-style: italic;
+    }
+    .econ-error-msg {
+      text-align: center; padding: 14px; color: var(--text-dim);
+      font-size: 0.8rem; background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    @media (max-width: 360px) {
+      .econ-rates-grid, .econ-markets-grid { grid-template-columns: 1fr; }
+    }
+
   </style>
 </head>
 <body>
@@ -2531,6 +2696,45 @@
     </div>
   </div><!-- /panel-journal -->
 
+  <!-- ══ ECONOMICS PANEL ══ -->
+  <div id="panel-econ" class="hidden">
+    <div class="econ-header">
+      <div class="econ-title">📊 Economy</div>
+      <div class="econ-subtitle" id="econ-last-updated"></div>
+      <button class="econ-refresh-btn" onclick="refreshEconData()" id="econ-refresh-btn" title="Refresh data">↻</button>
+    </div>
+
+    <!-- Key Rates & Numbers -->
+    <div class="econ-section" id="econ-rates-section">
+      <div class="econ-section-label">Key Rates &amp; Numbers</div>
+      <div class="econ-rates-grid" id="econ-rates-grid"></div>
+    </div>
+
+    <!-- Market Indices -->
+    <div class="econ-section" id="econ-markets-section">
+      <div class="econ-section-label">Markets</div>
+      <div class="econ-markets-grid" id="econ-markets-grid"></div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="econ-section" id="econ-events-section">
+      <div class="econ-section-label">Upcoming Events</div>
+      <div class="econ-events-list" id="econ-events-list"></div>
+    </div>
+
+    <!-- Trend Charts -->
+    <div class="econ-section" id="econ-charts-section">
+      <div class="econ-section-label">Trends</div>
+      <div id="econ-charts-container"></div>
+    </div>
+
+    <!-- News Feed -->
+    <div class="econ-section" id="econ-news-section">
+      <div class="econ-section-label">Economic News</div>
+      <div class="econ-news-list" id="econ-news-list"></div>
+    </div>
+  </div><!-- /panel-econ -->
+
 </div><!-- /card -->
 
 <!-- Import overlay -->
@@ -2644,6 +2848,7 @@
     { id: 'workout', icon: '💪', label: 'Workout',   pinned: true,  locked: false },
     { id: 'journal', icon: '📔', label: 'Journal',   pinned: true,  locked: false },
     { id: 'stim',    icon: '✨', label: 'Stim',      pinned: false, locked: false },
+    { id: 'econ',    icon: '📊', label: 'Economy',   pinned: false, locked: false },
   ];
   function saveNavConfig() { lsSet('navConfig', JSON.stringify(navConfig)); saveToFirestore(); }
 
@@ -4789,6 +4994,7 @@
       { id: 'workout', icon: '💪', label: 'Workout' },
       { id: 'journal', icon: '📔', label: 'Journal' },
       { id: 'stim',    icon: '✨', label: 'Stim' },
+      { id: 'econ',    icon: '📊', label: 'Economy' },
     ];
     KNOWN_TABS.forEach(known => {
       if (!navConfig.find(t => t.id === known.id)) {
@@ -4924,14 +5130,15 @@
     cal:     '📅 Calendar',
     workout: '💪 Workout',
     stim:    '✨ Quick Stim',
-    journal: '📔 Journal'
+    journal: '📔 Journal',
+    econ:    '📊 Economy'
   };
 
   function switchTab(tab) {
     var bg = document.getElementById('sw-bg');
     if (bg) bg.dataset.view = tab;
     closeViewMenu();
-    ['home','cal','workout','stim','journal'].forEach(t => {
+    ['home','cal','workout','stim','journal','econ'].forEach(t => {
       const panel = document.getElementById('panel-' + t);
       if (!panel) return;
       const show = tab === t;
@@ -4954,6 +5161,7 @@
     if (tab === 'workout') renderWorkoutTab();
     if (tab === 'stim')    renderStimTab();
     if (tab === 'journal') renderJournal();
+    if (tab === 'econ')    loadEconDashboard();
     if (tab === 'home') {
       updateHomeHeader();
       renderReminders();
@@ -5535,6 +5743,342 @@
   renderMoreDrawer();
   switchTab(lsGet('active-tab', 'home'));
   initAuth();
+
+  // ══════════════════════════════════════════════════════
+  // ECONOMICS DASHBOARD
+  // ══════════════════════════════════════════════════════
+
+  // ── Hardcoded Economic Events ──
+  const ECON_EVENTS = [
+    { date: '2025-01-29', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2025-03-19', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2025-05-07', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2025-06-18', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2025-07-30', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2025-09-17', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2025-10-29', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2025-12-17', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2026-01-28', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2026-03-18', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2026-05-06', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2026-06-17', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2026-07-29', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2026-09-16', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2026-10-28', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2026-12-16', type: 'fomc', label: 'FOMC Rate Decision' },
+    { date: '2025-04-10', type: 'cpi',  label: 'CPI Report (Mar)' },
+    { date: '2025-05-13', type: 'cpi',  label: 'CPI Report (Apr)' },
+    { date: '2025-06-11', type: 'cpi',  label: 'CPI Report (May)' },
+    { date: '2025-07-11', type: 'cpi',  label: 'CPI Report (Jun)' },
+    { date: '2025-08-12', type: 'cpi',  label: 'CPI Report (Jul)' },
+    { date: '2025-09-10', type: 'cpi',  label: 'CPI Report (Aug)' },
+    { date: '2025-10-14', type: 'cpi',  label: 'CPI Report (Sep)' },
+    { date: '2025-11-12', type: 'cpi',  label: 'CPI Report (Oct)' },
+    { date: '2025-12-10', type: 'cpi',  label: 'CPI Report (Nov)' },
+    { date: '2026-01-14', type: 'cpi',  label: 'CPI Report (Dec)' },
+    { date: '2026-02-11', type: 'cpi',  label: 'CPI Report (Jan)' },
+    { date: '2026-03-11', type: 'cpi',  label: 'CPI Report (Feb)' },
+    { date: '2026-04-14', type: 'cpi',  label: 'CPI Report (Mar)' },
+    { date: '2025-04-04', type: 'jobs', label: 'Jobs Report (Mar)' },
+    { date: '2025-05-02', type: 'jobs', label: 'Jobs Report (Apr)' },
+    { date: '2025-06-06', type: 'jobs', label: 'Jobs Report (May)' },
+    { date: '2025-07-03', type: 'jobs', label: 'Jobs Report (Jun)' },
+    { date: '2025-08-01', type: 'jobs', label: 'Jobs Report (Jul)' },
+    { date: '2025-09-05', type: 'jobs', label: 'Jobs Report (Aug)' },
+    { date: '2025-10-03', type: 'jobs', label: 'Jobs Report (Sep)' },
+    { date: '2025-11-07', type: 'jobs', label: 'Jobs Report (Oct)' },
+    { date: '2025-12-05', type: 'jobs', label: 'Jobs Report (Nov)' },
+    { date: '2026-01-09', type: 'jobs', label: 'Jobs Report (Dec)' },
+    { date: '2026-02-06', type: 'jobs', label: 'Jobs Report (Jan)' },
+    { date: '2026-03-06', type: 'jobs', label: 'Jobs Report (Feb)' },
+  ];
+
+  // ── Utility ──
+  function timeAgo(dateStr) {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return mins + ' min ago';
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + ' hr ago';
+    return Math.floor(hrs / 24) + 'd ago';
+  }
+
+  // ── SVG chart renderer ──
+  function renderEconSvg(dataPoints, options) {
+    if (!dataPoints || dataPoints.length < 2) return '<p style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:20px">Not enough data</p>';
+    const W = options.width || 300;
+    const H = options.height || 90;
+    const PX = 24; const PY = 10;
+    const color = options.color || '#6366f1';
+    const values = dataPoints.map(d => d.value);
+    const minV = Math.min(...values);
+    const maxV = Math.max(...values);
+    const range = maxV - minV || 1;
+    const xStep = dataPoints.length > 1 ? (W - PX * 2) / (dataPoints.length - 1) : 0;
+    const pts = dataPoints.map((d, i) => ({
+      x: PX + i * xStep,
+      y: PY + (1 - (d.value - minV) / range) * (H - PY * 2 - 14),
+      label: d.label,
+      value: d.value,
+    }));
+    const lineD = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    const fillD = `${lineD} L ${pts[pts.length-1].x.toFixed(1)} ${H - 14} L ${pts[0].x.toFixed(1)} ${H - 14} Z`;
+    const gradId = 'ecg' + Math.random().toString(36).slice(2, 7);
+    const dots = pts.map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.5" fill="${color}" stroke="var(--card)" stroke-width="1.5"/>`).join('');
+
+    let refLine = '';
+    if (options.refLine !== undefined) {
+      const refY = PY + (1 - (options.refLine - minV) / range) * (H - PY * 2 - 14);
+      if (refY >= PY && refY <= H - 14) {
+        refLine = `<line x1="${PX}" y1="${refY.toFixed(1)}" x2="${W - PX}" y2="${refY.toFixed(1)}" stroke="${color}" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>` +
+          `<text x="${W - PX}" y="${(refY - 3).toFixed(1)}" font-size="8" fill="${color}" text-anchor="end" opacity="0.8">${options.refLabel || ''}</text>`;
+      }
+    }
+
+    const suffix = options.suffix || '';
+    return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" class="econ-chart-svg">
+      <defs>
+        <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${color}" stop-opacity="0.28"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${fillD}" fill="url(#${gradId})"/>
+      <path d="${lineD}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${refLine}
+      ${dots}
+      <text x="${PX}" y="${H - 2}" font-size="9" fill="var(--subtle)">${minV.toFixed(1)}${suffix}</text>
+      <text x="${W - PX}" y="${H - 2}" font-size="9" fill="var(--subtle)" text-anchor="end">${maxV.toFixed(1)}${suffix}</text>
+    </svg>`;
+  }
+
+  // ── Loading state ──
+  function renderEconLoading() {
+    const ratesGrid = document.getElementById('econ-rates-grid');
+    const marketsGrid = document.getElementById('econ-markets-grid');
+    const chartsCont = document.getElementById('econ-charts-container');
+    const newsList = document.getElementById('econ-news-list');
+    const skeleton = () => `<div class="econ-loading-card"><div class="econ-loading-bar short"></div><div class="econ-loading-bar long"></div><div class="econ-loading-bar medium"></div></div>`;
+    if (ratesGrid)   ratesGrid.innerHTML   = skeleton() + skeleton() + skeleton() + skeleton();
+    if (marketsGrid) marketsGrid.innerHTML = skeleton() + skeleton() + skeleton() + skeleton();
+    if (chartsCont)  chartsCont.innerHTML  = skeleton() + skeleton();
+    if (newsList)    newsList.innerHTML    = skeleton() + skeleton() + skeleton();
+  }
+
+  // ── Section renderers ──
+  function renderEconRates(ratesData) {
+    const grid = document.getElementById('econ-rates-grid');
+    if (!grid) return;
+    if (!ratesData || ratesData.length === 0) { grid.innerHTML = '<div class="econ-error-msg">Couldn\'t load rate data. Try refreshing.</div>'; return; }
+    grid.innerHTML = ratesData.map(r => {
+      const direction = r.direction; // 'up', 'down', 'flat'
+      // For unemployment: up is bad (red), down is good (green)
+      // For all others: up is bad (red), down is good (green) -- same logic, simpler
+      const changeClass = direction === 'flat' ? 'flat' : (direction === 'down' ? 'down' : 'up');
+      const changeIcon  = direction === 'up' ? '↑' : direction === 'down' ? '↓' : '—';
+      const changeLabel = direction === 'flat' ? 'Unchanged' : `${changeIcon} from ${r.prev}`;
+      return `<div class="econ-rate-card">
+        <div class="econ-rate-name">${r.name}</div>
+        <div class="econ-rate-value">${r.value}${r.suffix || '%'}</div>
+        <div class="econ-rate-change ${changeClass}">${changeLabel}</div>
+        <div class="econ-rate-date">${r.date}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderEconMarkets(marketsData) {
+    const grid = document.getElementById('econ-markets-grid');
+    if (!grid) return;
+    if (!marketsData || marketsData.length === 0) { grid.innerHTML = '<div class="econ-error-msg">Couldn\'t load market data. Try refreshing.</div>'; return; }
+    grid.innerHTML = marketsData.map(m => {
+      const hasChange = m.change !== null && m.changePct !== null;
+      const pos = hasChange ? m.change >= 0 : null;
+      const changeHtml = hasChange
+        ? `<div class="econ-market-change ${pos ? 'positive' : 'negative'}">${pos ? '+' : ''}${m.change.toFixed(2)} (${pos ? '+' : ''}${m.changePct.toFixed(2)}%)</div>`
+        : '';
+      const priceStr = m.isInt ? Math.round(m.price).toLocaleString() : m.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return `<div class="econ-market-card">
+        <div class="econ-market-name">${m.name}</div>
+        <div class="econ-market-price">${m.prefix || ''}${priceStr}</div>
+        ${changeHtml}
+      </div>`;
+    }).join('');
+  }
+
+  function renderEconEvents() {
+    const list = document.getElementById('econ-events-list');
+    if (!list) return;
+    const todayStr = today();
+    const upcoming = ECON_EVENTS
+      .filter(e => e.date >= todayStr)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(0, 6);
+    if (upcoming.length === 0) { list.innerHTML = '<div class="econ-error-msg">No upcoming events found.</div>'; return; }
+    const typeEmoji = { fomc: '🏦', cpi: '📈', jobs: '💼' };
+    list.innerHTML = upcoming.map(e => {
+      const d = new Date(e.date + 'T12:00:00');
+      const formatted = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      const diffDays = Math.round((new Date(e.date + 'T12:00:00') - new Date(todayStr + 'T12:00:00')) / 86400000);
+      const isToday = diffDays === 0;
+      const countdown = isToday
+        ? `<span class="econ-event-countdown today">TODAY</span>`
+        : `<span class="econ-event-countdown">in ${diffDays} day${diffDays !== 1 ? 's' : ''}</span>`;
+      return `<div class="econ-event-item">
+        <span class="econ-event-badge ${e.type}">${typeEmoji[e.type]} ${e.type.toUpperCase()}</span>
+        <span class="econ-event-label">${e.label}</span>
+        <div class="econ-event-date">${formatted}${countdown}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderEconCharts(cpiHistory, spyHistory) {
+    const cont = document.getElementById('econ-charts-container');
+    if (!cont) return;
+    let html = '';
+
+    // CPI YoY chart
+    if (cpiHistory && cpiHistory.length >= 2) {
+      const latestVal = parseFloat(cpiHistory[cpiHistory.length - 1].value).toFixed(1);
+      const svgHtml = renderEconSvg(cpiHistory, {
+        color: '#f59e0b', refLine: 2.0, refLabel: '2% target', suffix: '%',
+      });
+      html += `<div class="econ-chart-card">
+        <div class="econ-chart-title">Inflation (CPI YoY)</div>
+        <div class="econ-chart-subtitle">12-month trend · Latest: ${latestVal}%</div>
+        ${svgHtml}
+      </div>`;
+    } else {
+      html += `<div class="econ-chart-card"><div class="econ-chart-title">Inflation (CPI YoY)</div><div class="econ-error-msg" style="margin-top:8px">Data unavailable</div></div>`;
+    }
+
+    // S&P 500 chart
+    if (spyHistory && spyHistory.length >= 2) {
+      const first = spyHistory[0].value;
+      const last  = spyHistory[spyHistory.length - 1].value;
+      const ytdPct = ((last - first) / first * 100).toFixed(1);
+      const color = last >= first ? '#22c55e' : '#ef4444';
+      const svgHtml = renderEconSvg(spyHistory, { color, suffix: '' });
+      html += `<div class="econ-chart-card">
+        <div class="econ-chart-title">S&amp;P 500 (SPY)</div>
+        <div class="econ-chart-subtitle">12-month trend · YTD: ${ytdPct >= 0 ? '+' : ''}${ytdPct}%</div>
+        ${svgHtml}
+      </div>`;
+    } else {
+      html += `<div class="econ-chart-card"><div class="econ-chart-title">S&amp;P 500 (SPY)</div><div class="econ-error-msg" style="margin-top:8px">Data unavailable</div></div>`;
+    }
+
+    cont.innerHTML = html;
+  }
+
+  function renderEconNews(articles) {
+    const list = document.getElementById('econ-news-list');
+    if (!list) return;
+    if (!articles || articles.length === 0) { list.innerHTML = '<div class="econ-error-msg">Couldn\'t load news. Try refreshing.</div>'; return; }
+    list.innerHTML = articles.map(a => {
+      const ago = timeAgo(a.publishedAt);
+      const snippet = a.description ? a.description.replace(/<[^>]+>/g, '') : '';
+      return `<a class="econ-news-card" href="${a.url}" target="_blank" rel="noopener noreferrer">
+        <div class="econ-news-title">${a.title}</div>
+        <div class="econ-news-meta">${a.source} &middot; ${ago}</div>
+        ${snippet ? `<div class="econ-news-snippet">${snippet}</div>` : ''}
+      </a>`;
+    }).join('');
+  }
+
+  // ── Economics Worker endpoint ──
+  const ECON_API_URL = 'https://econ-proxy.arman-bhatnagar.workers.dev';
+
+  // ── Browser-side cache ──
+  function econCacheGet(key) {
+    try {
+      const raw = lsGet('econ_' + key, 'null');
+      const parsed = JSON.parse(raw);
+      if (!parsed || !parsed.ts) return null;
+      return parsed;
+    } catch(e) { return null; }
+  }
+  function econCacheSet(key, data, ttlMinutes) {
+    lsSet('econ_' + key, JSON.stringify({ data, ts: Date.now(), ttl: ttlMinutes * 60 * 1000 }));
+  }
+  function econCacheValid(key) {
+    const c = econCacheGet(key);
+    if (!c) return false;
+    return (Date.now() - c.ts) < c.ttl;
+  }
+
+  // ── Single fetch to Worker ──
+  async function fetchEconFromWorker(forceRefresh) {
+    const url = ECON_API_URL + (forceRefresh ? '?refresh=true' : '');
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('Worker error: ' + resp.status);
+    return await resp.json();
+  }
+
+  // ── Main orchestration ──
+  async function loadEconDashboard() {
+    // 1. Render hardcoded events immediately
+    renderEconEvents();
+
+    // 2. Serve browser-cached data instantly if available
+    const cached = econCacheGet('all');
+    if (cached && cached.data) {
+      const d = cached.data;
+      if (d.rates)   renderEconRates(d.rates);
+      if (d.markets) renderEconMarkets(d.markets);
+      if (d.news)    renderEconNews(d.news);
+      if (d.charts)  renderEconCharts(d.charts.cpi, d.charts.spy);
+    } else {
+      renderEconLoading();
+    }
+
+    // 3. Fetch fresh data from worker
+    try {
+      const data = await fetchEconFromWorker(false);
+      econCacheSet('all', data, 5);
+
+      if (data.rates)   renderEconRates(data.rates);
+      if (data.markets) renderEconMarkets(data.markets);
+      if (data.news)    renderEconNews(data.news);
+      if (data.charts)  renderEconCharts(data.charts.cpi, data.charts.spy);
+
+      const el = document.getElementById('econ-last-updated');
+      if (el) el.textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    } catch(e) {
+      console.error('Econ fetch error:', e);
+      if (!cached || !cached.data) {
+        const errMsg = '<div class="econ-error-msg">Couldn\'t connect to data server. Try refreshing.</div>';
+        const rg = document.getElementById('econ-rates-grid');
+        const mg = document.getElementById('econ-markets-grid');
+        const nl = document.getElementById('econ-news-list');
+        const cc = document.getElementById('econ-charts-container');
+        if (rg) rg.innerHTML = errMsg;
+        if (mg) mg.innerHTML = errMsg;
+        if (nl) nl.innerHTML = errMsg;
+        if (cc) cc.innerHTML = errMsg;
+      }
+      const el = document.getElementById('econ-last-updated');
+      if (el && cached && cached.data) el.textContent = 'Showing cached data';
+    }
+  }
+
+  function refreshEconData() {
+    try { localStorage.removeItem('econ_all'); } catch(e) {}
+    const btn = document.getElementById('econ-refresh-btn');
+    if (btn) { btn.classList.add('spinning'); setTimeout(() => btn.classList.remove('spinning'), 900); }
+    renderEconLoading();
+    renderEconEvents();
+    fetchEconFromWorker(true).then(data => {
+      econCacheSet('all', data, 5);
+      if (data.rates)   renderEconRates(data.rates);
+      if (data.markets) renderEconMarkets(data.markets);
+      if (data.news)    renderEconNews(data.news);
+      if (data.charts)  renderEconCharts(data.charts.cpi, data.charts.spy);
+      const el = document.getElementById('econ-last-updated');
+      if (el) el.textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    }).catch(e => console.error('Refresh error:', e));
+  }
+
+
 </script>
 </body>
 </html>
