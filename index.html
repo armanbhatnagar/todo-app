@@ -1459,30 +1459,7 @@
       transition: color 0.3s;
     }
 
-    .sync-row {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 18px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-      transition: border-color 0.3s;
-    }
-
-    .btn-sync {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      padding: 6px 4px;
-      border-radius: 6px;
-      transition: color 0.15s;
-      touch-action: manipulation;
-    }
-    .btn-sync:hover { color: #6366f1; }
-
-    /* ══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════
        TASK MODAL (add & edit)
     ══════════════════════════════════════════════════════ */
     .task-modal-overlay {
@@ -1637,80 +1614,7 @@
     }
     .btn-modal-save:hover { background: #4f46e5; }
 
-    /* ══════════════════════════════════════════════════════
-       IMPORT OVERLAY
-    ══════════════════════════════════════════════════════ */
-    .import-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 100;
-    }
-    .import-overlay.hidden { display: none; }
-
-    .import-box {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 24px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.25);
-    }
-    .import-box h2 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--heading);
-      margin-bottom: 6px;
-    }
-    .import-box p {
-      font-size: 0.82rem;
-      color: var(--subtle);
-      margin-bottom: 12px;
-    }
-    .import-box textarea {
-      width: 100%;
-      height: 120px;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      padding: 10px;
-      font-size: 13px;
-      font-family: monospace;
-      color: var(--text);
-      background: var(--input-bg);
-      resize: vertical;
-      outline: none;
-      margin-bottom: 12px;
-    }
-    .import-box textarea:focus { border-color: #6366f1; }
-    .import-actions { display: flex; gap: 8px; justify-content: flex-end; }
-    .btn-import-cancel {
-      padding: 9px 16px;
-      background: var(--task-bg);
-      color: var(--text);
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    .btn-import-confirm {
-      padding: 9px 16px;
-      background: #6366f1;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    .btn-import-confirm:hover { background: #4f46e5; }
-
-    /* ══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════
        CALENDAR TAB
     ══════════════════════════════════════════════════════ */
     .cal-nav {
@@ -2745,18 +2649,6 @@
 
 </div><!-- /card -->
 
-<!-- Import overlay -->
-<div class="import-overlay hidden" id="import-overlay">
-  <div class="import-box">
-    <h2>Import tasks</h2>
-    <p>Paste the exported text from your other device below.</p>
-    <textarea id="import-textarea" placeholder='[{"text":"Buy milk","done":false,"section":"misc"},…]'></textarea>
-    <div class="import-actions">
-      <button class="btn-import-cancel" id="import-cancel">Cancel</button>
-      <button class="btn-import-confirm" id="import-confirm">Import</button>
-    </div>
-  </div>
-</div>
 
 <!-- Task modal (add & edit) -->
 <div class="task-modal-overlay hidden" id="task-modal-overlay" onclick="if(event.target===this)closeTaskModal()">
@@ -3310,72 +3202,7 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       closeTaskModal();
-      document.getElementById('import-overlay').classList.add('hidden');
     }
-  });
-
-  // ── Export ────────────────────────────────────────────
-  document.getElementById('export-btn').addEventListener('click', () => {
-    const json = JSON.stringify(tasks);
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(json).then(() => {
-        const btn = document.getElementById('export-btn');
-        btn.textContent = '✓ Copied!';
-        setTimeout(() => { btn.textContent = '↑ Export tasks'; }, 2000);
-      }).catch(() => fallbackCopy(json));
-    } else {
-      fallbackCopy(json);
-    }
-  });
-
-  function fallbackCopy(text) {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.cssText = 'position:fixed;opacity:0;';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    const btn = document.getElementById('export-btn');
-    btn.textContent = '✓ Copied!';
-    setTimeout(() => { btn.textContent = '↑ Export tasks'; }, 2000);
-  }
-
-  // ── Import ────────────────────────────────────────────
-  const importOverlay = document.getElementById('import-overlay');
-
-  document.getElementById('import-btn').addEventListener('click', () => {
-    document.getElementById('import-textarea').value = '';
-    importOverlay.classList.remove('hidden');
-    document.getElementById('import-textarea').focus();
-  });
-  document.getElementById('import-cancel').addEventListener('click', () => {
-    importOverlay.classList.add('hidden');
-  });
-  document.getElementById('import-confirm').addEventListener('click', () => {
-    const raw = document.getElementById('import-textarea').value.trim();
-    try {
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) throw new Error();
-      tasks = parsed
-        .filter(t => t && typeof t.text === 'string')
-        .map(t => ({
-          text:       String(t.text).slice(0, 200),
-          done:       !!t.done,
-          section:    ['school','work','misc'].includes(t.section) ? t.section : 'misc',
-          label:      typeof t.label === 'string' ? t.label : '',
-          labelColor: typeof t.labelColor === 'string' ? t.labelColor : '#6366f1',
-          dueDate:    typeof t.dueDate === 'string' ? t.dueDate : '',
-        }));
-      render();
-      save();
-      importOverlay.classList.add('hidden');
-    } catch(e) {
-      alert('Could not read that data. Make sure you copied the full exported text.');
-    }
-  });
-  importOverlay.addEventListener('click', e => {
-    if (e.target === importOverlay) importOverlay.classList.add('hidden');
   });
 
   // ══════════════════════════════════════════════════════
