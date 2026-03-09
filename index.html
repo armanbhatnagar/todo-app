@@ -5284,9 +5284,15 @@
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').then(registration => {
-        console.log('Service Worker registered:', registration);
-      }).catch(error => {
-        console.log('Service Worker registration failed:', error);
+        // Re-check for updates whenever the user returns to the app
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') registration.update();
+        });
+      }).catch(err => console.log('SW registration failed:', err));
+
+      // Auto-reload when a new SW takes over so the fresh page is served
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
       });
     });
   }
