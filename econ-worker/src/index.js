@@ -16,31 +16,26 @@ function memSet(key, data) {
   memCache[key] = { data, ts: Date.now() };
 }
 
-// ── Yahoo Finance: stock quotes ──
-async function fetchYahooQuotes(symbols) {
+// ── Yahoo Finance: stock quote via chart endpoint (quote endpoint is blocked on CF Workers) ──
+async function fetchYahooQuoteViaChart(symbol) {
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/quote?symbols=${symbols.join(',')}`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=5d&interval=1d`;
     const resp = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0' },
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36' },
     });
-    if (!resp.ok) return {};
+    if (!resp.ok) return null;
     const json = await resp.json();
-    const results = {};
-    (json.quoteResponse?.result || []).forEach(q => {
-      results[q.symbol] = {
-        price: q.regularMarketPrice,
-        change: q.regularMarketChange,
-        changePct: q.regularMarketChangePercent,
-        prevClose: q.regularMarketPreviousClose,
-        high: q.regularMarketDayHigh,
-        low: q.regularMarketDayLow,
-        name: q.shortName || q.symbol,
-      };
-    });
-    return results;
+    const result = json.chart?.result?.[0];
+    if (!result) return null;
+    const closes = (result.indicators?.quote?.[0]?.close || []).filter(c => c != null);
+    if (closes.length < 2) return null;
+    const price     = parseFloat(closes[closes.length - 1].toFixed(2));
+    const prevClose = parseFloat(closes[closes.length - 2].toFixed(2));
+    const change    = parseFloat((price - prevClose).toFixed(2));
+    const changePct = parseFloat(((change / prevClose) * 100).toFixed(2));
+    return { price, change, changePct, name: result.meta?.shortName || symbol };
   } catch (e) {
-    console.error('Yahoo quotes error:', e);
-    return {};
+    return null;
   }
 }
 
@@ -67,22 +62,32 @@ async function fetchYahooChart(symbol) {
   }
 }
 
-// ── CoinGecko: Bitcoin price (no key needed) ──
+// ── Bitcoin price: CoinGecko with Coinbase fallback ──
 async function fetchBitcoin() {
+  // Try CoinGecko first
   try {
     const url = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true';
     const resp = await fetch(url);
+    if (resp.ok) {
+      const json = await resp.json();
+      const btc = json.bitcoin;
+      if (btc) return {
+        price: btc.usd,
+        change: null,
+        changePct: btc.usd_24h_change ? parseFloat(btc.usd_24h_change.toFixed(2)) : null,
+      };
+    }
+  } catch (e) { /* fall through */ }
+
+  // Fallback: Coinbase public API (no auth required)
+  try {
+    const resp = await fetch('https://api.coinbase.com/v2/prices/BTC-USD/spot');
     if (!resp.ok) return null;
     const json = await resp.json();
-    const btc = json.bitcoin;
-    if (!btc) return null;
-    return {
-      price: btc.usd,
-      change: null,
-      changePct: btc.usd_24h_change ? parseFloat(btc.usd_24h_change.toFixed(2)) : null,
-    };
+    const price = parseFloat(json.data?.amount);
+    if (!price) return null;
+    return { price, change: null, changePct: null };
   } catch (e) {
-    console.error('BTC error:', e);
     return null;
   }
 }
@@ -152,19 +157,23 @@ async function buildRates(apiKey) {
 
 // ── Build markets ──
 async function buildMarkets() {
-  const [quotesResult, btcResult] = await Promise.allSettled([
-    fetchYahooQuotes(['SPY', 'DIA', 'QQQ']),
+  const [spyResult, diaResult, qqqResult, btcResult] = await Promise.allSettled([
+    fetchYahooQuoteViaChart('SPY'),
+    fetchYahooQuoteViaChart('DIA'),
+    fetchYahooQuoteViaChart('QQQ'),
     fetchBitcoin(),
   ]);
 
-  const quotes = quotesResult.status === 'fulfilled' ? quotesResult.value : {};
-  const btc    = btcResult.status === 'fulfilled'    ? btcResult.value    : null;
+  const spy = spyResult.status === 'fulfilled' ? spyResult.value : null;
+  const dia = diaResult.status === 'fulfilled' ? diaResult.value : null;
+  const qqq = qqqResult.status === 'fulfilled' ? qqqResult.value : null;
+  const btc = btcResult.status === 'fulfilled' ? btcResult.value : null;
 
   const markets = [];
-  if (quotes.SPY) markets.push({ name: 'S&P 500 (SPY)', ...quotes.SPY, isInt: false });
-  if (quotes.DIA) markets.push({ name: 'Dow (DIA)',     ...quotes.DIA, isInt: false });
-  if (quotes.QQQ) markets.push({ name: 'Nasdaq (QQQ)', ...quotes.QQQ, isInt: false });
-  if (btc)        markets.push({ name: 'Bitcoin',       ...btc,        isInt: true, prefix: '$' });
+  if (spy) markets.push({ name: 'S&P 500 (SPY)', ...spy, isInt: false });
+  if (dia) markets.push({ name: 'Dow (DIA)',     ...dia, isInt: false });
+  if (qqq) markets.push({ name: 'Nasdaq (QQQ)', ...qqq, isInt: false });
+  if (btc) markets.push({ name: 'Bitcoin',       ...btc, isInt: true, prefix: '$' });
 
   return markets;
 }
