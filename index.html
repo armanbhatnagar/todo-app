@@ -1455,6 +1455,71 @@
       user-select: none;
     }
 
+    /* ── Hologram effect ── */
+    #yoda-hologram-wrap {
+      text-align: center;
+    }
+    .hologram-inner {
+      position: relative;
+      display: inline-block;
+      transform-origin: bottom center;
+    }
+    #yoda-hologram-wrap .yoda-motivator {
+      filter: hue-rotate(195deg) saturate(4) brightness(1.6) contrast(1.1);
+      display: block;
+    }
+    .hologram-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 3px,
+        rgba(120, 210, 255, 0.12) 3px,
+        rgba(120, 210, 255, 0.12) 4px
+      );
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+    .hologram-base {
+      width: 60%;
+      max-width: 200px;
+      height: 14px;
+      margin: -4px auto 0;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(80,180,255,0.8) 0%, rgba(80,180,255,0.15) 60%, transparent 100%);
+      filter: blur(5px);
+    }
+    @keyframes holoMaterialize {
+      0%   { transform: scaleY(0);    opacity: 0;   filter: brightness(6) blur(8px); }
+      8%   { transform: scaleY(1.1);  opacity: 0.9; filter: brightness(3) blur(2px); }
+      13%  { transform: scaleY(0.5);  opacity: 0.4; }
+      20%  { transform: scaleY(1.05); opacity: 1;   filter: brightness(1.8) blur(0); }
+      26%  { transform: scaleY(0.92); opacity: 0.7; }
+      34%  { transform: scaleY(1);    opacity: 1;   filter: brightness(1); }
+      100% { transform: scaleY(1);    opacity: 1; }
+    }
+    @keyframes holoAmbient {
+      0%, 100% { opacity: 1; }
+      45%       { opacity: 0.91; }
+      50%       { opacity: 0.97; }
+      72%       { opacity: 0.87; }
+      77%       { opacity: 1; }
+    }
+    @keyframes holoDeactivate {
+      0%   { transform: scaleY(1);    opacity: 1;   filter: brightness(1); }
+      12%  { transform: scaleY(1.04); opacity: 1;   filter: brightness(2.5); }
+      22%  { transform: scaleY(0.9);  opacity: 0.6; }
+      33%  { transform: scaleY(1);    opacity: 1;   filter: brightness(3.5); }
+      50%  { transform: scaleY(0.65); opacity: 0.5; }
+      65%  { transform: scaleY(0.05); opacity: 0.8; filter: brightness(7) blur(4px); }
+      80%  { transform: scaleY(0.01); opacity: 0.2; }
+      100% { transform: scaleY(0);    opacity: 0; }
+    }
+    .hologram-inner.holo-on     { animation: holoMaterialize 1.2s ease-out forwards; }
+    .hologram-inner.holo-ambient { animation: holoAmbient 3s ease-in-out infinite; }
+    .hologram-inner.holo-off    { animation: holoDeactivate 1s ease-in forwards; }
+
     /* Calendar read-only workout summary */
     .cal-workout-read {
       border: 1.5px solid #22c55e44; border-radius: 10px;
@@ -2539,7 +2604,14 @@
     </div>
     <img id="yoda-lazy-img" src="/yoda-lazy.png" alt="" class="yoda-motivator" style="display:none;">
     <div id="yoda-quote" class="yoda-quote" style="display:none;">"Far to long since my last workout, it has been. To the needle I have turned, for another form of dopamine. In agony, I am"</div>
-    <img id="yoda-buff-img" src="/yoda-buff.png" alt="" class="yoda-motivator" style="display:none;">
+    <div id="yoda-hologram-wrap" style="display:none;">
+      <div class="hologram-inner" id="yoda-hologram-inner">
+        <img id="yoda-buff-img" src="/yoda-buff.png" alt="" class="yoda-motivator">
+        <div class="hologram-scanlines"></div>
+      </div>
+      <div class="hologram-base"></div>
+      <div id="yoda-buff-quote" class="yoda-quote" style="display:none;">"mmmm, coursing through my veins testosterone is. Satiated I am...for now"</div>
+    </div>
     <div id="workout-panel"></div>
   </div><!-- /panel-workout -->
 
@@ -3551,11 +3623,23 @@
 
   function toggleWorkoutCompletion(dateStr) {
     const day = ensureGymDay(dateStr);
+    const wasDone = day.completed;
     day.completed = !day.completed;
     saveGymData();
     const toggle = document.getElementById('workout-completed-toggle');
     if (toggle) toggle.checked = day.completed;
-    renderWorkoutPanel(dateStr);
+    if (!wasDone && day.completed && appMode === 'starWars') {
+      _holoIntroActive = false;
+      updateYodaVisibility(dateStr);
+      playYodaHologramIntro(dateStr);
+    } else {
+      if (!day.completed && _holoIntroActive) {
+        _holoIntroActive = false;
+        const wrap = document.getElementById('yoda-hologram-wrap');
+        if (wrap) wrap.style.display = 'none';
+      }
+      renderWorkoutPanel(dateStr);
+    }
     renderCalendarIfVisible();
   }
 
@@ -4003,16 +4087,59 @@
     el.innerHTML = `<span class="wk-label">This week:</span> ${chips}`;
   }
 
+  let _holoIntroActive = false;
+
+  function playYodaHologramIntro(dateStr) {
+    const wrap  = document.getElementById('yoda-hologram-wrap');
+    const inner = document.getElementById('yoda-hologram-inner');
+    const quote = document.getElementById('yoda-buff-quote');
+    if (!wrap || !inner) { renderWorkoutPanel(dateStr); return; }
+
+    _holoIntroActive = true;
+    wrap.style.display = 'block';
+    inner.classList.remove('holo-on', 'holo-ambient', 'holo-off');
+    void inner.offsetWidth;
+    inner.classList.add('holo-on');
+
+    setTimeout(() => {
+      if (!_holoIntroActive) return;
+      inner.classList.remove('holo-on');
+      inner.classList.add('holo-ambient');
+    }, 1200);
+
+    setTimeout(() => {
+      if (!_holoIntroActive || !quote) return;
+      quote.style.display = 'block';
+      quote.style.animation = 'none';
+      void quote.offsetWidth;
+      quote.style.animation = '';
+    }, 1400);
+
+    setTimeout(() => {
+      if (!_holoIntroActive) return;
+      if (quote) quote.style.display = 'none';
+      inner.classList.remove('holo-ambient');
+      inner.classList.add('holo-off');
+    }, 5000);
+
+    setTimeout(() => {
+      if (!_holoIntroActive) return;
+      _holoIntroActive = false;
+      wrap.style.display = 'none';
+      renderWorkoutPanel(dateStr);
+    }, 6200);
+  }
+
   function updateYodaVisibility(dateStr) {
     const lazy  = document.getElementById('yoda-lazy-img');
-    const buff  = document.getElementById('yoda-buff-img');
+    const holo  = document.getElementById('yoda-hologram-wrap');
     const quote = document.getElementById('yoda-quote');
-    if (!lazy || !buff) return;
+    if (!lazy) return;
     const isSW = appMode === 'starWars';
     const day  = gymData.history[dateStr];
     const done = !!(day && day.completed);
     lazy.style.display = (isSW && !done) ? 'block' : 'none';
-    buff.style.display = (isSW &&  done) ? 'block' : 'none';
+    if (holo && !_holoIntroActive) holo.style.display = 'none';
     if (quote) {
       if (isSW && !done) {
         quote.style.display = 'block';
