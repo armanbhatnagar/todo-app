@@ -1503,6 +1503,95 @@
       user-select: none;
     }
 
+    /* ── Dagobah Intro Sequence ── */
+    #sw-intro-scene {
+      width: 100%; min-height: 300px; height: min(75vw, 340px);
+      position: relative; overflow: hidden;
+      border-radius: 14px; margin: 16px 0 0;
+      background: #00000a;
+    }
+    #sw-hyperspace {
+      position: absolute; inset: 0;
+      width: 100% !important; height: 100% !important;
+    }
+    #sw-space-view {
+      display: none; position: absolute; inset: 0;
+      background: #00000a;
+      align-items: center; justify-content: center;
+    }
+    #dagobah-planet {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: min(64vw, 240px); height: min(64vw, 240px);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 28% 28%, rgba(255,255,255,0.28) 0%, transparent 28%),
+        radial-gradient(circle at 62% 58%, rgba(180,210,140,0.35) 0%, transparent 32%),
+        radial-gradient(circle at 38% 72%, rgba(200,230,160,0.3) 0%, transparent 36%),
+        radial-gradient(circle at 70% 30%, rgba(160,200,120,0.25) 0%, transparent 25%),
+        radial-gradient(ellipse at 50% 50%, #72a050 0%, #4a7a28 32%, #2a5a16 65%, #182f0a 100%);
+      box-shadow:
+        inset -28px -18px 55px rgba(0,0,0,0.65),
+        inset 8px 6px 25px rgba(100,150,55,0.12),
+        0 0 35px rgba(70,110,35,0.18);
+      opacity: 0;
+    }
+    #dagobah-planet.planet-appear {
+      animation: dagobahAppear 1.4s cubic-bezier(0.34,1.15,0.64,1) forwards;
+    }
+    @keyframes dagobahAppear {
+      from { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+      to   { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+    }
+    #sw-xwing {
+      position: absolute; right: 12%; top: 18%;
+      width: 72px; height: 72px; opacity: 0;
+    }
+    #sw-xwing.xwing-appear {
+      animation: xwingAppear 0.7s ease-out forwards;
+    }
+    #sw-xwing.xwing-descend {
+      animation: xwingDescend 2.2s ease-in forwards;
+    }
+    @keyframes xwingAppear {
+      from { opacity: 0; transform: scale(0.5); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes xwingDescend {
+      0%   { transform: translate(0,0) scale(1);    opacity: 1; }
+      60%  { transform: translate(-105%,95%) scale(0.18); opacity: 0.75; }
+      85%  { transform: translate(-118%,110%) scale(0.07); opacity: 0.3; }
+      100% { transform: translate(-125%,118%) scale(0.02); opacity: 0; }
+    }
+    /* Swamp background behind lazy Yoda */
+    #yoda-swamp-bg {
+      position: relative; margin: 16px auto 0;
+      width: min(85vw, 440px); border-radius: 14px; overflow: hidden;
+    }
+    #yoda-swamp-bg::before {
+      content: '';
+      position: absolute; inset: 0; border-radius: 14px; z-index: 0;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(120,170,80,0.1) 0%, transparent 55%),
+        radial-gradient(ellipse at 15% 55%, rgba(30,60,15,0.55) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 60%, rgba(25,50,12,0.5) 0%, transparent 40%),
+        linear-gradient(180deg, transparent 40%, rgba(10,20,5,0.75) 100%),
+        linear-gradient(168deg, #0b1409 0%, #0e1b0b 45%, #091408 80%, #060e05 100%);
+    }
+    #yoda-swamp-bg::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 35%; z-index: 0;
+      background:
+        radial-gradient(ellipse at 8% 100%, rgba(6,12,4,0.95) 28%, transparent 65%),
+        radial-gradient(ellipse at 92% 100%, rgba(5,10,3,0.9) 22%, transparent 55%),
+        radial-gradient(ellipse at 50% 100%, rgba(15,30,8,0.6) 20%, transparent 60%),
+        linear-gradient(to bottom, rgba(20,40,10,0.35), rgba(8,16,4,0.85));
+    }
+    #yoda-swamp-bg .yoda-motivator {
+      position: relative; z-index: 1; margin: 0 auto;
+    }
+
     /* ── Hologram effect ── */
     #yoda-hologram-wrap {
       text-align: center;
@@ -2734,7 +2823,33 @@
         💪 Workout Completed
       </label>
     </div>
-    <img id="yoda-lazy-img" src="/yoda-lazy.png" alt="" class="yoda-motivator" style="display:none;">
+    <div id="sw-intro-scene" style="display:none;">
+      <canvas id="sw-hyperspace" style="display:block;width:100%;height:100%;"></canvas>
+      <div id="sw-space-view">
+        <div id="dagobah-planet"></div>
+        <svg id="sw-xwing" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- Fuselage -->
+          <ellipse cx="40" cy="40" rx="5" ry="22" fill="#c8c8c8"/>
+          <ellipse cx="40" cy="20" rx="3" ry="7" fill="#a0a0a0"/>
+          <!-- Wings (X) -->
+          <rect x="6" y="29" width="68" height="5" rx="2.5" fill="#b8b8b8" transform="rotate(-22 40 31.5)"/>
+          <rect x="6" y="46" width="68" height="5" rx="2.5" fill="#b8b8b8" transform="rotate(22 40 48.5)"/>
+          <!-- Engine pods -->
+          <circle cx="13" cy="22" r="4.5" fill="#1a1a1a"/><circle cx="67" cy="22" r="4.5" fill="#1a1a1a"/>
+          <circle cx="13" cy="58" r="4.5" fill="#1a1a1a"/><circle cx="67" cy="58" r="4.5" fill="#1a1a1a"/>
+          <!-- Engine glow -->
+          <circle cx="13" cy="22" r="2.8" fill="#ff6a00" opacity="0.92"/>
+          <circle cx="67" cy="22" r="2.8" fill="#ff6a00" opacity="0.92"/>
+          <circle cx="13" cy="58" r="2.8" fill="#ff6a00" opacity="0.92"/>
+          <circle cx="67" cy="58" r="2.8" fill="#ff6a00" opacity="0.92"/>
+          <!-- Red stripe -->
+          <rect x="35" y="28" width="10" height="3" rx="1" fill="#cc2222" opacity="0.7"/>
+        </svg>
+      </div>
+    </div>
+    <div id="yoda-swamp-bg">
+      <img id="yoda-lazy-img" src="/yoda-lazy.png" alt="" class="yoda-motivator" style="display:none;">
+    </div>
     <div id="yoda-quote" class="yoda-quote" style="display:none;">"Far to long since my last workout, it has been. To the needle I have turned, for another form of dopamine. In agony, I am"</div>
     <div id="yoda-hologram-wrap" style="display:none;">
       <div class="hologram-inner" id="yoda-hologram-inner">
@@ -4221,6 +4336,149 @@
     el.innerHTML = `<span class="wk-label">This week:</span> ${chips}`;
   }
 
+  let _introRunning = false;
+  let _introHyperspaceStop = null;
+
+  function startHyperspace(canvas) {
+    const W = canvas.clientWidth || 360;
+    const H = canvas.clientHeight || 300;
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    const CX = W / 2, CY = H / 2;
+    const stars = Array.from({length: 88}, () => ({
+      angle: Math.random() * Math.PI * 2,
+      dist:  8 + Math.random() * 35,
+      speed: 1 + Math.random() * 2.8,
+      w:     0.5 + Math.random() * 1.2,
+    }));
+    let running = true, t = 0;
+    function draw() {
+      if (!running) return;
+      t += 0.02;
+      ctx.fillStyle = 'rgba(0,0,10,0.22)';
+      ctx.fillRect(0, 0, W, H);
+      const spd = Math.min(t * 2.8, 4);
+      stars.forEach(s => {
+        s.dist += s.speed * spd;
+        const trail = 3 + s.dist * 0.12 * spd;
+        const x1 = CX + Math.cos(s.angle) * Math.max(1, s.dist - trail);
+        const y1 = CY + Math.sin(s.angle) * Math.max(1, s.dist - trail);
+        const x2 = CX + Math.cos(s.angle) * s.dist;
+        const y2 = CY + Math.sin(s.angle) * s.dist;
+        const a = Math.min(s.dist / 55, 1);
+        ctx.strokeStyle = `rgba(${170+Math.random()*85|0},${185+Math.random()*70|0},255,${a})`;
+        ctx.lineWidth = s.w * (1 + s.dist / 100);
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        if (s.dist > Math.hypot(CX, CY) * 1.1) {
+          s.dist = 8 + Math.random() * 30;
+          s.speed = 1 + Math.random() * 2.8;
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+    ctx.fillStyle = '#00000a'; ctx.fillRect(0, 0, W, H);
+    draw();
+    return () => { running = false; };
+  }
+
+  function cancelWorkoutIntro() {
+    if (_introHyperspaceStop) { _introHyperspaceStop(); _introHyperspaceStop = null; }
+    _introRunning = false;
+    const scene = document.getElementById('sw-intro-scene');
+    if (scene) { scene.style.display = 'none'; scene.style.opacity = '1'; }
+  }
+
+  function playWorkoutIntroSequence(dateStr) {
+    if (_introRunning) return;
+    _introRunning = true;
+
+    const lazy    = document.getElementById('yoda-lazy-img');
+    const quote   = document.getElementById('yoda-quote');
+    const swampBg = document.getElementById('yoda-swamp-bg');
+    if (lazy) lazy.style.display = 'none';
+    if (quote) quote.style.display = 'none';
+    if (swampBg) swampBg.style.display = 'none';
+
+    const scene     = document.getElementById('sw-intro-scene');
+    const canvas    = document.getElementById('sw-hyperspace');
+    const spaceView = document.getElementById('sw-space-view');
+    const planet    = document.getElementById('dagobah-planet');
+    const xwing     = document.getElementById('sw-xwing');
+
+    if (!scene || !canvas) { cancelWorkoutIntro(); updateYodaVisibility(dateStr); return; }
+
+    if (spaceView) spaceView.style.display = 'none';
+    if (planet)  { planet.classList.remove('planet-appear'); planet.style.opacity = '0'; }
+    if (xwing)   { xwing.classList.remove('xwing-appear','xwing-descend'); xwing.style.opacity = '0'; }
+    canvas.style.opacity = '1'; canvas.style.transition = 'none';
+    scene.style.display = 'block';
+    scene.style.opacity = '1';
+    scene.style.transition = 'none';
+
+    // Stage 1: Hyperspace
+    _introHyperspaceStop = startHyperspace(canvas);
+
+    // Stage 2: Exit hyperspace → space view (1.9s)
+    setTimeout(() => {
+      if (!_introRunning) return;
+      if (_introHyperspaceStop) { _introHyperspaceStop(); _introHyperspaceStop = null; }
+      canvas.style.transition = 'opacity 0.55s';
+      canvas.style.opacity = '0';
+      if (spaceView) {
+        spaceView.style.opacity = '0';
+        spaceView.style.display = 'flex';
+        spaceView.style.transition = 'opacity 0.5s';
+        requestAnimationFrame(() => requestAnimationFrame(() => { spaceView.style.opacity = '1'; }));
+      }
+    }, 1900);
+
+    // Stage 3: Dagobah planet grows (2.6s)
+    setTimeout(() => {
+      if (!_introRunning || !planet) return;
+      planet.classList.add('planet-appear');
+    }, 2600);
+
+    // Stage 4: X-wing appears (4.1s)
+    setTimeout(() => {
+      if (!_introRunning || !xwing) return;
+      xwing.classList.add('xwing-appear');
+    }, 4100);
+
+    // Stage 5: X-wing descends into planet (5.6s)
+    setTimeout(() => {
+      if (!_introRunning || !xwing) return;
+      xwing.classList.remove('xwing-appear');
+      xwing.classList.add('xwing-descend');
+    }, 5600);
+
+    // Stage 6: Scene fades out (7.8s)
+    setTimeout(() => {
+      if (!_introRunning) return;
+      scene.style.transition = 'opacity 0.9s';
+      scene.style.opacity = '0';
+    }, 7800);
+
+    // Stage 7: Show lazy Yoda + quote (8.9s)
+    setTimeout(() => {
+      if (!_introRunning) return;
+      _introRunning = false;
+      scene.style.display = 'none';
+      scene.style.opacity = '1';
+      scene.style.transition = 'none';
+      if (swampBg) swampBg.style.display = '';
+      if (lazy) lazy.style.display = 'block';
+      if (quote) {
+        quote.style.display = 'block';
+        quote.style.animation = 'none';
+        void quote.offsetWidth;
+        quote.style.animation = '';
+      }
+      if (planet) planet.classList.remove('planet-appear');
+      if (xwing)  xwing.classList.remove('xwing-appear','xwing-descend');
+      canvas.style.opacity = '1'; canvas.style.transition = 'none';
+    }, 8900);
+  }
+
   let _holoIntroActive = false;
 
   function playYodaHologramIntro(dateStr) {
@@ -4265,25 +4523,29 @@
   }
 
   function updateYodaVisibility(dateStr) {
-    const lazy  = document.getElementById('yoda-lazy-img');
-    const holo  = document.getElementById('yoda-hologram-wrap');
-    const quote = document.getElementById('yoda-quote');
+    const lazy    = document.getElementById('yoda-lazy-img');
+    const holo    = document.getElementById('yoda-hologram-wrap');
+    const quote   = document.getElementById('yoda-quote');
+    const swampBg = document.getElementById('yoda-swamp-bg');
     if (!lazy) return;
     const isSW = appMode === 'starWars';
     const day  = gymData.history[dateStr];
     const done = !!(day && day.completed);
-    lazy.style.display = (isSW && !done) ? 'block' : 'none';
-    if (holo && !_holoIntroActive) holo.style.display = 'none';
-    if (quote) {
-      if (isSW && !done) {
-        quote.style.display = 'block';
-        quote.style.animation = 'none';
-        void quote.offsetWidth;
-        quote.style.animation = '';
-      } else {
-        quote.style.display = 'none';
-      }
+
+    if (isSW && !done) {
+      if (!_introRunning) playWorkoutIntroSequence(dateStr);
+      if (holo && !_holoIntroActive) holo.style.display = 'none';
+      return;
     }
+
+    // Non-SW or completed: cancel any running intro
+    if (_introRunning) cancelWorkoutIntro();
+    const scene = document.getElementById('sw-intro-scene');
+    if (scene) scene.style.display = 'none';
+    if (swampBg) swampBg.style.display = isSW ? '' : 'none';
+    lazy.style.display = 'none';
+    if (holo && !_holoIntroActive) holo.style.display = 'none';
+    if (quote) quote.style.display = 'none';
   }
 
   function renderWorkoutPanel(dateStr) {
@@ -5315,6 +5577,7 @@
   };
 
   function switchTab(tab) {
+    if (tab !== 'workout' && _introRunning) cancelWorkoutIntro();
     var bg = document.getElementById('sw-bg');
     if (bg) bg.dataset.view = tab;
     closeViewMenu();
