@@ -1579,6 +1579,15 @@
       color: rgba(180,190,210,0.55);
     }
     body.sw-mode:not(.dark) .gnav-label { color: rgba(80,100,140,0.8); }
+    body.sw-mode .gnav-drawer-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; flex-shrink: 0; font-size: 0;
+    }
+    body.sw-mode .gnav-drawer-icon svg {
+      width: 18px; height: 18px;
+      stroke: var(--subtle);
+    }
+    body.sw-mode .gnav-drawer-item.active .gnav-drawer-icon svg { stroke: #22c55e; }
 
     /* Calendar read-only workout summary */
     .cal-workout-read {
@@ -2963,6 +2972,8 @@
     if (isSW) starfieldInit();
     renderWater();
     if (typeof updateHomeHeader === 'function') updateHomeHeader();
+    if (typeof renderNavBar === 'function') renderNavBar();
+    if (typeof renderMoreDrawer === 'function') renderMoreDrawer();
     const wpEl = document.getElementById('workout-panel');
     if (wpEl && wpEl.dataset.dateStr) updateYodaVisibility(wpEl.dataset.dateStr);
   }
