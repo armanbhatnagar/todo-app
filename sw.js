@@ -1,4 +1,4 @@
-const CACHE_NAME = 'todo-app-v2';
+const CACHE_NAME = 'todo-app-v3';
 
 const urlsToCache = ['/', '/index.html', '/manifest.json'];
 
