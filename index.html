@@ -1592,26 +1592,9 @@
       position: relative; z-index: 1; margin: 0 auto;
     }
 
-    /* Full-bleed intro scene when active */
-    body.sw-intro-active #sw-intro-scene {
-      position: fixed;
-      top: var(--intro-top, 140px);
-      left: 0; right: 0; bottom: 62px;
-      width: 100%; height: auto;
-      border-radius: 0; margin: 0;
-      z-index: 50;
-    }
-    /* Full-bleed yoda swamp stage */
-    body.sw-yoda-active #yoda-swamp-bg {
-      position: fixed;
-      top: var(--intro-top, 140px);
-      left: 0; right: 0; bottom: 62px;
-      width: 100%; height: auto;
-      border-radius: 0; margin: 0;
-      z-index: 50;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-    }
+    /* Yoda swamp active: child + pseudo-element styling (positioning done in JS) */
+    body.sw-yoda-active #yoda-swamp-bg::before,
+    body.sw-yoda-active #yoda-swamp-bg::after { border-radius: 0; }
     body.sw-yoda-active #yoda-swamp-bg .yoda-motivator {
       max-height: 72%; width: auto; object-fit: contain;
     }
@@ -4395,9 +4378,9 @@
   let _introRunning = false;
   let _introHyperspaceStop = null;
 
-  function startHyperspace(canvas) {
-    const W = canvas.clientWidth || 360;
-    const H = canvas.clientHeight || 300;
+  function startHyperspace(canvas, W, H) {
+    W = W || canvas.clientWidth || 360;
+    H = H || canvas.clientHeight || 300;
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
     const CX = W / 2, CY = H / 2;
@@ -4440,9 +4423,11 @@
   function cancelWorkoutIntro() {
     if (_introHyperspaceStop) { _introHyperspaceStop(); _introHyperspaceStop = null; }
     _introRunning = false;
-    document.body.classList.remove('sw-intro-active', 'sw-yoda-active');
+    document.body.classList.remove('sw-yoda-active');
     const scene = document.getElementById('sw-intro-scene');
-    if (scene) { scene.style.display = 'none'; scene.style.opacity = '1'; }
+    if (scene) scene.style.cssText = 'display:none';
+    const swampBg = document.getElementById('yoda-swamp-bg');
+    if (swampBg) { swampBg.style.cssText = ''; swampBg.style.display = 'none'; }
     const locText = document.getElementById('dagobah-location-text');
     if (locText) { locText.classList.remove('loc-show','loc-hide'); locText.style.opacity = '0'; }
   }
@@ -4451,12 +4436,9 @@
     if (_introRunning) return;
     _introRunning = true;
 
-    // Set full-bleed positioning via CSS variable + body class
     const toggleRow = document.querySelector('.workout-toggle-row');
     const introTop = toggleRow ? Math.round(toggleRow.getBoundingClientRect().bottom) : 140;
-    document.documentElement.style.setProperty('--intro-top', introTop + 'px');
-    document.body.classList.add('sw-intro-active');
-    document.body.classList.remove('sw-yoda-active');
+    const navH = 62;
 
     const lazy    = document.getElementById('yoda-lazy-img');
     const quote   = document.getElementById('yoda-quote');
@@ -4474,23 +4456,28 @@
 
     if (!scene || !canvas) { cancelWorkoutIntro(); updateYodaVisibility(dateStr); return; }
 
+    // Reset animation state
     if (spaceView) spaceView.style.display = 'none';
     if (planet)  { planet.classList.remove('planet-appear'); planet.style.opacity = '0'; }
     if (xwing)   { xwing.classList.remove('xwing-appear','xwing-descend'); xwing.style.opacity = '0'; }
     if (locText) { locText.classList.remove('loc-show','loc-hide'); locText.style.opacity = '0'; }
     canvas.style.opacity = '1'; canvas.style.transition = 'none';
-    scene.style.display = 'block';
-    scene.style.opacity = '1';
-    scene.style.transition = 'none';
 
-    // Resize canvas to match fixed dimensions after display
-    requestAnimationFrame(() => {
-      canvas.width = canvas.clientWidth || window.innerWidth;
-      canvas.height = canvas.clientHeight || (window.innerHeight - introTop - 62);
-    });
+    // Set scene to full-bleed via inline styles (reliable, no CSS-class timing issues)
+    scene.style.cssText = [
+      'display:block', 'opacity:1', 'transition:none',
+      'position:fixed', 'top:' + introTop + 'px', 'left:0', 'right:0', 'bottom:' + navH + 'px',
+      'width:100%', 'height:auto', 'border-radius:0', 'margin:0',
+      'z-index:50', 'background:#00000a', 'overflow:hidden',
+    ].join(';');
 
-    // Stage 1: Hyperspace
-    _introHyperspaceStop = startHyperspace(canvas);
+    // Stage 1: Hyperspace — delay 2 rAFs so canvas has correct layout dimensions
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (!_introRunning) return;
+      const W = window.innerWidth;
+      const H = window.innerHeight - introTop - navH;
+      _introHyperspaceStop = startHyperspace(canvas, W, H);
+    }));
 
     // Stage 2: Exit hyperspace → space view (1.9s)
     setTimeout(() => {
@@ -4519,7 +4506,7 @@
       xwing.classList.add('xwing-appear');
     }, 4100);
 
-    // Stage 5: X-wing descends into planet + hide location text (5.6s)
+    // Stage 5: X-wing descends + hide location text (5.6s)
     setTimeout(() => {
       if (!_introRunning || !xwing) return;
       xwing.classList.remove('xwing-appear');
@@ -4534,16 +4521,19 @@
       scene.style.opacity = '0';
     }, 7800);
 
-    // Stage 7: Show lazy Yoda + quote (8.9s)
+    // Stage 7: Show lazy Yoda + quote full-bleed (8.9s)
     setTimeout(() => {
       if (!_introRunning) return;
       _introRunning = false;
-      scene.style.display = 'none';
-      scene.style.opacity = '1';
-      scene.style.transition = 'none';
-      document.body.classList.remove('sw-intro-active');
-      document.body.classList.add('sw-yoda-active');
-      if (swampBg) swampBg.style.display = '';
+      scene.style.cssText = 'display:none';
+      // Show swamp bg full-bleed via inline styles
+      document.body.classList.add('sw-yoda-active'); // for child/pseudo-element CSS
+      swampBg.style.cssText = [
+        'display:flex', 'flex-direction:column',
+        'align-items:center', 'justify-content:center',
+        'position:fixed', 'top:' + introTop + 'px', 'left:0', 'right:0', 'bottom:' + navH + 'px',
+        'width:100%', 'height:auto', 'border-radius:0', 'margin:0', 'z-index:50',
+      ].join(';');
       if (lazy) lazy.style.display = 'block';
       if (quote) {
         quote.style.display = 'block';
@@ -4617,12 +4607,11 @@
       return;
     }
 
-    // Non-SW or completed: cancel any running intro
-    if (_introRunning) cancelWorkoutIntro();
-    document.body.classList.remove('sw-intro-active', 'sw-yoda-active');
+    // Non-SW or completed: cancel intro and clear all inline styles
+    cancelWorkoutIntro();
     const scene = document.getElementById('sw-intro-scene');
-    if (scene) scene.style.display = 'none';
-    if (swampBg) swampBg.style.display = isSW ? '' : 'none';
+    if (scene) scene.style.cssText = 'display:none';
+    if (swampBg) { swampBg.style.cssText = ''; swampBg.style.display = isSW ? '' : 'none'; }
     lazy.style.display = 'none';
     if (holo && !_holoIntroActive) holo.style.display = 'none';
     if (quote) quote.style.display = 'none';
@@ -5658,8 +5647,7 @@
 
   function switchTab(tab) {
     if (tab !== 'workout') {
-      if (_introRunning) cancelWorkoutIntro();
-      document.body.classList.remove('sw-intro-active', 'sw-yoda-active');
+      if (_introRunning || document.body.classList.contains('sw-yoda-active')) cancelWorkoutIntro();
     }
     var bg = document.getElementById('sw-bg');
     if (bg) bg.dataset.view = tab;
