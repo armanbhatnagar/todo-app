@@ -1431,8 +1431,26 @@
 
     .yoda-motivator {
       display: block;
-      width: 180px;
-      margin: 12px auto 0;
+      width: min(85vw, 440px);
+      margin: 16px auto 0;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    @keyframes yodaQuoteFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .yoda-quote {
+      color: #ffe81f;
+      font-style: italic;
+      font-size: 0.88rem;
+      text-align: center;
+      padding: 12px 24px 0;
+      line-height: 1.7;
+      opacity: 0;
+      animation: yodaQuoteFadeIn 1s ease forwards;
+      animation-delay: 0.6s;
       pointer-events: none;
       user-select: none;
     }
@@ -2520,6 +2538,7 @@
       </label>
     </div>
     <img id="yoda-lazy-img" src="/yoda-lazy.png" alt="" class="yoda-motivator" style="display:none;">
+    <div id="yoda-quote" class="yoda-quote" style="display:none;">"Far to long since my last workout, it has been. To the needle I have turned, for another form of dopamine. In agony, I am"</div>
     <img id="yoda-buff-img" src="/yoda-buff.png" alt="" class="yoda-motivator" style="display:none;">
     <div id="workout-panel"></div>
   </div><!-- /panel-workout -->
@@ -3985,14 +4004,25 @@
   }
 
   function updateYodaVisibility(dateStr) {
-    const lazy = document.getElementById('yoda-lazy-img');
-    const buff = document.getElementById('yoda-buff-img');
+    const lazy  = document.getElementById('yoda-lazy-img');
+    const buff  = document.getElementById('yoda-buff-img');
+    const quote = document.getElementById('yoda-quote');
     if (!lazy || !buff) return;
     const isSW = appMode === 'starWars';
     const day  = gymData.history[dateStr];
     const done = !!(day && day.completed);
     lazy.style.display = (isSW && !done) ? 'block' : 'none';
     buff.style.display = (isSW &&  done) ? 'block' : 'none';
+    if (quote) {
+      if (isSW && !done) {
+        quote.style.display = 'block';
+        quote.style.animation = 'none';
+        void quote.offsetWidth;
+        quote.style.animation = '';
+      } else {
+        quote.style.display = 'none';
+      }
+    }
   }
 
   function renderWorkoutPanel(dateStr) {
