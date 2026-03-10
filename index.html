@@ -1592,6 +1592,61 @@
       position: relative; z-index: 1; margin: 0 auto;
     }
 
+    /* Full-bleed intro scene when active */
+    body.sw-intro-active #sw-intro-scene {
+      position: fixed;
+      top: var(--intro-top, 140px);
+      left: 0; right: 0; bottom: 62px;
+      width: 100%; height: auto;
+      border-radius: 0; margin: 0;
+      z-index: 50;
+    }
+    /* Full-bleed yoda swamp stage */
+    body.sw-yoda-active #yoda-swamp-bg {
+      position: fixed;
+      top: var(--intro-top, 140px);
+      left: 0; right: 0; bottom: 62px;
+      width: 100%; height: auto;
+      border-radius: 0; margin: 0;
+      z-index: 50;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    body.sw-yoda-active #yoda-swamp-bg .yoda-motivator {
+      max-height: 72%; width: auto; object-fit: contain;
+    }
+    body.sw-yoda-active #yoda-swamp-bg .yoda-quote {
+      position: relative; z-index: 1;
+      padding: 8px 20px 0; font-size: 0.82rem;
+    }
+    /* Dagobah location text */
+    #dagobah-location-text {
+      position: absolute; bottom: 18%; left: 8%;
+      color: #e8e8c8; font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; line-height: 1.6;
+      opacity: 0; pointer-events: none; user-select: none;
+      text-shadow: 0 0 12px rgba(255,255,200,0.4);
+    }
+    #dagobah-location-text span {
+      font-size: 0.6rem; font-weight: 400; opacity: 0.65; display: block;
+      letter-spacing: 0.18em;
+    }
+    #dagobah-location-text.loc-show {
+      animation: locFadeIn 1s ease forwards;
+    }
+    #dagobah-location-text.loc-hide {
+      animation: locFadeOut 0.6s ease forwards;
+    }
+    @keyframes locFadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes locFadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-4px); }
+    }
+
     /* ── Hologram effect ── */
     #yoda-hologram-wrap {
       text-align: center;
@@ -2827,6 +2882,7 @@
       <canvas id="sw-hyperspace" style="display:block;width:100%;height:100%;"></canvas>
       <div id="sw-space-view">
         <div id="dagobah-planet"></div>
+        <div id="dagobah-location-text">Dagobah<span>Outer Rim</span></div>
         <svg id="sw-xwing" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <!-- Fuselage -->
           <ellipse cx="40" cy="40" rx="5" ry="22" fill="#c8c8c8"/>
@@ -2849,8 +2905,8 @@
     </div>
     <div id="yoda-swamp-bg">
       <img id="yoda-lazy-img" src="/yoda-lazy.png" alt="" class="yoda-motivator" style="display:none;">
+      <div id="yoda-quote" class="yoda-quote" style="display:none;">"Far to long since my last workout, it has been. To the needle I have turned, for another form of dopamine. In agony, I am"</div>
     </div>
-    <div id="yoda-quote" class="yoda-quote" style="display:none;">"Far to long since my last workout, it has been. To the needle I have turned, for another form of dopamine. In agony, I am"</div>
     <div id="yoda-hologram-wrap" style="display:none;">
       <div class="hologram-inner" id="yoda-hologram-inner">
         <img id="yoda-buff-img" src="/yoda-buff.png" alt="" class="yoda-motivator">
@@ -4384,13 +4440,23 @@
   function cancelWorkoutIntro() {
     if (_introHyperspaceStop) { _introHyperspaceStop(); _introHyperspaceStop = null; }
     _introRunning = false;
+    document.body.classList.remove('sw-intro-active', 'sw-yoda-active');
     const scene = document.getElementById('sw-intro-scene');
     if (scene) { scene.style.display = 'none'; scene.style.opacity = '1'; }
+    const locText = document.getElementById('dagobah-location-text');
+    if (locText) { locText.classList.remove('loc-show','loc-hide'); locText.style.opacity = '0'; }
   }
 
   function playWorkoutIntroSequence(dateStr) {
     if (_introRunning) return;
     _introRunning = true;
+
+    // Set full-bleed positioning via CSS variable + body class
+    const toggleRow = document.querySelector('.workout-toggle-row');
+    const introTop = toggleRow ? Math.round(toggleRow.getBoundingClientRect().bottom) : 140;
+    document.documentElement.style.setProperty('--intro-top', introTop + 'px');
+    document.body.classList.add('sw-intro-active');
+    document.body.classList.remove('sw-yoda-active');
 
     const lazy    = document.getElementById('yoda-lazy-img');
     const quote   = document.getElementById('yoda-quote');
@@ -4404,16 +4470,24 @@
     const spaceView = document.getElementById('sw-space-view');
     const planet    = document.getElementById('dagobah-planet');
     const xwing     = document.getElementById('sw-xwing');
+    const locText   = document.getElementById('dagobah-location-text');
 
     if (!scene || !canvas) { cancelWorkoutIntro(); updateYodaVisibility(dateStr); return; }
 
     if (spaceView) spaceView.style.display = 'none';
     if (planet)  { planet.classList.remove('planet-appear'); planet.style.opacity = '0'; }
     if (xwing)   { xwing.classList.remove('xwing-appear','xwing-descend'); xwing.style.opacity = '0'; }
+    if (locText) { locText.classList.remove('loc-show','loc-hide'); locText.style.opacity = '0'; }
     canvas.style.opacity = '1'; canvas.style.transition = 'none';
     scene.style.display = 'block';
     scene.style.opacity = '1';
     scene.style.transition = 'none';
+
+    // Resize canvas to match fixed dimensions after display
+    requestAnimationFrame(() => {
+      canvas.width = canvas.clientWidth || window.innerWidth;
+      canvas.height = canvas.clientHeight || (window.innerHeight - introTop - 62);
+    });
 
     // Stage 1: Hyperspace
     _introHyperspaceStop = startHyperspace(canvas);
@@ -4432,10 +4506,11 @@
       }
     }, 1900);
 
-    // Stage 3: Dagobah planet grows (2.6s)
+    // Stage 3: Dagobah planet grows + location text (2.6s)
     setTimeout(() => {
       if (!_introRunning || !planet) return;
       planet.classList.add('planet-appear');
+      if (locText) { locText.classList.remove('loc-hide'); locText.classList.add('loc-show'); }
     }, 2600);
 
     // Stage 4: X-wing appears (4.1s)
@@ -4444,11 +4519,12 @@
       xwing.classList.add('xwing-appear');
     }, 4100);
 
-    // Stage 5: X-wing descends into planet (5.6s)
+    // Stage 5: X-wing descends into planet + hide location text (5.6s)
     setTimeout(() => {
       if (!_introRunning || !xwing) return;
       xwing.classList.remove('xwing-appear');
       xwing.classList.add('xwing-descend');
+      if (locText) { locText.classList.remove('loc-show'); locText.classList.add('loc-hide'); }
     }, 5600);
 
     // Stage 6: Scene fades out (7.8s)
@@ -4465,6 +4541,8 @@
       scene.style.display = 'none';
       scene.style.opacity = '1';
       scene.style.transition = 'none';
+      document.body.classList.remove('sw-intro-active');
+      document.body.classList.add('sw-yoda-active');
       if (swampBg) swampBg.style.display = '';
       if (lazy) lazy.style.display = 'block';
       if (quote) {
@@ -4475,6 +4553,7 @@
       }
       if (planet) planet.classList.remove('planet-appear');
       if (xwing)  xwing.classList.remove('xwing-appear','xwing-descend');
+      if (locText) { locText.classList.remove('loc-show','loc-hide'); locText.style.opacity = '0'; }
       canvas.style.opacity = '1'; canvas.style.transition = 'none';
     }, 8900);
   }
@@ -4540,6 +4619,7 @@
 
     // Non-SW or completed: cancel any running intro
     if (_introRunning) cancelWorkoutIntro();
+    document.body.classList.remove('sw-intro-active', 'sw-yoda-active');
     const scene = document.getElementById('sw-intro-scene');
     if (scene) scene.style.display = 'none';
     if (swampBg) swampBg.style.display = isSW ? '' : 'none';
@@ -5577,7 +5657,10 @@
   };
 
   function switchTab(tab) {
-    if (tab !== 'workout' && _introRunning) cancelWorkoutIntro();
+    if (tab !== 'workout') {
+      if (_introRunning) cancelWorkoutIntro();
+      document.body.classList.remove('sw-intro-active', 'sw-yoda-active');
+    }
     var bg = document.getElementById('sw-bg');
     if (bg) bg.dataset.view = tab;
     closeViewMenu();
