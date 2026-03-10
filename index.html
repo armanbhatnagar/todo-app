@@ -13,6 +13,7 @@
   <title>My Daily To-Do</title>
   <link rel="preconnect" href="https://api.fontshare.com">
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore-compat.js"></script>
@@ -1519,6 +1520,65 @@
     .hologram-inner.holo-on     { animation: holoMaterialize 1.2s ease-out forwards; }
     .hologram-inner.holo-ambient { animation: holoAmbient 3s ease-in-out infinite; }
     .hologram-inner.holo-off    { animation: holoDeactivate 1s ease-in forwards; }
+
+    /* ── SW mode nav icons ── */
+    body.sw-mode .global-nav {
+      border-top: 1px solid rgba(37,99,235,0.35);
+    }
+    body.sw-mode.dark .global-nav {
+      border-top: 1px solid rgba(220,38,38,0.28);
+    }
+    body.sw-mode:not(.dark) .global-nav {
+      background: rgba(18,22,36,0.90);
+    }
+    body.sw-mode .gnav-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+    }
+    body.sw-mode:not(.dark) .gnav-icon {
+      border: 1px solid rgba(0,0,0,0.18);
+      background: rgba(255,255,255,0.1);
+    }
+    body.sw-mode .gnav-icon svg {
+      width: 20px; height: 20px;
+      stroke: rgba(180,190,210,0.75);
+      transition: stroke 0.2s;
+    }
+    body.sw-mode:not(.dark) .gnav-icon svg {
+      stroke: rgba(120,140,180,0.9);
+    }
+    body.sw-mode .global-nav-item.active .gnav-icon {
+      background: rgba(220,38,38,0.18);
+      border-color: rgba(220,38,38,0.65);
+      box-shadow: 0 0 10px rgba(220,38,38,0.3);
+    }
+    body.sw-mode.dark .global-nav-item.active .gnav-icon svg {
+      stroke: #ff5555;
+    }
+    body.sw-mode:not(.dark) .global-nav-item.active .gnav-icon {
+      background: rgba(37,99,235,0.16);
+      border-color: rgba(37,99,235,0.65);
+      box-shadow: 0 0 10px rgba(37,99,235,0.3);
+    }
+    body.sw-mode:not(.dark) .global-nav-item.active .gnav-icon svg {
+      stroke: #4a90ff;
+    }
+    body.sw-mode .global-nav-item.active .gnav-label { color: #ff5555; }
+    body.sw-mode:not(.dark) .global-nav-item.active .gnav-label { color: #4a90ff; }
+    body.sw-mode .gnav-dot { display: none; }
+    body.sw-mode .gnav-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.42rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(180,190,210,0.55);
+    }
+    body.sw-mode:not(.dark) .gnav-label { color: rgba(80,100,140,0.8); }
 
     /* Calendar read-only workout summary */
     .cal-workout-read {
@@ -5045,6 +5105,19 @@
   function getPinnedTabs() { return navConfig.filter(t => t.pinned); }
   function getOverflowTabs() { return navConfig.filter(t => !t.pinned); }
 
+  const SW_TAB_ICONS = {
+    home:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><line x1="3.5" y1="12" x2="20.5" y2="12"/><circle cx="8.5" cy="9.5" r="2.2"/></svg>`,
+    cal:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="1.5"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="8" y1="5" x2="8" y2="9"/><line x1="16" y1="5" x2="16" y2="9"/><line x1="7.5" y1="13" x2="10.5" y2="13"/><line x1="13.5" y1="13" x2="16.5" y2="13"/><line x1="7.5" y1="17" x2="12" y2="17"/></svg>`,
+    workout: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="19" y2="4"/><line x1="19" y1="20" x2="5" y2="4"/><rect x="3" y="19" width="4" height="2.5" rx="1"/><rect x="17" y="19" width="4" height="2.5" rx="1"/></svg>`,
+    journal: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 20,7 20,17 12,22 4,17 4,7"/><line x1="4" y1="7" x2="20" y2="17"/><line x1="20" y1="7" x2="4" y2="17"/><line x1="12" y1="2" x2="12" y2="22"/></svg>`,
+    stim:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 7 13 12 13 11 22 17 10 12 10 13 2"/></svg>`,
+    econ:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 18 7 12 11 15 15 9 21 12"/><line x1="3" y1="21" x2="21" y2="21"/></svg>`,
+    _more:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>`,
+  };
+  function getSWIcon(tabId) {
+    return (appMode === 'starWars' && SW_TAB_ICONS[tabId]) ? SW_TAB_ICONS[tabId] : null;
+  }
+
   function renderNavBar() {
     const bar = document.getElementById('global-nav');
     if (!bar) return;
@@ -5055,14 +5128,16 @@
     let html = '';
     pinned.forEach(tab => {
       const isActive = activeTab === tab.id;
+      const swIcon = getSWIcon(tab.id);
       html += `<button class="global-nav-item ${isActive ? 'active' : ''}" onclick="switchTab('${tab.id}')">
-        <span class="gnav-icon">${tab.icon}</span>
+        <span class="gnav-icon">${swIcon || tab.icon}</span>
         <span class="gnav-label">${tab.label}</span>
         <div class="gnav-dot"></div>
       </button>`;
     });
+    const swMoreIcon = appMode === 'starWars' ? SW_TAB_ICONS._more : '•••';
     html += `<button class="global-nav-item gnav-more ${overflowActive ? 'has-active' : ''}" onclick="toggleMoreDrawer()">
-      <span class="gnav-icon">•••</span>
+      <span class="gnav-icon">${swMoreIcon}</span>
       <span class="gnav-label">More</span>
       <div class="gnav-dot"></div>
     </button>`;
@@ -5081,8 +5156,9 @@
     let html = '<div class="gnav-drawer-title">More</div><div class="gnav-drawer-grid">';
     overflow.forEach(tab => {
       const isActive = activeTab === tab.id;
+      const swIcon = getSWIcon(tab.id);
       html += `<button class="gnav-drawer-item ${isActive ? 'active' : ''}" onclick="switchTab('${tab.id}')">
-        <span class="gnav-drawer-icon">${tab.icon}</span> ${tab.label}
+        <span class="gnav-drawer-icon">${swIcon || tab.icon}</span> ${tab.label}
       </button>`;
     });
     html += '</div>';
