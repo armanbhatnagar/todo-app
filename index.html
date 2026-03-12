@@ -1536,30 +1536,9 @@
       from { opacity: 0; transform: translateY(-15px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    #dagobah-xwing {
-      position: absolute;
-      left: 50%;
-      width: min(30vw, 130px);
-      z-index: 2;
-      pointer-events: none;
-      filter: brightness(0.85);
-    }
-    @keyframes xwingDescend {
-      0%   { top: -15%; transform: translateX(-50%) rotate(-8deg) scale(0.6); opacity: 0; }
-      15%  { opacity: 1; }
-      50%  { transform: translateX(-50%) rotate(-3deg) scale(0.85); }
-      75%  { transform: translateX(-50%) rotate(2deg) scale(0.95); }
-      100% { top: 55%; transform: translateX(-50%) rotate(-1deg) scale(1); opacity: 0.9; }
-    }
-    #dagobah-fog {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 35%;
-      background: linear-gradient(to top, rgba(10,30,10,0.85) 0%, rgba(10,30,10,0.4) 50%, transparent 100%);
-      z-index: 1;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 1.5s ease;
+    #sw-dagobah {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
     }
     #yoda-swamp-bg {
       display: none;
@@ -4286,6 +4265,7 @@
 
   let _introRunning = false;
   let _introHyperspaceStop = null;
+  let _dagobahApproachStop = null;
 
   function startHyperspace(canvas, W, H) {
     W = W || canvas.clientWidth || 360;
@@ -4329,24 +4309,148 @@
     return () => { running = false; };
   }
 
+  function startDagobahApproach(dagCanvas) {
+    const W = dagCanvas.width  = window.innerWidth;
+    const H = dagCanvas.height = window.innerHeight;
+    const ctx = dagCanvas.getContext('2d');
+    let running = true, startTime = null;
+    const DURATION = 8000;
+
+    const stars = Array.from({length: 130}, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H * 0.6,
+      r: 0.4 + Math.random() * 1.3,
+      a: 0.3 + Math.random() * 0.7,
+    }));
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function easeOut(t) { return 1 - Math.pow(1 - t, 2.2); }
+
+    const planetImg = new Image();
+    planetImg.src = '/dagobah.png';
+
+    let processedXwing = null;
+    const xwingRaw = new Image();
+    xwingRaw.crossOrigin = 'anonymous';
+    xwingRaw.onload = () => {
+      const oc = document.createElement('canvas');
+      oc.width = xwingRaw.naturalWidth; oc.height = xwingRaw.naturalHeight;
+      const oc2 = oc.getContext('2d');
+      oc2.drawImage(xwingRaw, 0, 0);
+      const id = oc2.getImageData(0, 0, oc.width, oc.height);
+      const px = id.data;
+      for (let i = 0; i < px.length; i += 4) {
+        const brightness = (px[i] + px[i+1] + px[i+2]) / 3;
+        if (brightness > 230) { px[i+3] = 0; }
+        else if (brightness > 190) { px[i+3] = Math.round((230 - brightness) / 40 * 255); }
+      }
+      oc2.putImageData(id, 0, 0);
+      processedXwing = oc;
+    };
+    xwingRaw.src = '/xwing.png';
+
+    function draw(ts) {
+      if (!running) return;
+      if (!startTime) startTime = ts;
+      const t  = Math.min((ts - startTime) / DURATION, 1);
+      const te = easeOut(t);
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#00010c';
+      ctx.fillRect(0, 0, W, H);
+
+      // ── PLANET ──
+      const pSize    = W * lerp(2.4, 6.0, te);
+      const pCenterY = H * lerp(1.08, 1.12, te);
+      const pX = (W - pSize) / 2;
+      const pY = pCenterY - pSize / 2;
+      ctx.drawImage(planetImg, pX, pY, pSize, pSize);
+
+      // Approximate visible horizon Y
+      const horizonY = H * lerp(0.53, 0.08, te);
+
+      // ── SPACE OVERLAY ──
+      const spaceGrad = ctx.createLinearGradient(0, 0, 0, horizonY + 50);
+      spaceGrad.addColorStop(0,    'rgba(0,1,12,1)');
+      spaceGrad.addColorStop(0.75, 'rgba(0,2,15,0.96)');
+      spaceGrad.addColorStop(1,    'rgba(0,2,15,0)');
+      ctx.fillStyle = spaceGrad;
+      ctx.fillRect(0, 0, W, horizonY + 50);
+
+      // ── STARS ──
+      const starFade = Math.max(0, 1 - te * 0.6);
+      ctx.save();
+      stars.forEach(s => {
+        if (s.y > horizonY * 1.05) return;
+        ctx.globalAlpha = s.a * starFade;
+        ctx.fillStyle = '#e8eeff';
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+
+      // ── ATMOSPHERIC RIM ──
+      const rimThick = 14 + (1 - te) * 10;
+      const rimAlpha = lerp(0.85, 0.55, te);
+      const rimGrad = ctx.createLinearGradient(0, horizonY - rimThick, 0, horizonY + rimThick * 0.6);
+      rimGrad.addColorStop(0,    'rgba(140,210,255,0)');
+      rimGrad.addColorStop(0.35, `rgba(180,230,255,${rimAlpha * 0.6})`);
+      rimGrad.addColorStop(0.6,  `rgba(210,245,255,${rimAlpha})`);
+      rimGrad.addColorStop(1,    'rgba(160,215,255,0)');
+      ctx.fillStyle = rimGrad;
+      ctx.fillRect(0, horizonY - rimThick, W, rimThick * 1.6);
+
+      // ── X-WING ──
+      const shipW = W * lerp(0.22, 0.04, te);
+      if (processedXwing) {
+        const aspect = processedXwing.height / processedXwing.width;
+        const shipH  = shipW * aspect;
+        const shipX  = (W - shipW) / 2;
+        const shipY  = H * lerp(0.32, 0.44, te) - shipH / 2;
+
+        ctx.drawImage(processedXwing, shipX, shipY, shipW, shipH);
+
+        // ── ENGINE GLOW ──
+        const gs    = shipW * 0.10;
+        const pulse = 0.8 + Math.sin(ts / 130) * 0.2;
+        [{ ox: 0.22, oy: 0.52 }, { ox: 0.38, oy: 0.58 }].forEach(({ ox, oy }) => {
+          const ex = shipX + shipW * ox;
+          const ey = shipY + shipH * oy;
+          const og = ctx.createRadialGradient(ex, ey, 0, ex, ey, gs * 3);
+          og.addColorStop(0,   `rgba(255,155,35,${0.65 * pulse})`);
+          og.addColorStop(0.4, `rgba(255,80,15,${0.3 * pulse})`);
+          og.addColorStop(1,    'rgba(200,40,0,0)');
+          ctx.fillStyle = og;
+          ctx.beginPath(); ctx.arc(ex, ey, gs * 3, 0, Math.PI * 2); ctx.fill();
+          const ig = ctx.createRadialGradient(ex, ey, 0, ex, ey, gs * 0.7);
+          ig.addColorStop(0, `rgba(200,185,255,${0.95 * pulse})`);
+          ig.addColorStop(1,  'rgba(130,100,230,0)');
+          ctx.fillStyle = ig;
+          ctx.beginPath(); ctx.arc(ex, ey, gs * 0.7, 0, Math.PI * 2); ctx.fill();
+        });
+      }
+
+      if (running && t < 1) requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+    return () => { running = false; };
+  }
+
   function cancelWorkoutIntro() {
-    if (_introHyperspaceStop) { _introHyperspaceStop(); _introHyperspaceStop = null; }
+    if (_introHyperspaceStop)  { _introHyperspaceStop(); _introHyperspaceStop = null; }
+    if (_dagobahApproachStop)  { _dagobahApproachStop(); _dagobahApproachStop = null; }
     _introRunning = false;
     document.body.classList.remove('sw-yoda-active');
 
     const scene = document.getElementById('sw-intro-scene');
     if (scene) scene.style.cssText = 'display:none';
 
-    const dagScene  = document.getElementById('dagobah-scene');
-    const dagPlanet = document.getElementById('dagobah-planet');
-    const dagLabel  = document.getElementById('dagobah-label');
-    const xwing     = document.getElementById('dagobah-xwing');
-    const fog       = document.getElementById('dagobah-fog');
-    if (dagScene)  { dagScene.style.display  = 'none'; }
-    if (dagPlanet) { dagPlanet.style.opacity = '0'; dagPlanet.style.transition = 'none'; }
-    if (dagLabel)  { dagLabel.style.display  = 'none'; dagLabel.style.animation = 'none'; }
-    if (xwing)     { xwing.style.display     = 'none'; xwing.style.animation   = 'none'; }
-    if (fog)       { fog.style.opacity       = '0'; fog.style.transition      = 'none'; }
+    const dagScene = document.getElementById('dagobah-scene');
+    const dagLabel = document.getElementById('dagobah-label');
+    if (dagScene) dagScene.style.display = 'none';
+    if (dagLabel) { dagLabel.style.display = 'none'; dagLabel.style.animation = 'none'; }
 
     const swampBg = document.getElementById('yoda-swamp-bg');
     if (swampBg) { swampBg.style.cssText = ''; swampBg.style.display = 'none'; }
@@ -4392,18 +4496,17 @@
       canvas.style.opacity    = '0';
     }, 3500);
 
-    // ── STAGE 2: DAGOBAH APPROACH ──
-    // At 4100ms: show Dagobah bg, fog, label
+    // ── STAGE 2: DAGOBAH APPROACH (8s canvas animation) ──
     setTimeout(() => {
       if (!_introRunning) return;
       const dagScene  = document.getElementById('dagobah-scene');
-      const dagPlanet = document.getElementById('dagobah-planet');
+      const dagCanvas = document.getElementById('sw-dagobah');
       const dagLabel  = document.getElementById('dagobah-label');
-      const fog       = document.getElementById('dagobah-fog');
 
-      if (dagScene)  dagScene.style.display  = 'block';
-      if (dagPlanet) dagPlanet.style.opacity = '1';  // CSS transition fades in over 1s
-      if (fog)       fog.style.opacity       = '1';  // CSS transition fades in over 1.5s
+      if (dagScene) dagScene.style.display = 'block';
+      if (_dagobahApproachStop) { _dagobahApproachStop(); _dagobahApproachStop = null; }
+      if (dagCanvas) _dagobahApproachStop = startDagobahApproach(dagCanvas);
+
       if (dagLabel) {
         dagLabel.style.display   = 'block';
         dagLabel.style.animation = 'none';
@@ -4412,48 +4515,29 @@
       }
     }, 4100);
 
-    // At 4400ms: show X-wing descending
-    setTimeout(() => {
-      if (!_introRunning) return;
-      const xwing = document.getElementById('dagobah-xwing');
-      if (xwing) {
-        xwing.style.display   = 'block';
-        xwing.style.animation = 'xwingDescend 2.5s ease-in-out forwards';
-      }
-    }, 4400);
-
-    // ── STAGE 3: EXIT ──
-    // At 7000ms: fade entire overlay to black
+    // ── STAGE 3: EXIT (4100 + 8000 = 12100ms) ──
     setTimeout(() => {
       if (!_introRunning) return;
       scene.style.transition = 'opacity 0.7s ease';
       scene.style.opacity    = '0';
-    }, 7000);
+    }, 12100);
 
-    // At 7700ms: kill overlay, show inline Yoda content
+    // At 12800ms: kill overlay, show inline Yoda
     setTimeout(() => {
       if (!_introRunning) return;
       _introRunning = false;
+      if (_dagobahApproachStop) { _dagobahApproachStop(); _dagobahApproachStop = null; }
 
       scene.style.cssText = 'display:none';
 
-      // Reset dagobah children
-      const dagScene  = document.getElementById('dagobah-scene');
-      const dagPlanet = document.getElementById('dagobah-planet');
-      const dagLabel  = document.getElementById('dagobah-label');
-      const xwing     = document.getElementById('dagobah-xwing');
-      const fog       = document.getElementById('dagobah-fog');
-      if (dagScene)  { dagScene.style.display  = 'none'; }
-      if (dagPlanet) { dagPlanet.style.opacity = '0'; dagPlanet.style.transition = 'none'; }
-      if (dagLabel)  { dagLabel.style.display  = 'none'; dagLabel.style.animation = 'none'; }
-      if (xwing)     { xwing.style.display     = 'none'; xwing.style.animation   = 'none'; }
-      if (fog)       { fog.style.opacity       = '0'; fog.style.transition      = 'none'; }
+      const dagScene = document.getElementById('dagobah-scene');
+      const dagLabel = document.getElementById('dagobah-label');
+      if (dagScene) dagScene.style.display = 'none';
+      if (dagLabel) { dagLabel.style.display = 'none'; dagLabel.style.animation = 'none'; }
 
-      // Reset canvas for next time
       canvas.style.opacity    = '1';
       canvas.style.transition = 'none';
 
-      // Show inline Yoda + quote
       if (lazy) {
         lazy.style.display    = 'block';
         lazy.style.opacity    = '0';
@@ -4468,7 +4552,7 @@
           quote.style.animation = '';
         }, 300);
       }
-    }, 7700);
+    }, 12800);
   }
 
   let _holoIntroActive = false;
@@ -6529,11 +6613,8 @@
 <div id="sw-intro-scene" style="display:none;">
   <canvas id="sw-hyperspace" style="display:block;width:100%;height:100%;"></canvas>
   <div id="dagobah-scene" style="display:none;">
-    <img id="dagobah-planet" src="/dagobah.png" alt=""
-         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1s ease;">
+    <canvas id="sw-dagobah" style="position:absolute;inset:0;display:block;width:100%;height:100%;"></canvas>
     <div id="dagobah-label" style="display:none;">DAGOBAH<br><span style="font-size:0.55em;letter-spacing:0.15em;opacity:0.7;">OUTER RIM</span></div>
-    <img id="dagobah-xwing" src="/xwing.png" alt="" style="display:none;">
-    <div id="dagobah-fog"></div>
   </div>
 </div>
 </body>
