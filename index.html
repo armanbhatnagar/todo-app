@@ -4467,7 +4467,7 @@
 
     const scene  = document.getElementById('sw-intro-scene');
     const canvas = document.getElementById('sw-hyperspace');
-    if (!scene || !canvas) { cancelWorkoutIntro(); updateYodaVisibility(dateStr); return; }
+    if (!scene || !canvas) { cancelWorkoutIntro(); return; }
 
     canvas.style.opacity    = '1';
     canvas.style.transition = 'none';
@@ -6605,7 +6605,11 @@
       if (data.charts)  renderEconCharts(data.charts.cpi, data.charts.spy);
       const el = document.getElementById('econ-last-updated');
       if (el) el.textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    }).catch(e => console.error('Refresh error:', e));
+    }).catch(e => {
+      console.error('Refresh error:', e);
+      const el = document.getElementById('econ-last-updated');
+      if (el) el.textContent = 'Refresh failed — check connection';
+    });
   }
 
 
