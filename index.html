@@ -160,6 +160,7 @@
       box-shadow: 0 0 8px rgba(220,38,38,0.5), 0 0 20px rgba(220,38,38,0.2);
       color: #dc2626; border-color: rgba(220,38,38,0.45);
     }
+    body.sw-mode #theme-btn { display: none; }
 
     /* Icon visibility */
     .icon-jedi, .icon-empire { display: none; }
@@ -3159,6 +3160,12 @@
   function setAppMode(mode) {
     appMode = mode;
     lsSet('appMode', mode);
+    if (mode === 'starWars' && !dark) {
+      dark = true;
+      document.body.classList.add('dark');
+      lsSet('dark', 'true');
+      saveToFirestore();
+    }
     applyMode();
     closeSettingsMenu();
   }
