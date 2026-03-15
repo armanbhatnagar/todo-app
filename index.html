@@ -241,7 +241,6 @@
         0 0 18px var(--saber-color),
         0 0 36px var(--saber-glow),
         0 0 70px var(--saber-glow-outer);
-      filter: url(#saberCrackle);
       animation: saberFlicker 4s ease-in-out infinite;
       transition: width 0.4s ease;
     }
@@ -264,6 +263,14 @@
       display: none;
     }
     body.sw-mode .saber-power-label { display: block; }
+    body.sw-mode #sw-replay-row { display: flex; justify-content: center; margin: 6px 0 2px; }
+    .sw-replay-btn {
+      background: none; border: 1px solid rgba(255,232,31,0.35); border-radius: 8px;
+      color: rgba(255,232,31,0.75); font-size: 0.72rem; letter-spacing: 0.08em;
+      padding: 5px 14px; cursor: pointer; font-family: 'Orbitron', sans-serif;
+      touch-action: manipulation;
+    }
+    .sw-replay-btn:active { opacity: 0.6; }
     body.sw-mode .card { background: transparent; box-shadow: none; }
 
     @keyframes saberFlicker {
@@ -311,7 +318,7 @@
       box-shadow: 0 8px 32px var(--shadow);
       width: 100%;
       max-width: 480px;
-      padding: 32px 28px 28px;
+      padding: 4px 28px 28px;
       transition: background 0.3s, box-shadow 0.3s;
       position: relative;
       z-index: 1;
@@ -1041,7 +1048,7 @@
     /* ══ APP HEADER (minimal) ══ */
     .app-header {
       display: flex; justify-content: flex-end; align-items: center;
-      padding: 10px 0 4px; margin-bottom: 0;
+      padding: 4px 0 4px; margin-bottom: 0;
     }
     .app-header-actions { display: flex; gap: 8px; align-items: center; }
 
@@ -2775,6 +2782,9 @@
         💪 Workout Completed
       </label>
     </div>
+    <div id="sw-replay-row" style="display:none;">
+      <button class="sw-replay-btn" onclick="playWorkoutIntroSequence(workoutDate)">▶ Replay Intro</button>
+    </div>
     <img id="yoda-lazy-img" src="/yoda-lazy.png" alt="" class="yoda-motivator" style="display:none;">
     <div id="yoda-quote" class="yoda-quote" style="display:none;">"Far too long since my last workout, it has been. To the needle I have turned, for another form of dopamine. In agony, I am"</div>
     <div id="yoda-swamp-bg" style="display:none;"></div>
@@ -3080,7 +3090,10 @@
     if (typeof renderNavBar === 'function') renderNavBar();
     if (typeof renderMoreDrawer === 'function') renderMoreDrawer();
     const wpEl = document.getElementById('workout-panel');
-    if (wpEl && wpEl.dataset.dateStr) updateYodaVisibility(wpEl.dataset.dateStr);
+    const panelWorkout = document.getElementById('panel-workout');
+    if (wpEl && wpEl.dataset.dateStr && panelWorkout && !panelWorkout.classList.contains('hidden')) {
+      updateYodaVisibility(wpEl.dataset.dateStr);
+    }
   }
 
   // ══ SW BACKGROUND SYSTEM ══════════════════════════════
@@ -4611,7 +4624,10 @@
     if (isSW && !done) {
       lazy.style.display  = 'none';
       if (quote) quote.style.display = 'none';
-      if (!_introRunning) playWorkoutIntroSequence(dateStr);
+      if (!_introRunning && lsGet('swIntroSeen', '') !== 'true') {
+        lsSet('swIntroSeen', 'true');
+        playWorkoutIntroSequence(dateStr);
+      }
       if (holo && !_holoIntroActive) holo.style.display = 'none';
       return;
     }
