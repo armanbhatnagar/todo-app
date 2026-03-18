@@ -6562,7 +6562,7 @@
 
   // ── Single fetch to Worker ──
   async function fetchEconFromWorker(forceRefresh) {
-    const url = ECON_API_URL + (forceRefresh ? '?refresh=true' : '');
+    const url = ECON_API_URL + (forceRefresh ? `?refresh=true&t=${Date.now()}` : '');
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('Worker error: ' + resp.status);
     return await resp.json();
@@ -6616,7 +6616,7 @@
   }
 
   function refreshEconData() {
-    try { localStorage.removeItem('econ_all'); } catch(e) {}
+    try { Object.keys(localStorage).filter(k => k.startsWith('econ_')).forEach(k => localStorage.removeItem(k)); } catch(e) {}
     const btn = document.getElementById('econ-refresh-btn');
     if (btn) { btn.classList.add('spinning'); setTimeout(() => btn.classList.remove('spinning'), 900); }
     renderEconLoading();
